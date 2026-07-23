@@ -6,12 +6,67 @@ import {
   readJson,
   sha256,
   stableStringify,
+  validateCanonicalSchema,
   validateDataset
 } from '../../tools/lib/canonical.mjs';
 
 test('candidate dataset is internally consistent', async () => {
   const dataset = await readJson(fixturePath);
+  assert.deepEqual(validateCanonicalSchema(dataset), []);
   assert.deepEqual(validateDataset(dataset), []);
+});
+
+test('JSON Schema validation rejects missing required assertion review state', async () => {
+  const dataset = await readJson(fixturePath);
+  const broken = structuredClone(dataset);
+  delete broken.assertions[0].review_status;
+
+  const errors = validateDataset(broken);
+  assert.ok(
+    errors.some((error) =>
+      error.includes(
+        "schema /assertions/0/review_status: must have required property 'review_status'"
+      )
+    )
+  );
+});
+
+test('JSON Schema validation enforces declared date-time formats', async () => {
+  const dataset = await readJson(fixturePath);
+  const broken = structuredClone(dataset);
+  broken.created_at = 'not-a-date';
+
+  const errors = validateDataset(broken);
+  assert.ok(
+    errors.some((error) =>
+      error.includes('schema /created_at: must match format "date-time"')
+    )
+  );
+});
+
+test('graph edges reject unresolved subject and object endpoints', async () => {
+  const dataset = await readJson(fixturePath);
+  const broken = structuredClone(dataset);
+  broken.edges[0].subject_id =
+    'RBTX:R:019f8f7d-ffff-7fff-8fff-ffffffffffff';
+  broken.edges[1].object_id =
+    'RBTX:E:019f8f7d-eeee-7eee-8eee-eeeeeeeeeeee';
+
+  const errors = validateDataset(broken);
+  assert.ok(
+    errors.some((error) =>
+      error.includes(
+        `edge ${broken.edges[0].edge_id}: missing subject ${broken.edges[0].subject_id}`
+      )
+    )
+  );
+  assert.ok(
+    errors.some((error) =>
+      error.includes(
+        `edge ${broken.edges[1].edge_id}: missing object ${broken.edges[1].object_id}`
+      )
+    )
+  );
 });
 
 test('publication snapshot is deterministic and hash-bound', async () => {

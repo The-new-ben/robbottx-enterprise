@@ -1,7 +1,10 @@
 import crypto from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 
 export const repositoryRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -33,6 +36,23 @@ export const packagedSnapshotPath = path.join(
   'publication',
   'golden-slice.v0.php'
 );
+
+export const canonicalSchemaPath = path.join(
+  repositoryRoot,
+  'packages',
+  'contracts',
+  'schema',
+  'canonical-slice.schema.json'
+);
+
+const canonicalSchema = JSON.parse(readFileSync(canonicalSchemaPath, 'utf8'));
+const schemaValidator = new Ajv2020({
+  allErrors: true,
+  allowUnionTypes: true,
+  strict: true
+});
+addFormats(schemaValidator);
+const validateSchema = schemaValidator.compile(canonicalSchema);
 
 const typedIdPatterns = {
   entity: /^RBTX:E:[0-9a-f-]{36}$/,
@@ -151,6 +171,37 @@ const publicCompatibilityDetails = {
   }
 };
 
+function jsonPointerSegment(value) {
+  return String(value).replaceAll('~', '~0').replaceAll('/', '~1');
+}
+
+function schemaErrorLocation(error) {
+  const property =
+    error.keyword === 'required'
+      ? error.params.missingProperty
+      : error.keyword === 'additionalProperties'
+        ? error.params.additionalProperty
+        : null;
+  const base = error.instancePath || '';
+
+  if (property) {
+    return `${base}/${jsonPointerSegment(property)}`;
+  }
+
+  return base || '/';
+}
+
+export function validateCanonicalSchema(dataset) {
+  if (validateSchema(dataset)) {
+    return [];
+  }
+
+  return (validateSchema.errors ?? []).map(
+    (error) =>
+      `schema ${schemaErrorLocation(error)}: ${error.message ?? error.keyword}`
+  );
+}
+
 export function stableValue(value) {
   if (Array.isArray(value)) {
     return value.map(stableValue);
@@ -201,8 +252,12 @@ function uniqueIndex(records, key, errors, context) {
 }
 
 export function validateDataset(dataset) {
-  const errors = [];
+  const schemaErrors = validateCanonicalSchema(dataset);
+  if (schemaErrors.length > 0) {
+    return schemaErrors;
+  }
 
+  const errors = [];
   assert(dataset.schema_version === '0.1.0', 'schema_version must be 0.1.0', errors);
   validateTypedId(dataset.dataset_id, 'snapshot', errors, 'dataset');
   assert(['candidate', 'approved', 'superseded', 'withdrawn'].includes(dataset.dataset_status), 'invalid dataset_status', errors);
@@ -218,8 +273,8 @@ export function validateDataset(dataset) {
   const entityIndex = uniqueIndex(dataset.entities, 'entity_id', errors, 'entities');
   const revisionIndex = uniqueIndex(dataset.revisions, 'revision_id', errors, 'revisions');
   const evidenceIndex = uniqueIndex(dataset.evidence, 'evidence_id', errors, 'evidence');
-  uniqueIndex(dataset.assertions, 'assertion_id', errors, 'assertions');
-  uniqueIndex(dataset.edges, 'edge_id', errors, 'edges');
+  const assertionIndex = uniqueIndex(dataset.assertions, 'assertion_id', errors, 'assertions');
+  const edgeIndex = uniqueIndex(dataset.edges, 'edge_id', errors, 'edges');
 
   for (const entity of dataset.entities) {
     validateTypedId(entity.entity_id, 'entity', errors, 'entity');
@@ -259,8 +314,36 @@ export function validateDataset(dataset) {
     assert(assertion.conditions !== undefined, `assertion ${assertion.assertion_id}: conditions required`, errors);
   }
 
+  const graphNodeIds = new Set([
+    ...entityIndex.keys(),
+    ...revisionIndex.keys(),
+    ...evidenceIndex.keys(),
+    ...assertionIndex.keys(),
+    ...edgeIndex.keys(),
+    dataset.configuration.configuration_id,
+    dataset.bom.bom_id,
+    dataset.compatibility.assessment_id,
+    ...dataset.compatibility.rules.map(({ rule_id: ruleId }) => ruleId),
+    ...dataset.offers
+      .map(({ offer_id: offerId }) => offerId)
+      .filter((offerId) => typeof offerId === 'string'),
+    ...dataset.assets_3d
+      .map(({ asset_id: assetId }) => assetId)
+      .filter((assetId) => typeof assetId === 'string')
+  ]);
+
   for (const edge of dataset.edges) {
     validateTypedId(edge.edge_id, 'edge', errors, 'edge');
+    assert(
+      graphNodeIds.has(edge.subject_id),
+      `edge ${edge.edge_id}: missing subject ${edge.subject_id}`,
+      errors
+    );
+    assert(
+      graphNodeIds.has(edge.object_id),
+      `edge ${edge.edge_id}: missing object ${edge.object_id}`,
+      errors
+    );
     assert(edge.evidence_ids.length > 0, `edge ${edge.edge_id}: evidence required`, errors);
     for (const evidenceId of edge.evidence_ids) {
       assert(evidenceIndex.has(evidenceId), `edge ${edge.edge_id}: missing evidence ${evidenceId}`, errors);

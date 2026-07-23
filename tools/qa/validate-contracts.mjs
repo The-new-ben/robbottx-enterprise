@@ -1,24 +1,15 @@
-import path from 'node:path';
 import {
   buildSnapshot,
+  canonicalSchemaPath,
   fixturePath,
   readJson,
-  repositoryRoot,
   sha256,
   snapshotPath,
   stableStringify,
   validateDataset
 } from '../lib/canonical.mjs';
 
-const schema = await readJson(
-  path.join(
-    repositoryRoot,
-    'packages',
-    'contracts',
-    'schema',
-    'canonical-slice.schema.json'
-  )
-);
+const schema = await readJson(canonicalSchemaPath);
 const dataset = await readJson(fixturePath);
 const storedSnapshot = await readJson(snapshotPath);
 
