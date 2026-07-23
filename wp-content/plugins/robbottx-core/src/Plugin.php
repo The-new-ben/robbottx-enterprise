@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RobbottX\Core;
 
+use RobbottX\Core\Discovery\PublicDiscovery;
 use RobbottX\Core\Presentation\Assets;
 use RobbottX\Core\Presentation\Blocks;
 use RobbottX\Core\Presentation\Seo;
@@ -18,6 +19,7 @@ final class Plugin
 {
     public function boot(): void
     {
+        PublicDiscovery::boot();
         Seo::boot();
         add_action('wp_enqueue_scripts', array(Assets::class, 'enqueue'));
         add_action('wp', array(Assets::class, 'prepareFrontPage'));
