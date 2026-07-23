@@ -7,6 +7,9 @@
 - `build-robbottx`: enforces evidence, hierarchy, graph, compatibility,
   WordPress boundaries, multilingual readiness, SEO discipline, QA, receipts,
   and truthful completion.
+- `robbottx-public-language`: defines the public audience, established-platform
+  voice, progressive disclosure, technical state vocabulary, claim boundaries,
+  and release rejection rules for all customer-facing language.
 
 ## WordPress execution skills
 
@@ -16,6 +19,9 @@
   parts, patterns, and fallback behavior.
 - `wp-plugin-development`: controls plugin structure, lifecycle, validation,
   data boundaries, and additive migrations.
+- `wordpress-agent-deploy`: controls deterministic packages, exact public
+  artifacts, temporary capability-gated deployment routes, independent
+  verification, cache handling, cleanup, and emergency recovery.
 
 ## Browser and visual skills
 

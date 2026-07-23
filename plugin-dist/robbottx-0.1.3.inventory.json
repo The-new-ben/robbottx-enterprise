@@ -1,0 +1,93 @@
+{
+  "artifact": "robbottx-0.1.3.zip",
+  "files": [
+    {
+      "bytes": 171,
+      "path": "robbottx/ASSET-LICENSES.json",
+      "sha256": "f98ddb57588d32d6593ee8d357491098685439805ec33df7c7f7d0a464e71e02"
+    },
+    {
+      "bytes": 721,
+      "path": "robbottx/functions.php",
+      "sha256": "2ed625f9a2469b4603d9ba861e34227517674e2efbf422b9ba19f2e7d060b5de"
+    },
+    {
+      "bytes": 880,
+      "path": "robbottx/parts/footer.html",
+      "sha256": "ac8e8273812f3f29475283a32f304ee4f70a865c1dd9879b27525f91c91e39c7"
+    },
+    {
+      "bytes": 670,
+      "path": "robbottx/parts/header.html",
+      "sha256": "7ae27068eb8f52e6051c60066fff0c080ef9e98437b6f3a94400f129a8628208"
+    },
+    {
+      "bytes": 1696,
+      "path": "robbottx/patterns/home-methodology.php",
+      "sha256": "dc00245f00077abbead436b4f5dd1e707e084ab5e668a51513532682c53396a4"
+    },
+    {
+      "bytes": 4142,
+      "path": "robbottx/patterns/home-precision-atlas.php",
+      "sha256": "b869216c97c64ddf9b1532b4cfe1807a7ce6c8597c8fd5d840813f3aedc32a04"
+    },
+    {
+      "bytes": 281,
+      "path": "robbottx/readme.txt",
+      "sha256": "0bbbedfd75ae680481aee76dcda4e5237d4689c2330e0828975e5da63b1efa5f"
+    },
+    {
+      "bytes": 23203,
+      "path": "robbottx/style.css",
+      "sha256": "a0a9bb50233a6d917792158f64d214e0a5eba65f3c012b0ea184ca55b2943381"
+    },
+    {
+      "bytes": 664,
+      "path": "robbottx/templates/404.html",
+      "sha256": "c616ed85beb4c686a3d9d8e0d46a6fd5c811a403e804ff8c09d33dcef0d34cf8"
+    },
+    {
+      "bytes": 498,
+      "path": "robbottx/templates/front-page.html",
+      "sha256": "cdce88f0f9bd3ba452ceb32e7a0c8da268b426752ed9cf028fb74a2cb6faafeb"
+    },
+    {
+      "bytes": 944,
+      "path": "robbottx/templates/index.html",
+      "sha256": "3c539d41a27a2abaeabeb5faefccb6281c7faf0da9c520d57d18d91be1fb2b04"
+    },
+    {
+      "bytes": 444,
+      "path": "robbottx/templates/page.html",
+      "sha256": "868e7dbb8509e9bfb7191b249d0e5aa884e2de24b199f243e9ddf92af5c2e83b"
+    },
+    {
+      "bytes": 1038,
+      "path": "robbottx/templates/search.html",
+      "sha256": "6ec4cd5ea5affd8955ed607602c22c746a7f626ea6f2db1c8d6f86de02a930b6"
+    },
+    {
+      "bytes": 496,
+      "path": "robbottx/templates/single-rbtx_config.html",
+      "sha256": "9a66dbaa9919f10e1984f065ee5530b54d7e89ef72767c8b36a2d437963189dc"
+    },
+    {
+      "bytes": 444,
+      "path": "robbottx/templates/single-rbtx_entity.html",
+      "sha256": "868e7dbb8509e9bfb7191b249d0e5aa884e2de24b199f243e9ddf92af5c2e83b"
+    },
+    {
+      "bytes": 467,
+      "path": "robbottx/templates/single.html",
+      "sha256": "103a3ca30a920699a8849e0a7587ff39226ead6985b06aeff125b03badda5044"
+    },
+    {
+      "bytes": 3174,
+      "path": "robbottx/theme.json",
+      "sha256": "42316ca7fd8b85955b3b3d00d0ed2546cb2a6d9d3b388616327b0572989b2475"
+    }
+  ],
+  "version": "0.1.3",
+  "zip_bytes": 13950,
+  "zip_sha256": "1e9d2a5827eb5f65b3a45670a3bc3da463fed3863a99c607579ea8dbcfa02d30"
+}

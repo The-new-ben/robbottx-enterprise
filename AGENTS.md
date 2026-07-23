@@ -35,6 +35,11 @@ vertical slice.
   database.
 - Do not create mass indexable pages before identity, evidence, canonical,
   quality, sitemap, and faceted-navigation gates exist.
+- Do not expose internal project, prompt, agent, publication, snapshot,
+  projection, candidate, release, or pipeline language on public pages.
+- Do not make the public site sound like a beta, launch log, roadmap, research
+  exercise, or unfinished project.
+- Do not use em dashes or formulaic generated filler in customer-facing copy.
 
 ## Architecture
 
@@ -44,7 +49,7 @@ vertical slice.
 - Assertion-level provenance and confidence.
 - Versioned typed graph edges, BOMs, rules, and compatibility results.
 - Rebuildable WordPress, search, graph, vector, feed, and 3D projections.
-- English public launch first; source ingestion supports `en`, `zh-Hans`,
+- English public interface first; source ingestion supports `en`, `zh-Hans`,
   `zh-Hant`, `ja`, `ko`, and `de` from the beginning.
 
 ## Definition of done

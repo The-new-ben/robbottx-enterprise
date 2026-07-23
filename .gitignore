@@ -1,8 +1,10 @@
 /.artifacts/
+/.playwright-cli/
 /.cache/
 /dist/
 /node_modules/
 /vendor/
+__pycache__/
 /.wp-env/
 /.DS_Store
 Thumbs.db

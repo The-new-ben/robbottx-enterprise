@@ -3,17 +3,16 @@ Contributors: robbottx
 Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPLv2 or later
 
-Projection-only publishing gates and evidence components for RobbottX.
+Source-backed robotics records and compatibility views for RobbottX.
 
 == Description ==
 
-Registers the minimal public projection types, integrity-checks deterministic
-publication snapshots, renders the golden-slice evidence component, blocks
-canonical publication when required snapshot metadata is absent, exposes a
-public version healthcheck, and provides a guarded update-manifest fallback.
+Provides RobbottX robotics record types, manufacturer-published specifications,
+compatibility conditions, technical document references, record-integrity
+checks, a public status endpoint, and a guarded update-manifest connection.
 
-This plugin does not import the retired catalog, perform remote ingestion,
-create engineering source-of-truth tables, delete data, or modify commerce.
+Compatibility, certification, stock, price, warranty, and regional availability
+are shown only when the applicable record contains supporting information.

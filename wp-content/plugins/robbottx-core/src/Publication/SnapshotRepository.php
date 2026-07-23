@@ -16,18 +16,13 @@ final class SnapshotRepository
             . DIRECTORY_SEPARATOR
             . 'publication'
             . DIRECTORY_SEPARATOR
-            . 'golden-slice.v0.json';
+            . 'golden-slice.v0.php';
 
         if (! is_readable($filePath)) {
             throw new \RuntimeException('Publication snapshot is missing.');
         }
 
-        $raw = file_get_contents($filePath);
-        if ($raw === false) {
-            throw new \RuntimeException('Publication snapshot cannot be read.');
-        }
-
-        $snapshot = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        $snapshot = require $filePath;
         if (! is_array($snapshot) || ! isset($snapshot['payload'])) {
             throw new \UnexpectedValueException('Publication snapshot is malformed.');
         }

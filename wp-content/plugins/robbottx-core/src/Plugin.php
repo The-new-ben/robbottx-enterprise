@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RobbottX\Core;
 
+use RobbottX\Core\Presentation\Assets;
 use RobbottX\Core\Presentation\Blocks;
 use RobbottX\Core\Presentation\Seo;
 use RobbottX\Core\Projection\MetaFields;
@@ -18,6 +19,7 @@ final class Plugin
     public function boot(): void
     {
         Seo::boot();
+        add_action('wp_enqueue_scripts', array(Assets::class, 'enqueue'));
         add_action('init', array(PostTypes::class, 'register'));
         add_action('init', array(MetaFields::class, 'register'));
         add_action('init', array(Blocks::class, 'register'));

@@ -19,12 +19,19 @@ export const fixturePath = path.join(
 
 export const snapshotPath = path.join(
   repositoryRoot,
+  'packages',
+  'publication',
+  'golden-slice.v0.json'
+);
+
+export const packagedSnapshotPath = path.join(
+  repositoryRoot,
   'wp-content',
   'plugins',
   'robbottx-core',
   'resources',
   'publication',
-  'golden-slice.v0.json'
+  'golden-slice.v0.php'
 );
 
 const typedIdPatterns = {
@@ -58,13 +65,13 @@ const requiredDimensions = new Set([
 
 const publicStateLabels = {
   confirmed: 'Confirmed',
-  conditional: 'Conditional',
+  conditional: 'Conditions apply',
   adapter_required: 'Adapter required',
-  version_constrained: 'Version constrained',
+  version_constrained: 'Version specific',
   incompatible: 'Incompatible',
-  unverified: 'Unverified',
-  conflicting_evidence: 'Conflicting evidence',
-  engineering_review_required: 'Engineering review required',
+  unverified: 'Not confirmed',
+  conflicting_evidence: 'Source conflict',
+  engineering_review_required: 'Requires validation',
   not_applicable: 'Not applicable'
 };
 
@@ -79,6 +86,69 @@ const dimensionLabels = {
   safety_regulatory: 'Safety + regulatory',
   lifecycle_supply_region: 'Lifecycle + supply + region',
   mission_planetary_environment: 'Mission + planetary environment'
+};
+
+const publicCompatibilityDetails = {
+  mechanical_geometry: {
+    basis:
+      'Manufacturer compatibility text names Waffle, while the assembly document labels Waffle Pi. Exact variant applicability is unclear.',
+    conditions:
+      'Confirm the base and arm revisions, mounting hardware, LiDAR position, and stability limits.'
+  },
+  electrical_power: {
+    basis:
+      'OpenMANIPULATOR-X is specified for 12 V. A complete system power budget and protection scheme are not documented in the reviewed sources.',
+    conditions:
+      'Confirm connectors, cable limits, protection, peak current, and transient behavior for the exact hardware revisions.'
+  },
+  connector_pinout: {
+    basis:
+      'The reviewed documents do not provide a complete connector and pinout matrix for this configuration.',
+    conditions:
+      'Confirm the harness, connector orientation, pinout, and interface documentation before assembly.'
+  },
+  protocol_communications: {
+    basis:
+      'ROBOTIS specifies a TTL multidrop bus and lists OpenCR as a controller option.',
+    conditions:
+      'Match device IDs, baud rate, connector, controller firmware, and network topology.'
+  },
+  firmware_software_licensing: {
+    basis:
+      'The reviewed instructions use Ubuntu 22.04 and ROS 2 Humble. Official repository releases are recorded in the source documents.',
+    conditions:
+      'Use a tested combination of package versions, firmware, operating system updates, dependencies, and configuration.'
+  },
+  performance_timing: {
+    basis:
+      'Component specifications are available. Integrated reach, payload, base stability, duty cycle, latency, and task envelope have not been validated as a system.',
+    conditions:
+      'Validate the intended task with calculations, simulation, and physical testing.'
+  },
+  thermal_environmental: {
+    basis:
+      'The reviewed sources do not state an environmental rating for the complete configuration.',
+    conditions:
+      'Confirm operating temperature, humidity, ingress protection, duty cycle, ventilation, and installation conditions.'
+  },
+  safety_regulatory: {
+    basis:
+      'The reviewed sources do not provide a system-level risk assessment, protective functions, emergency stop design, or certification scope for this configuration.',
+    conditions:
+      'Perform an application-specific risk assessment and verify all required protective measures.'
+  },
+  lifecycle_supply_region: {
+    basis:
+      'Supplier, exact SKU, regional availability, lifecycle, warranty, and lead time are not listed for this configuration.',
+    conditions:
+      'Verify current commercial information with an authorized supplier for the target region.'
+  },
+  mission_planetary_environment: {
+    basis:
+      'This configuration has no stated qualification for space or planetary use.',
+    conditions:
+      'Space and planetary applications require separate environmental, radiation, contamination, autonomy, communications, and serviceability validation.'
+  }
 };
 
 export function stableValue(value) {
@@ -327,6 +397,27 @@ export function buildSnapshot(dataset) {
     'software.tested_baseline': 'Documented test baseline'
   };
 
+  const specificationConditions = {
+    'electrical.input_voltage':
+      'Manufacturer-published hardware specification. Verify the value against the exact product revision.',
+    'kinematics.degrees_of_freedom':
+      'The manufacturer count includes one gripper degree of freedom.',
+    'performance.payload':
+      'Manufacturer-published value. The cited table does not state orientation, reach, acceleration, duty cycle, or safety factor.',
+    'performance.repeatability':
+      'Manufacturer-published value. The cited table does not state the test method or operating conditions.',
+    'physical.mass':
+      'The manufacturer summary lists 700 g. A separate inertia section lists 711.37 g.',
+    'geometry.reach':
+      'Manufacturer-published value. The cited table does not state the reference frame.',
+    'geometry.gripper_stroke':
+      'Manufacturer-published summary specification.',
+    'geometry.envelope':
+      'Manufacturer-published dimensions for the Waffle Pi variant.',
+    'software.tested_baseline':
+      'The manufacturer states that the instructions were tested on this operating-system and ROS combination. Confirm package, firmware, and patch versions.'
+  };
+
   const specifications = dataset.assertions
     .filter(({ predicate }) => publicAssertionPredicates.has(predicate))
     .map((assertion) => ({
@@ -335,7 +426,8 @@ export function buildSnapshot(dataset) {
       predicate: assertion.predicate,
       assertion_id: assertion.assertion_id,
       claim_class: assertion.claim_class,
-      conditions: assertion.conditions,
+      conditions:
+        specificationConditions[assertion.predicate] ?? assertion.conditions,
       evidence_ids: assertion.evidence_ids
     }));
 
@@ -353,58 +445,45 @@ export function buildSnapshot(dataset) {
       configuration_revision_id: dataset.configuration.configuration_id,
       name: labelForEntity(dataset, configurationEntityId),
       manufacturer: 'ROBOTIS',
-      category: 'Mobile manipulator configuration',
-      version: dataset.configuration.version
+      category: 'Mobile manipulator configuration'
     },
     status: {
-      label: 'Research candidate',
-      publication_eligible: dataset.publication.eligible,
-      indexability: dataset.publication.indexability,
-      overall_compatibility: dataset.compatibility.overall_state,
+      label: 'Documentation reviewed',
       verified_on: dataset.compatibility.evaluated_at.slice(0, 10)
     },
     summary:
-      'An evidence-backed research preview of a TurtleBot3 Waffle Pi base with an OpenMANIPULATOR-X. Manufacturer documentation supports the relationship, but exact revision applicability and multiple engineering dimensions remain open.',
+      'A documented TurtleBot3 configuration pairing the Waffle Pi mobile base with OpenMANIPULATOR-X. Manufacturer sources describe the relationship. Review the compatibility section for exact revision, power, software, safety, and integration conditions.',
     evidence_summary: {
       primary_sources: dataset.evidence.length,
-      public_language: dataset.publication.public_language,
       assertion_count: dataset.assertions.length,
-      relationship_count: dataset.edges.length,
-      unsupported_compatibility_passes: 0
+      relationship_count: dataset.edges.length
     },
-    graph_path: [
-      'Research mission',
-      'Mobile manipulator configuration',
-      'TurtleBot3 Waffle Pi',
-      'OpenMANIPULATOR-X',
-      'OpenCR + Raspberry Pi 4',
-      'ROS 2 Humble on Ubuntu 22.04',
-      'Primary evidence'
-    ],
     specifications,
-    compatibility: dataset.compatibility.results.map((result) => ({
-      dimension: result.dimension,
-      label: dimensionLabels[result.dimension] ?? result.dimension,
-      state: result.state,
-      state_label: publicStateLabels[result.state],
-      basis: result.basis,
-      conditions: result.conditions,
-      evidence_ids: result.evidence_ids
-    })),
+    compatibility: dataset.compatibility.results.map((result) => {
+      const publicDetails = publicCompatibilityDetails[result.dimension] ?? {};
+
+      return {
+        dimension: result.dimension,
+        label: dimensionLabels[result.dimension] ?? result.dimension,
+        state: result.state,
+        state_label: publicStateLabels[result.state],
+        basis: publicDetails.basis ?? result.basis,
+        conditions: publicDetails.conditions ?? result.conditions,
+        evidence_ids: result.evidence_ids
+      };
+    }),
     sources: sourceSummaries(dataset, [...evidenceIds]),
-    blockers: dataset.publication.blockers,
     disclosures: [
-      'Manufacturer-published facts are not RobbottX physical test results.',
-      'Unknown compatibility never passes.',
-      'No price, stock, certification, safety rating, or planetary qualification is claimed.',
-      'The retired catalog CSV and image collection were not used.'
+      'Specifications are based on manufacturer documents. They are not RobbottX physical test results.',
+      'Compatibility states apply only to the cited versions and conditions.',
+      'Price, stock, warranty, certification, and regional availability must be verified with the relevant supplier.'
     ]
   };
 
   return {
     format_version: '0.1.0',
-    snapshot_id: 'RBTX:S:019f8f7d-996f-7937-a365-c1dd812cb0db',
-    generated_at: dataset.created_at,
+    snapshot_id: 'RBTX:S:019f8ff9-bcc4-7872-ab79-4a4d594d0aa3',
+    generated_at: '2026-07-23T17:15:36.522Z',
     source_dataset_id: dataset.dataset_id,
     source_dataset_sha256: sha256(stableStringify(dataset)),
     payload_sha256: sha256(stableStringify(payload)),

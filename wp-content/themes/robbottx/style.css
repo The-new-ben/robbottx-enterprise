@@ -3,11 +3,11 @@ Theme Name: RobbottX Precision Atlas
 Theme URI: https://robbottx.com/
 Author: RobbottX
 Author URI: https://robbottx.com/
-Description: Original static block-theme chrome for the evidence-backed RobbottX robotics atlas.
+Description: RobbottX catalog theme for robotics systems, configurations, compatibility records, and technical documents.
 Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 8.3
-Version: 0.1.2
+Version: 0.1.3
 License: GPL-2.0-or-later
 Text Domain: robbottx
 */
@@ -515,6 +515,7 @@ summary:focus-visible {
 
 .rbtx-intents,
 .rbtx-golden-slice,
+.rbtx-featured-configuration,
 .rbtx-methodology,
 .rbtx-content-shell {
   margin-left: auto;
@@ -534,8 +535,7 @@ summary:focus-visible {
 }
 
 .rbtx-section-heading h2,
-.rbtx-subheading h3,
-.rbtx-release-gate h3 {
+.rbtx-subheading h3 {
   font-family: Georgia, "Times New Roman", serif;
   letter-spacing: -0.05em;
   line-height: 1.02;
@@ -607,7 +607,8 @@ summary:focus-visible {
   margin-top: 24px;
 }
 
-.rbtx-golden-slice {
+.rbtx-golden-slice,
+.rbtx-featured-configuration {
   padding: 112px 0;
 }
 
@@ -788,13 +789,11 @@ summary:focus-visible {
 }
 
 .rbtx-compatibility,
-.rbtx-sources,
-.rbtx-release-gate {
+.rbtx-sources {
   margin-top: 96px;
 }
 
-.rbtx-subheading h3,
-.rbtx-release-gate h3 {
+.rbtx-subheading h3 {
   font-size: clamp(2rem, 4vw, 4rem);
   max-width: 13ch;
 }
@@ -925,47 +924,6 @@ summary:focus-visible {
   color: #607075;
   font-family: var(--rbtx-mono);
   font-size: 0.68rem;
-}
-
-.rbtx-release-gate {
-  background: var(--rbtx-amber-soft);
-  border: 1px solid rgba(177, 112, 20, 0.2);
-  border-radius: var(--rbtx-radius-lg);
-  display: grid;
-  gap: 60px;
-  grid-template-columns: 0.72fr 1.28fr;
-  padding: clamp(34px, 5vw, 64px);
-}
-
-.rbtx-release-gate ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.rbtx-release-gate li {
-  border-top: 1px solid rgba(119, 76, 14, 0.22);
-  padding: 14px 0;
-}
-
-.rbtx-release-gate li:first-child {
-  border-top: 0;
-}
-
-.rbtx-release-gate strong {
-  display: block;
-  font-family: var(--rbtx-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.rbtx-release-gate span {
-  color: #694b21;
-  display: block;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  margin-top: 5px;
 }
 
 .rbtx-disclosures {
@@ -1112,7 +1070,7 @@ summary:focus-visible {
   line-height: 1.7;
 }
 
-.rbtx-snapshot-error {
+.rbtx-record-error {
   background: #fbe1e1;
   border: 1px solid #cf7777;
   border-radius: var(--rbtx-radius-sm);
@@ -1175,7 +1133,6 @@ summary:focus-visible {
   .rbtx-hero-trust,
   .rbtx-slice-grid,
   .rbtx-methodology,
-  .rbtx-release-gate,
   .rbtx-footer-inner {
     grid-template-columns: 1fr;
   }
@@ -1272,6 +1229,7 @@ summary:focus-visible {
 
   .rbtx-intents,
   .rbtx-golden-slice,
+  .rbtx-featured-configuration,
   .rbtx-methodology {
     padding: 82px 0;
   }
@@ -1297,8 +1255,7 @@ summary:focus-visible {
     border-bottom: 0;
   }
 
-  .rbtx-panel,
-  .rbtx-release-gate {
+  .rbtx-panel {
     padding: 28px 22px;
   }
 

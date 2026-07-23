@@ -6,7 +6,7 @@ namespace RobbottX\Core\Presentation;
 
 final class Seo
 {
-    private const HOME_DESCRIPTION = 'RobbottX is the evidence-backed robotics atlas for tracing systems, components, software, compatibility, sources, and procurement states.';
+    private const HOME_DESCRIPTION = 'Explore robotics systems, components, software, compatibility records, and technical documents with RobbottX.';
 
     private static bool $rankMathDescriptionHandled = false;
     private static bool $rankMathJsonLdHandled = false;
@@ -99,7 +99,7 @@ final class Seo
         $name    = (string) get_bloginfo('name');
         $tagline = (string) get_bloginfo('description');
         $language = (string) get_bloginfo('language');
-        $pageName = trim($name . ($tagline !== '' ? ' — ' . $tagline : ''));
+        $pageName = trim($name . ($tagline !== '' ? ': ' . $tagline : ''));
 
         return array(
             'WebSite' => array(

@@ -5,23 +5,39 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import re
 import sys
 from pathlib import Path, PurePosixPath
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 
-EXCLUDED_PARTS = {
-    ".git",
-    ".github",
-    ".idea",
-    ".vscode",
-    "node_modules",
-    "tests",
-    "vendor-bin",
+ALLOWED_APPLICATION_FILES = {
+    "blocks/golden-slice/block.json",
+    "blocks/golden-slice/render.php",
+    "readme.txt",
+    "resources/publication/golden-slice.v0.php",
+    "robbottx-core.php",
+    "src/Lifecycle.php",
+    "src/Plugin.php",
+    "src/Presentation/Assets.php",
+    "src/Presentation/Blocks.php",
+    "src/Presentation/GoldenSliceRenderer.php",
+    "src/Presentation/Seo.php",
+    "src/Projection/MetaFields.php",
+    "src/Projection/PostTypes.php",
+    "src/Projection/PublicationGate.php",
+    "src/Publication/SnapshotRepository.php",
+    "src/Rest/HealthController.php",
+    "src/Updates/UpdateChecker.php",
+    "uninstall.php",
+    "views/golden-slice.php",
 }
-EXCLUDED_SUFFIXES = {".map", ".log", ".sql", ".sqlite", ".pem", ".key", ".p12"}
-SECRET_NAMES = {".env", "credentials.json", "cookies.txt"}
+VENDORED_PREFIX = "lib/plugin-update-checker/"
+VENDORED_FILE_COUNT = 117
+VENDORED_TREE_SHA256 = (
+    "209664c4a743fa59e27cfbb8707d54a200e9a89dc4ed55dad5aa3503ea5535ea"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -40,14 +56,58 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 
-def allowed(relative: Path) -> bool:
-    if any(part in EXCLUDED_PARTS for part in relative.parts):
-        return False
-    if relative.name.lower() in SECRET_NAMES:
-        return False
-    if relative.suffix.lower() in EXCLUDED_SUFFIXES:
-        return False
-    return True
+def tree_digest(root: Path, files: list[Path]) -> str:
+    digest = hashlib.sha256()
+    for file_path in sorted(
+        files,
+        key=lambda path: path.relative_to(root).as_posix(),
+    ):
+        relative = file_path.relative_to(root).as_posix()
+        file_digest = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(file_digest.encode("ascii"))
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def collect_allowed_files(plugin_dir: Path) -> list[Path]:
+    files = sorted(
+        (path for path in plugin_dir.rglob("*") if path.is_file()),
+        key=lambda path: path.relative_to(plugin_dir).as_posix(),
+    )
+    application_files: set[str] = set()
+    vendored_files: list[Path] = []
+    unexpected: list[str] = []
+
+    for file_path in files:
+        relative = file_path.relative_to(plugin_dir).as_posix()
+        if relative.startswith(VENDORED_PREFIX):
+            vendored_files.append(file_path)
+        elif relative in ALLOWED_APPLICATION_FILES:
+            application_files.add(relative)
+        else:
+            unexpected.append(relative)
+
+    missing = sorted(ALLOWED_APPLICATION_FILES - application_files)
+    if unexpected:
+        fail(
+            "Unexpected plugin package files:\n- "
+            + "\n- ".join(unexpected)
+        )
+    if missing:
+        fail(
+            "Required plugin package files are missing:\n- "
+            + "\n- ".join(missing)
+        )
+    if len(vendored_files) != VENDORED_FILE_COUNT:
+        fail("Vendored dependency file count does not match its pinned inventory.")
+
+    vendor_root = plugin_dir / VENDORED_PREFIX.rstrip("/")
+    if tree_digest(vendor_root, vendored_files) != VENDORED_TREE_SHA256:
+        fail("Vendored dependency inventory or checksums changed.")
+
+    return files
 
 
 def assert_version(main_text: str, version: str, constant: str) -> None:
@@ -86,14 +146,7 @@ def main() -> int:
     main_text = main_file.read_text(encoding="utf-8")
     assert_version(main_text, args.version, args.version_constant)
 
-    files = sorted(
-        (
-            path
-            for path in plugin_dir.rglob("*")
-            if path.is_file() and allowed(path.relative_to(plugin_dir))
-        ),
-        key=lambda path: path.relative_to(plugin_dir).as_posix(),
-    )
+    files = collect_allowed_files(plugin_dir)
     if not files:
         fail("No package files found.")
 
@@ -133,6 +186,29 @@ def main() -> int:
             fail("ZIP integrity test failed.")
         packaged_main = archive.read(f"{args.slug}/{args.main_file}").decode("utf-8")
         assert_version(packaged_main, args.version, args.version_constant)
+
+    inventory = {
+        "artifact": output.name,
+        "version": args.version,
+        "zip_bytes": output.stat().st_size,
+        "zip_sha256": digest,
+        "files": [
+            {
+                "path": (
+                    PurePosixPath(args.slug)
+                    / PurePosixPath(file_path.relative_to(plugin_dir).as_posix())
+                ).as_posix(),
+                "bytes": file_path.stat().st_size,
+                "sha256": hashlib.sha256(file_path.read_bytes()).hexdigest(),
+            }
+            for file_path in files
+        ],
+    }
+    inventory_path = args.output_dir / f"{args.slug}-{args.version}.inventory.json"
+    inventory_path.write_text(
+        json.dumps(inventory, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
     print(f"{output}\t{output.stat().st_size}\t{digest}")
     return 0

@@ -31,22 +31,33 @@ final class HealthController
             $snapshot = (new SnapshotRepository())->loadGoldenSlice();
         } catch (\Throwable $exception) {
             return new WP_Error(
-                'robbottx_snapshot_unhealthy',
+                'robbottx_record_unavailable',
                 __(
-                    'The RobbottX publication snapshot failed integrity verification.',
+                    'The RobbottX catalog record is temporarily unavailable.',
                     'robbottx-core'
                 ),
                 array('status' => 503)
             );
         }
 
+        $payload  = is_array($snapshot['payload'] ?? null)
+            ? $snapshot['payload']
+            : array();
+        $identity = is_array($payload['identity'] ?? null)
+            ? $payload['identity']
+            : array();
+        $status   = is_array($payload['status'] ?? null)
+            ? $payload['status']
+            : array();
+
         return rest_ensure_response(
             array(
-                'status'           => 'ok',
-                'version'          => ROBBOTTX_CORE_VERSION,
-                'snapshot_id'      => (string) ($snapshot['snapshot_id'] ?? ''),
-                'snapshot_hash'    => (string) ($snapshot['payload_sha256'] ?? ''),
-                'projection_state' => (string) ($snapshot['projection_state'] ?? ''),
+                'status'        => 'ok',
+                'version'       => ROBBOTTX_CORE_VERSION,
+                'record_id'     => (string) ($identity['canonical_id'] ?? ''),
+                'record_hash'   => (string) ($snapshot['payload_sha256'] ?? ''),
+                'record_state'  => 'documentation_reviewed',
+                'last_reviewed' => (string) ($status['verified_on'] ?? ''),
             )
         );
     }
@@ -69,16 +80,20 @@ final class HealthController
                     'type'     => 'string',
                     'readonly' => true,
                 ),
-                'snapshot_id' => array(
+                'record_id' => array(
                     'type'     => 'string',
                     'readonly' => true,
                 ),
-                'snapshot_hash' => array(
+                'record_hash' => array(
                     'type'     => 'string',
                     'pattern'  => '^[0-9a-f]{64}$',
                     'readonly' => true,
                 ),
-                'projection_state' => array(
+                'record_state' => array(
+                    'type'     => 'string',
+                    'readonly' => true,
+                ),
+                'last_reviewed' => array(
                     'type'     => 'string',
                     'readonly' => true,
                 ),

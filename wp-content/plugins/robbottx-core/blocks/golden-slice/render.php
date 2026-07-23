@@ -14,9 +14,9 @@ try {
     echo GoldenSliceRenderer::render($snapshot); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 } catch (Throwable $exception) {
     if (current_user_can('manage_options')) {
-        echo '<p class="rbtx-snapshot-error">';
+        echo '<p class="rbtx-record-error">';
         echo esc_html__(
-            'The RobbottX evidence preview is unavailable because its integrity check failed.',
+            'The RobbottX record is unavailable because its integrity check failed.',
             'robbottx-core'
         );
         echo '</p>';

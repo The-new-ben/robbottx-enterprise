@@ -2,8 +2,8 @@
 Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 8.3
-Version: 0.1.2
+Version: 0.1.3
 License: GPLv2 or later
 
-Original static block-theme chrome for RobbottX. Dynamic enterprise behavior
-and evolving presentation belong in the versioned RobbottX Core plugin.
+RobbottX block theme for catalog navigation, system configurations, technical
+records, compatibility sections, and manufacturer document references.

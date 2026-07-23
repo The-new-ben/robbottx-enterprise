@@ -11,11 +11,14 @@
     "build": "npm run build:snapshot && npm run build:preview",
     "build:snapshot": "node tools/build-publication-snapshot.mjs",
     "build:preview": "node tools/build-preview.mjs",
+    "deploy:theme": "python scripts/deploy-wordpress-theme.py",
     "test": "node --test tests/js/*.test.mjs",
+    "test:python": "python -m unittest discover -s tests/python -p \"test_*.py\"",
     "validate:contracts": "node tools/qa/validate-contracts.mjs",
     "validate:forbidden": "node tools/qa/validate-forbidden-inputs.mjs",
+    "validate:language": "node tools/qa/validate-public-language.mjs",
     "validate:theme": "node tools/qa/validate-theme.mjs",
     "validate:php": "node tools/qa/php-lint.mjs",
-    "qa": "npm run build && npm run validate:contracts && npm run validate:forbidden && npm run validate:theme && npm run validate:php && npm test"
+    "qa": "npm run build && npm run validate:contracts && npm run validate:forbidden && npm run validate:language && npm run validate:theme && npm run validate:php && npm run test:python && npm test"
   }
 }

@@ -18,16 +18,15 @@ $evidence      = is_array($payload['evidence_summary'] ?? null) ? $payload['evid
 $specifications = is_array($payload['specifications'] ?? null) ? $payload['specifications'] : array();
 $compatibility = is_array($payload['compatibility'] ?? null) ? $payload['compatibility'] : array();
 $sources       = is_array($payload['sources'] ?? null) ? $payload['sources'] : array();
-$blockers      = is_array($payload['blockers'] ?? null) ? $payload['blockers'] : array();
 $disclosures   = is_array($payload['disclosures'] ?? null) ? $payload['disclosures'] : array();
 ?>
-<section class="rbtx-golden-slice" id="golden-slice" aria-labelledby="rbtx-golden-slice-title">
+<section class="rbtx-featured-configuration" id="featured-configuration" aria-labelledby="rbtx-featured-configuration-title">
     <div class="rbtx-section-heading">
         <div>
-            <p class="rbtx-eyebrow"><?php esc_html_e('Golden vertical slice 01', 'robbottx-core'); ?></p>
-            <h2 id="rbtx-golden-slice-title"><?php echo esc_html((string) ($identity['name'] ?? '')); ?></h2>
+            <p class="rbtx-eyebrow"><?php esc_html_e('Featured system configuration', 'robbottx-core'); ?></p>
+            <h2 id="rbtx-featured-configuration-title"><?php echo esc_html((string) ($identity['name'] ?? '')); ?></h2>
         </div>
-        <span class="rbtx-status rbtx-status--candidate">
+        <span class="rbtx-status rbtx-status--documented">
             <span aria-hidden="true"></span>
             <?php echo esc_html((string) ($status['label'] ?? '')); ?>
         </span>
@@ -37,23 +36,23 @@ $disclosures   = is_array($payload['disclosures'] ?? null) ? $payload['disclosur
 
     <dl class="rbtx-evidence-ribbon" aria-label="<?php esc_attr_e('Evidence summary', 'robbottx-core'); ?>">
         <div>
-            <dt><?php esc_html_e('Canonical ID', 'robbottx-core'); ?></dt>
+            <dt><?php esc_html_e('RobbottX record ID', 'robbottx-core'); ?></dt>
             <dd><code><?php echo esc_html((string) ($identity['canonical_id'] ?? '')); ?></code></dd>
         </div>
         <div>
-            <dt><?php esc_html_e('Primary sources', 'robbottx-core'); ?></dt>
+            <dt><?php esc_html_e('Source documents', 'robbottx-core'); ?></dt>
             <dd><?php echo esc_html((string) ($evidence['primary_sources'] ?? '0')); ?></dd>
         </div>
         <div>
-            <dt><?php esc_html_e('Assertions', 'robbottx-core'); ?></dt>
+            <dt><?php esc_html_e('Sourced technical claims', 'robbottx-core'); ?></dt>
             <dd><?php echo esc_html((string) ($evidence['assertion_count'] ?? '0')); ?></dd>
         </div>
         <div>
-            <dt><?php esc_html_e('Unsupported passes', 'robbottx-core'); ?></dt>
-            <dd><?php echo esc_html((string) ($evidence['unsupported_compatibility_passes'] ?? '0')); ?></dd>
+            <dt><?php esc_html_e('System relationships', 'robbottx-core'); ?></dt>
+            <dd><?php echo esc_html((string) ($evidence['relationship_count'] ?? '0')); ?></dd>
         </div>
         <div>
-            <dt><?php esc_html_e('Reviewed', 'robbottx-core'); ?></dt>
+            <dt><?php esc_html_e('Last reviewed', 'robbottx-core'); ?></dt>
             <dd><time datetime="<?php echo esc_attr((string) ($status['verified_on'] ?? '')); ?>"><?php echo esc_html((string) ($status['verified_on'] ?? '')); ?></time></dd>
         </div>
     </dl>
@@ -70,25 +69,25 @@ $disclosures   = is_array($payload['disclosures'] ?? null) ? $payload['disclosur
                 <?php endforeach; ?>
             </dl>
             <p class="rbtx-caption">
-                <?php esc_html_e('Each value retains its conditions, claim class, assertion ID, and source references in the snapshot.', 'robbottx-core'); ?>
+                <?php esc_html_e('Values are normalized for comparison. Review the source documents and compatibility conditions below.', 'robbottx-core'); ?>
             </p>
         </div>
 
         <div class="rbtx-panel rbtx-panel--dark">
-            <p class="rbtx-panel-kicker"><?php esc_html_e('Why this is not a green check', 'robbottx-core'); ?></p>
-            <h3><?php esc_html_e('Evidence supports the relationship. Engineering closure does not yet.', 'robbottx-core'); ?></h3>
-            <p><?php esc_html_e('The official text names Waffle while its assembly section names Waffle Pi. Exact revisions, power, pinout, stability, safety, asset rights, and physical validation remain open.', 'robbottx-core'); ?></p>
+            <p class="rbtx-panel-kicker"><?php esc_html_e('Compatibility notes', 'robbottx-core'); ?></p>
+            <h3><?php esc_html_e('Confirm the exact Waffle variant before integration.', 'robbottx-core'); ?></h3>
+            <p><?php esc_html_e('Manufacturer compatibility text names Waffle, while its assembly documentation names Waffle Pi. Check exact revisions, mounting hardware, power, pinout, stability, and safety for the intended application.', 'robbottx-core'); ?></p>
             <div class="rbtx-verdict">
-                <span><?php esc_html_e('Overall', 'robbottx-core'); ?></span>
-                <strong><?php esc_html_e('Engineering review required', 'robbottx-core'); ?></strong>
+                <span><?php esc_html_e('Configuration status', 'robbottx-core'); ?></span>
+                <strong><?php esc_html_e('Requires application validation', 'robbottx-core'); ?></strong>
             </div>
         </div>
     </div>
 
     <div class="rbtx-compatibility" id="verify">
         <div class="rbtx-subheading">
-            <p class="rbtx-eyebrow"><?php esc_html_e('Compatibility is multidimensional', 'robbottx-core'); ?></p>
-            <h3><?php esc_html_e('Ten questions. No hidden unknowns.', 'robbottx-core'); ?></h3>
+            <p class="rbtx-eyebrow"><?php esc_html_e('Compatibility', 'robbottx-core'); ?></p>
+            <h3><?php esc_html_e('Compatibility across 10 technical areas.', 'robbottx-core'); ?></h3>
         </div>
         <div class="rbtx-compatibility-grid">
             <?php foreach ($compatibility as $result) : ?>
@@ -107,8 +106,8 @@ $disclosures   = is_array($payload['disclosures'] ?? null) ? $payload['disclosur
 
     <div class="rbtx-sources" id="methodology">
         <div class="rbtx-subheading">
-            <p class="rbtx-eyebrow"><?php esc_html_e('Evidence, not decoration', 'robbottx-core'); ?></p>
-            <h3><?php esc_html_e('Every consequential statement can be traced.', 'robbottx-core'); ?></h3>
+            <p class="rbtx-eyebrow"><?php esc_html_e('Technical documents and sources', 'robbottx-core'); ?></p>
+            <h3><?php esc_html_e('Manufacturer sources for this configuration.', 'robbottx-core'); ?></h3>
         </div>
         <ol class="rbtx-source-list">
             <?php foreach ($sources as $source) : ?>
@@ -122,21 +121,6 @@ $disclosures   = is_array($payload['disclosures'] ?? null) ? $payload['disclosur
                 </li>
             <?php endforeach; ?>
         </ol>
-    </div>
-
-    <div class="rbtx-release-gate">
-        <div>
-            <p class="rbtx-eyebrow"><?php esc_html_e('Publication gate', 'robbottx-core'); ?></p>
-            <h3><?php echo esc_html(count($blockers)); ?> <?php esc_html_e('open items are visible, not buried.', 'robbottx-core'); ?></h3>
-        </div>
-        <ul>
-            <?php foreach ($blockers as $blocker) : ?>
-                <li>
-                    <strong><?php echo esc_html(str_replace('_', ' ', (string) ($blocker['code'] ?? ''))); ?></strong>
-                    <span><?php echo esc_html((string) ($blocker['description'] ?? '')); ?></span>
-                </li>
-            <?php endforeach; ?>
-        </ul>
     </div>
 
     <ul class="rbtx-disclosures" aria-label="<?php esc_attr_e('Important disclosures', 'robbottx-core'); ?>">
