@@ -18,6 +18,7 @@ ALLOWED_APPLICATION_FILES = {
     "readme.txt",
     "resources/publication/golden-slice.v0.php",
     "robbottx-core.php",
+    "src/Discovery/PublicDiscovery.php",
     "src/Lifecycle.php",
     "src/Plugin.php",
     "src/Presentation/Assets.php",

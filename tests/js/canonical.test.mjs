@@ -44,6 +44,27 @@ test('JSON Schema validation enforces declared date-time formats', async () => {
   );
 });
 
+test('JSON Schema validation rejects unknown fields and invalid evidence URIs', async () => {
+  const dataset = await readJson(fixturePath);
+  const broken = structuredClone(dataset);
+  broken.entities[0].unreviewed_field = true;
+  broken.evidence[0].url = 'not a URI';
+
+  const errors = validateDataset(broken);
+  assert.ok(
+    errors.some((error) =>
+      error.includes(
+        'schema /entities/0/unreviewed_field: must NOT have additional properties'
+      )
+    )
+  );
+  assert.ok(
+    errors.some((error) =>
+      error.includes('schema /evidence/0/url: must match format "uri"')
+    )
+  );
+});
+
 test('graph edges reject unresolved subject and object endpoints', async () => {
   const dataset = await readJson(fixturePath);
   const broken = structuredClone(dataset);

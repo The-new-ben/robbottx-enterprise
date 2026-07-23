@@ -38,21 +38,21 @@ test('plugin version header, constant, manifest, and block agree', async () => {
     path.join(
       repositoryRoot,
       'plugin-dist',
-      'robbottx-core-0.1.4.inventory.json'
+      'robbottx-core-0.1.5.inventory.json'
     )
   );
   const snapshot = await readJson(snapshotPath);
 
-  assert.match(plugin, /\* Version:\s+0\.1\.4/);
-  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.4'\)/);
-  assert.equal(block.version, '0.1.4');
-  assert.equal(manifest.version, '0.1.4');
-  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.4.zip'));
+  assert.match(plugin, /\* Version:\s+0\.1\.5/);
+  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.5'\)/);
+  assert.equal(block.version, '0.1.5');
+  assert.equal(manifest.version, '0.1.5');
+  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.5.zip'));
   assert.equal(manifest.download_sha256, inventory.zip_sha256);
   assert.equal(manifest.download_size, inventory.zip_bytes);
   assert.ok(
     manifest.inventory_url.endsWith(
-      'robbottx-core-0.1.4.inventory.json'
+      'robbottx-core-0.1.5.inventory.json'
     )
   );
   assert.equal(manifest.record_hash, snapshot.payload_sha256);

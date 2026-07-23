@@ -10,6 +10,22 @@
 - Added local contract, forbidden-input, theme, PHP, snapshot, and preview
   verification.
 
+## 0.1.5
+
+- Added complete JSON Schema 2020-12 execution before the canonical
+  cross-record and publication invariants.
+- Added deterministic schema diagnostics for missing fields, unknown fields,
+  invalid dates, invalid timestamps, and invalid source URIs.
+- Added graph endpoint referential integrity and subject/object mutation tests.
+- Added reversible public-discovery controls for inherited robot records,
+  sample content, default taxonomy, and author surfaces.
+- Preserved administration, editorial access, RobbottX record types,
+  WooCommerce products, commerce pages, media, and external navigation.
+- Added collection and direct-record REST controls with resource-specific
+  editorial access.
+- Added matching WordPress and Rank Math robots directives plus a 169-assertion
+  PHP behavior harness.
+
 ## 0.1.4
 
 - Increased muted small-text contrast with a measured accessibility margin.

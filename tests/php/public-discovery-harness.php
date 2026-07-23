@@ -11,6 +11,20 @@ $GLOBALS['rbtx_request']    = array();
 $GLOBALS['rbtx_assertions'] = 0;
 $GLOBALS['rbtx_post_lookups'] = 0;
 $GLOBALS['rbtx_term_lookups'] = 0;
+$GLOBALS['rbtx_caps'] = array();
+
+final class WP_Error
+{
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __construct(
+        public string $code,
+        public string $message,
+        public array $data = array()
+    ) {
+    }
+}
 
 function add_filter(
     string $hook,
@@ -39,9 +53,22 @@ function is_admin(): bool
     return $GLOBALS['rbtx_admin'];
 }
 
-function current_user_can(string $capability): bool
+function current_user_can(string $capability, mixed ...$arguments): bool
 {
-    return $capability === 'edit_others_posts' && $GLOBALS['rbtx_can_edit'];
+    if ($capability === 'edit_others_posts') {
+        return $GLOBALS['rbtx_can_edit'];
+    }
+
+    $key = $capability;
+
+    if ($arguments !== array()) {
+        $key .= ':' . implode(
+            ',',
+            array_map('strval', $arguments)
+        );
+    }
+
+    return in_array($key, $GLOBALS['rbtx_caps'], true);
 }
 
 function get_page_by_path(
@@ -235,6 +262,25 @@ final class DiscoveryQuery
     }
 }
 
+final class DiscoveryRequest
+{
+    public function __construct(
+        private string $route,
+        private string $method = 'GET'
+    ) {
+    }
+
+    public function get_route(): string
+    {
+        return $this->route;
+    }
+
+    public function get_method(): string
+    {
+        return $this->method;
+    }
+}
+
 require dirname(__DIR__, 2)
     . '/wp-content/plugins/robbottx-core/src/Discovery/PublicDiscovery.php';
 
@@ -257,6 +303,7 @@ $expectedHooks = array(
     'rest_term_search_query',
     'rest_category_query',
     'rest_user_query',
+    'rest_pre_dispatch',
     'wp_list_pages_excludes',
     'widget_posts_args',
     'widget_categories_args',
@@ -278,6 +325,11 @@ expectSame(
     3,
     $GLOBALS['rbtx_hooks']['wp_get_nav_menu_items']['accepted_args'],
     'navigation filter accepts the full core signature'
+);
+expectSame(
+    3,
+    $GLOBALS['rbtx_hooks']['rest_pre_dispatch']['accepted_args'],
+    'REST detail gate accepts the full core signature'
 );
 
 $postTypes = PublicDiscovery::filterSitemapPostTypes(
@@ -368,6 +420,10 @@ expect(
 expect(
     in_array('product', $searchVariables['post_type'], true),
     'public search preserves products'
+);
+expect(
+    in_array('attachment', $searchVariables['post_type'], true),
+    'public search does not hide media outside the policy scope'
 );
 expectSame(
     array(101, 201, 202),
@@ -555,6 +611,109 @@ expectSame(
     $restSearch['post__not_in'],
     'public machine search excludes default content'
 );
+$defaultRestSearch = PublicDiscovery::filterRestPostSearchQuery(array(), null);
+expect(
+    in_array('attachment', $defaultRestSearch['post_type'], true),
+    'public machine search does not hide media outside the policy scope'
+);
+
+foreach (
+    array(
+        '/wp/v2/robot/77',
+        '/wp/v2/robot/77/',
+        '/wp/v2/posts/101',
+        '/wp/v2/pages/201',
+        '/wp/v2/pages/202',
+        '/wp/v2/categories/301',
+        '/wp/v2/users/1',
+    ) as $route
+) {
+    $detail = PublicDiscovery::filterRestDetailResponse(
+        'continue',
+        null,
+        new DiscoveryRequest($route)
+    );
+    expect(
+        $detail instanceof WP_Error,
+        "{$route} public detail is hidden"
+    );
+    expectSame(
+        404,
+        $detail->data['status'] ?? null,
+        "{$route} public detail returns 404"
+    );
+}
+
+foreach (
+    array(
+        '/wp/v2/posts/500',
+        '/wp/v2/pages/700',
+        '/wp/v2/categories/500',
+        '/wp/v2/users/me',
+        '/wp/v2/products/55',
+    ) as $route
+) {
+    expectSame(
+        'continue',
+        PublicDiscovery::filterRestDetailResponse(
+            'continue',
+            null,
+            new DiscoveryRequest($route)
+        ),
+        "{$route} remains outside the detail policy"
+    );
+}
+
+expect(
+    PublicDiscovery::filterRestDetailResponse(
+        'continue',
+        null,
+        new DiscoveryRequest('/wp/v2/robot/77', 'HEAD')
+    ) instanceof WP_Error,
+    'retired record HEAD detail is hidden'
+);
+expectSame(
+    'continue',
+    PublicDiscovery::filterRestDetailResponse(
+        'continue',
+        null,
+        new DiscoveryRequest('/wp/v2/robot/77', 'POST')
+    ),
+    'write requests continue to WordPress capability checks'
+);
+
+foreach (
+    array(
+        array('/wp/v2/robot/77', 'edit_post:77', 'list_users'),
+        array('/wp/v2/posts/101', 'edit_post:101', 'manage_categories'),
+        array('/wp/v2/pages/201', 'edit_post:201', 'list_users'),
+        array('/wp/v2/pages/202', 'edit_post:202', 'manage_categories'),
+        array('/wp/v2/categories/301', 'manage_categories', 'list_users'),
+        array('/wp/v2/users/1', 'list_users', 'manage_categories'),
+    ) as [$route, $requiredCapability, $unrelatedCapability]
+) {
+    $GLOBALS['rbtx_caps'] = array($requiredCapability);
+    expectSame(
+        'continue',
+        PublicDiscovery::filterRestDetailResponse(
+            'continue',
+            null,
+            new DiscoveryRequest($route)
+        ),
+        "{$route} preserves resource-specific editorial access"
+    );
+
+    $GLOBALS['rbtx_caps'] = array($unrelatedCapability);
+    expect(
+        PublicDiscovery::filterRestDetailResponse(
+            'continue',
+            null,
+            new DiscoveryRequest($route)
+        ) instanceof WP_Error,
+        "{$route} rejects an unrelated editorial capability"
+    );
+}
+$GLOBALS['rbtx_caps'] = array();
 
 $restRobot = PublicDiscovery::filterRestRobotQuery(array(), null);
 expectSame(

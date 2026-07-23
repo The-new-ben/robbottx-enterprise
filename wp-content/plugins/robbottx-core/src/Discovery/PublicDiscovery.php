@@ -100,6 +100,12 @@ final class PublicDiscovery
             10,
             2
         );
+        add_filter(
+            'rest_pre_dispatch',
+            array(self::class, 'filterRestDetailResponse'),
+            10,
+            3
+        );
 
         add_filter(
             'wp_list_pages_excludes',
@@ -256,6 +262,51 @@ final class PublicDiscovery
         $robots['follow']  = 'follow';
 
         return $robots;
+    }
+
+    public static function filterRestDetailResponse(
+        mixed $result,
+        mixed $server,
+        mixed $request
+    ): mixed {
+        if (
+            ! is_object($request)
+            || ! method_exists($request, 'get_method')
+            || ! method_exists($request, 'get_route')
+        ) {
+            return $result;
+        }
+
+        $method = strtoupper((string) $request->get_method());
+
+        if (! in_array($method, array('GET', 'HEAD'), true)) {
+            return $result;
+        }
+
+        $route = rtrim((string) $request->get_route(), '/');
+
+        if (
+            preg_match(
+                '#^/wp/v2/(robot|posts|pages|categories|users)/([0-9]+)$#',
+                $route,
+                $matches
+            ) !== 1
+        ) {
+            return $result;
+        }
+
+        $resource = $matches[1];
+        $resourceId = (int) $matches[2];
+
+        if (! self::isBlockedRestDetail($resource, $resourceId)) {
+            return $result;
+        }
+
+        return new \WP_Error(
+            'rest_not_found',
+            'Not found.',
+            array('status' => 404)
+        );
     }
 
     /**
@@ -529,6 +580,39 @@ final class PublicDiscovery
         return current_user_can('edit_others_posts');
     }
 
+    private static function isBlockedRestDetail(
+        string $resource,
+        int $resourceId
+    ): bool {
+        if ($resource === self::RETIRED_POST_TYPE) {
+            return ! current_user_can('edit_post', $resourceId);
+        }
+
+        if ($resource === 'posts') {
+            return in_array(
+                $resourceId,
+                self::contentIdsForPostType('post'),
+                true
+            ) && ! current_user_can('edit_post', $resourceId);
+        }
+
+        if ($resource === 'pages') {
+            return in_array(
+                $resourceId,
+                self::contentIdsForPostType('page'),
+                true
+            ) && ! current_user_can('edit_post', $resourceId);
+        }
+
+        if ($resource === 'categories') {
+            return $resourceId === self::excludedCategoryId()
+                && ! current_user_can('manage_categories');
+        }
+
+        return $resource === 'users'
+            && ! current_user_can('list_users');
+    }
+
     private static function queryFlag(object $query, string $method): bool
     {
         return method_exists($query, $method) && (bool) $query->{$method}();
@@ -640,7 +724,7 @@ final class PublicDiscovery
         return array_values(
             array_diff(
                 array_map('strval', (array) $postTypes),
-                array(self::RETIRED_POST_TYPE, 'attachment')
+                array(self::RETIRED_POST_TYPE)
             )
         );
     }
