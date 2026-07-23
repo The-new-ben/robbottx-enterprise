@@ -38,21 +38,21 @@ test('plugin version header, constant, manifest, and block agree', async () => {
     path.join(
       repositoryRoot,
       'plugin-dist',
-      'robbottx-core-0.1.3.inventory.json'
+      'robbottx-core-0.1.4.inventory.json'
     )
   );
   const snapshot = await readJson(snapshotPath);
 
-  assert.match(plugin, /\* Version:\s+0\.1\.3/);
-  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.3'\)/);
-  assert.equal(block.version, '0.1.3');
-  assert.equal(manifest.version, '0.1.3');
-  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.3.zip'));
+  assert.match(plugin, /\* Version:\s+0\.1\.4/);
+  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.4'\)/);
+  assert.equal(block.version, '0.1.4');
+  assert.equal(manifest.version, '0.1.4');
+  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.4.zip'));
   assert.equal(manifest.download_sha256, inventory.zip_sha256);
   assert.equal(manifest.download_size, inventory.zip_bytes);
   assert.ok(
     manifest.inventory_url.endsWith(
-      'robbottx-core-0.1.3.inventory.json'
+      'robbottx-core-0.1.4.inventory.json'
     )
   );
   assert.equal(manifest.record_hash, snapshot.payload_sha256);
@@ -133,6 +133,23 @@ test('homepage SEO is deterministic and evidence-conservative', async () => {
   assert.ok(seo.includes("'@type'       => 'WebSite'"));
   assert.ok(seo.includes("'@type'       => 'WebPage'"));
   assert.ok(!seo.includes("'@type'       => 'Organization'"));
+  for (const socialTag of [
+    'og:title',
+    'og:type',
+    'og:url',
+    'og:description',
+    'og:site_name',
+    'og:locale',
+    'twitter:card',
+    'twitter:title',
+    'twitter:description'
+  ]) {
+    assert.ok(seo.includes(socialTag));
+  }
+  assert.ok(seo.includes('$rankMathFacebookHandled'));
+  assert.ok(seo.includes('$rankMathTwitterHandled'));
+  assert.ok(seo.includes("'summary'"));
+  assert.ok(!seo.includes('summary_large_image'));
   assert.ok(!seo.includes(' — '));
 });
 
@@ -155,6 +172,78 @@ test('dynamic engineering identifiers wrap on narrow viewports', async () => {
   assert.ok(assets.includes('ROBBOTTX_CORE_VERSION'));
 });
 
+test('homepage asset discipline preserves every commerce context', async () => {
+  const assets = await fs.readFile(
+    path.join(
+      repositoryRoot,
+      'wp-content',
+      'plugins',
+      'robbottx-core',
+      'src',
+      'Presentation',
+      'Assets.php'
+    ),
+    'utf8'
+  );
+  const plugin = await fs.readFile(
+    path.join(
+      repositoryRoot,
+      'wp-content',
+      'plugins',
+      'robbottx-core',
+      'src',
+      'Plugin.php'
+    ),
+    'utf8'
+  );
+
+  assert.ok(plugin.includes("'dequeueUnusedFrontPageAssets'"));
+  assert.ok(plugin.includes('PHP_INT_MAX'));
+  assert.ok(assets.includes('is_admin()'));
+  assert.ok(assets.includes('is_front_page()'));
+  for (const conditional of [
+    'is_woocommerce',
+    'is_shop',
+    'is_product',
+    'is_product_taxonomy',
+    'is_cart',
+    'is_checkout',
+    'is_account_page',
+    'is_wc_endpoint_url'
+  ]) {
+    assert.ok(assets.includes(`'${conditional}'`));
+  }
+  for (const handle of [
+    'searchandfilter',
+    'woocommerce-layout',
+    'woocommerce-smallscreen',
+    'woocommerce-general',
+    'woocommerce-blocktheme',
+    'woocommerce-inline',
+    'brands-styles',
+    'wc-blocks-style',
+    'site-reviews',
+    'wc-add-to-cart',
+    'woocommerce',
+    'sourcebuster-js',
+    'wc-order-attribution'
+  ]) {
+    assert.ok(assets.includes(`'${handle}'`));
+  }
+  assert.ok(assets.includes('wp_dequeue_style'));
+  assert.ok(assets.includes('wp_dequeue_script'));
+  assert.ok(!assets.includes('wp_deregister_'));
+  for (const sharedHandle of [
+    "'jquery'",
+    "'jquery-core'",
+    "'jquery-migrate'",
+    "'jquery-blockui'",
+    "'js-cookie'"
+  ]) {
+    assert.ok(!assets.includes(sharedHandle));
+  }
+});
+
 test('theme language release preserves the previous container during deployment', async () => {
   const style = await fs.readFile(
     path.join(
@@ -167,9 +256,43 @@ test('theme language release preserves the previous container during deployment'
     'utf8'
   );
 
-  assert.ok(style.includes('Version: 0.1.3'));
+  assert.ok(style.includes('Version: 0.1.4'));
   assert.ok(style.includes('.rbtx-golden-slice'));
   assert.ok(style.includes('.rbtx-featured-configuration'));
+});
+
+test('theme ships an original cache-versioned favicon with guarded output', async () => {
+  const themeRoot = path.join(
+    repositoryRoot,
+    'wp-content',
+    'themes',
+    'robbottx'
+  );
+  const functions = await fs.readFile(
+    path.join(themeRoot, 'functions.php'),
+    'utf8'
+  );
+  const favicon = await fs.readFile(
+    path.join(themeRoot, 'assets', 'favicon.svg'),
+    'utf8'
+  );
+  const receipt = await readJson(
+    path.join(themeRoot, 'ASSET-LICENSES.json')
+  );
+
+  assert.ok(functions.includes('has_site_icon()'));
+  assert.ok(functions.includes("get_theme_file_uri('assets/favicon.svg')"));
+  assert.ok(functions.includes('add_query_arg('));
+  assert.ok(functions.includes('rel="icon"'));
+  assert.match(favicon, /<svg\b/);
+  assert.ok(favicon.includes('#52e8d6'));
+  assert.ok(
+    !/<script\b|<foreignObject\b|(?:href|src)\s*=\s*["']https?:/i.test(
+      favicon
+    )
+  );
+  assert.equal(receipt.version, '0.1.4');
+  assert.equal(receipt.assets[0].path, 'assets/favicon.svg');
 });
 
 test('public configuration copy uses established catalog language', async () => {

@@ -28,7 +28,7 @@ npm run qa
 python scripts/build-plugin-zip.py \
   --plugin-dir wp-content/plugins/robbottx-core \
   --slug robbottx-core \
-  --version 0.1.3 \
+  --version <version> \
   --main-file robbottx-core.php \
   --version-constant ROBBOTTX_CORE_VERSION \
   --output-dir plugin-dist \
@@ -36,7 +36,7 @@ python scripts/build-plugin-zip.py \
 python scripts/build-theme-zip.py \
   --theme-dir wp-content/themes/robbottx \
   --slug robbottx \
-  --version 0.1.3 \
+  --version <version> \
   --output-dir plugin-dist
 ```
 

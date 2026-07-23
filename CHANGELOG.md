@@ -10,6 +10,17 @@
 - Added local contract, forbidden-input, theme, PHP, snapshot, and preview
   verification.
 
+## 0.1.4
+
+- Increased muted small-text contrast with a measured accessibility margin.
+- Added an original, cache-versioned favicon that matches the RobbottX
+  geometric brand mark.
+- Added deterministic homepage Open Graph metadata using the compact summary
+  card format.
+- Removed unused commerce, review, and filter assets from the catalog
+  homepage while preserving every commerce and account context.
+- Added automated condition-matrix checks for homepage asset discipline.
+
 ## 0.1.3
 
 - Added versioned plugin-owned responsive wrapping for long engineering model,

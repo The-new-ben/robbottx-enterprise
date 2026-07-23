@@ -20,6 +20,17 @@ final class Plugin
     {
         Seo::boot();
         add_action('wp_enqueue_scripts', array(Assets::class, 'enqueue'));
+        add_action('wp', array(Assets::class, 'prepareFrontPage'));
+        add_action(
+            'wp_enqueue_scripts',
+            array(Assets::class, 'dequeueUnusedFrontPageAssets'),
+            PHP_INT_MAX
+        );
+        add_action(
+            'wp_footer',
+            array(Assets::class, 'dequeueUnusedFrontPageAssets'),
+            1
+        );
         add_action('init', array(PostTypes::class, 'register'));
         add_action('init', array(MetaFields::class, 'register'));
         add_action('init', array(Blocks::class, 'register'));

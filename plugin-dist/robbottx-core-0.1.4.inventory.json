@@ -1,0 +1,688 @@
+{
+  "artifact": "robbottx-core-0.1.4.zip",
+  "files": [
+    {
+      "bytes": 464,
+      "path": "robbottx-core/blocks/golden-slice/block.json",
+      "sha256": "2424fe5b8673f500b0649c0dd95d77051f4104b01bb21a3bab4161a7b0c11c8d"
+    },
+    {
+      "bytes": 664,
+      "path": "robbottx-core/blocks/golden-slice/render.php",
+      "sha256": "863cebf111debee9b6df0f7c4c7ee350b7c93489a6cd4b1a0c658918031128dc"
+    },
+    {
+      "bytes": 191,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5/PucFactory.php",
+      "sha256": "50930940f86dbac434f1f7b028bb13dbbb23ab94d8f0e39d44d9a8516ee3ca91"
+    },
+    {
+      "bytes": 2688,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Autoloader.php",
+      "sha256": "9920351293199eabcdc5711a588ff6579addfece0773885c653e5214186bbd58"
+    },
+    {
+      "bytes": 6471,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/DebugBar/Extension.php",
+      "sha256": "c6a8f68e46868fef15675df8e1242c28fd3cba1753f7087bb2cf5d4773c4099f"
+    },
+    {
+      "bytes": 5895,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/DebugBar/Panel.php",
+      "sha256": "bb5cc11ee371fa0810858ce40597ad402c7c68ccc4fd57eb52ef96d15865d5e6"
+    },
+    {
+      "bytes": 1230,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/DebugBar/PluginExtension.php",
+      "sha256": "0fcb47f0c80a25cda64ab32b03ba23f2a53deb644ad889cb7683103d644dc71f"
+    },
+    {
+      "bytes": 1205,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/DebugBar/PluginPanel.php",
+      "sha256": "5ff9fb5f392176d5036efb7ba1574c57f70e2bccfc23230d34918d7778d3de6c"
+    },
+    {
+      "bytes": 573,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/DebugBar/ThemePanel.php",
+      "sha256": "f0c9e5b2fa142ad70c4edde92a462dda95693309cb7fa14259ff508e2448a9a5"
+    },
+    {
+      "bytes": 2937,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/InstalledPackage.php",
+      "sha256": "96db8898ef3f7f2339923e0fe7e5c19d6d6c35db4708e255b759376e888f29c3"
+    },
+    {
+      "bytes": 4239,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Metadata.php",
+      "sha256": "e7bd6b5adcd0ba3c86085cdc62a32a9852d3f072c3d2c078bc37de2bbcdae48a"
+    },
+    {
+      "bytes": 3065,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/OAuthSignature.php",
+      "sha256": "3edf0d6778c912bda64092e093af454fb61739e389c92af24aefa06cee41adb8"
+    },
+    {
+      "bytes": 5547,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Plugin/Package.php",
+      "sha256": "286dde8e7b5bc3585114d4cbd27c89bfe5dd8a486c33ae1bc0a2a2a9ea10ce0a"
+    },
+    {
+      "bytes": 3837,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Plugin/PluginInfo.php",
+      "sha256": "3c7e7475c5a2ebe7dbf44dd329baa38a87e6ab32b5dcd578972dc79eeeaf5a51"
+    },
+    {
+      "bytes": 10420,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Plugin/Ui.php",
+      "sha256": "ea8932715b68f438f29e775431c1a92588bc8a19ba23a3f3afbfcdfddfc6a497"
+    },
+    {
+      "bytes": 3259,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Plugin/Update.php",
+      "sha256": "ad7cc90b06b7de49813bf37aa7ec8425c3e3d1e0d99aeae38e98d3e7b7c78474"
+    },
+    {
+      "bytes": 13355,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Plugin/UpdateChecker.php",
+      "sha256": "9942138a2073bea9db053090752662f1e5ccd6ae768bffd853a0d82a22ebc2c6"
+    },
+    {
+      "bytes": 11767,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/PucFactory.php",
+      "sha256": "db537d83b73b3a349efa3c4bf749f3c00d59072d49f5a879f2be0ea404e5d33f"
+    },
+    {
+      "bytes": 10867,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Scheduler.php",
+      "sha256": "e1a33efed518f0e238759b36450724aa09b9dee24641a7517a02c62d405b04e2"
+    },
+    {
+      "bytes": 4758,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/StateStore.php",
+      "sha256": "c5228b20ac4db840a8235c6c1bce323e2be829fed07962ac39b139006427f5ac"
+    },
+    {
+      "bytes": 1829,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Theme/Package.php",
+      "sha256": "d28ff0deea685af6cadbae8c3236c9355bac0d156dce506cbf861af6b8b52b7a"
+    },
+    {
+      "bytes": 2211,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Theme/Update.php",
+      "sha256": "831103152d1e6fe78540995f7e7a78622d65c21dd426f36089ef6427d07ddef7"
+    },
+    {
+      "bytes": 4678,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Theme/UpdateChecker.php",
+      "sha256": "6e98ea7cb39aa38a08c2ddba905814859e968630c6a61d6525e223fbcf75201c"
+    },
+    {
+      "bytes": 749,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Update.php",
+      "sha256": "ccf109e7779430db579b688469ea8f81e776b3f028a7965e0938fae2936cb76c"
+    },
+    {
+      "bytes": 36305,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/UpdateChecker.php",
+      "sha256": "7d031a02ca4f5bd9578af1eb269df9c075905ddab4ccf75141bdc9fb7a98c13a"
+    },
+    {
+      "bytes": 7048,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/UpgraderStatus.php",
+      "sha256": "f06f4b1eb47a2d7fead9239ec9c255b5ce10118b45d7ee18de6fe9eb30a82f14"
+    },
+    {
+      "bytes": 1895,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Utils.php",
+      "sha256": "acefd09f9d5c4532620533ab70e28ace5bcf10ccd6127dc47b136b905db1fc73"
+    },
+    {
+      "bytes": 9885,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/Api.php",
+      "sha256": "a47c1cbb13f02a70a7cd854f9a35fdd6bdaf621117734cea4a2add5ff6a0c417"
+    },
+    {
+      "bytes": 547,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/BaseChecker.php",
+      "sha256": "ec5be48c685e6323e3177a95a098503c486b9b203a675a1bb62e7b9bc7a446b0"
+    },
+    {
+      "bytes": 7354,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/BitBucketApi.php",
+      "sha256": "59df89347db9c803994d2fa18d655a8c78eec13e21a619eda083954e25ca862c"
+    },
+    {
+      "bytes": 13740,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/GitHubApi.php",
+      "sha256": "9bc6a56467c5d7e7e0cb4220f5bd7834330908b34d259473b5dc522c9261e6fd"
+    },
+    {
+      "bytes": 11721,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/GitLabApi.php",
+      "sha256": "731696f39f25fe438af9a935a3d5ad52677dc32117dbaeeecccfb21b3649027f"
+    },
+    {
+      "bytes": 9106,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/PluginUpdateChecker.php",
+      "sha256": "6a8fc54972dd4a4a06f99c4924916b48c2dce2f648e15f87fda61791ee1b8fdd"
+    },
+    {
+      "bytes": 1122,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/Reference.php",
+      "sha256": "15e672265371908c6563009132ce93d138a46d29c4aab8ebcc1263db854e8020"
+    },
+    {
+      "bytes": 2383,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/ReleaseAssetSupport.php",
+      "sha256": "428197aca98355f73740a6ed3809275048f1522b97216542e0202bf8b8e129f6"
+    },
+    {
+      "bytes": 3180,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/ReleaseFilteringFeature.php",
+      "sha256": "cb18508a0f357e71f23fa9aefe759d54678f269c51982a6d097972d9afb5c8b1"
+    },
+    {
+      "bytes": 2703,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/ThemeUpdateChecker.php",
+      "sha256": "e104c23fd54e882b54f33afa626f3bc362c9267dfbee4cdb63451a23255d8f5e"
+    },
+    {
+      "bytes": 1286,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/Vcs/VcsCheckerMethods.php",
+      "sha256": "7812b8c9a56afb6ebc91c7a681a9c20681279e69356f474254491b94efa77467"
+    },
+    {
+      "bytes": 2584,
+      "path": "robbottx-core/lib/plugin-update-checker/Puc/v5p6/WpCliCheckTrigger.php",
+      "sha256": "5bb8c4f0d406cf3cbfb5e3be53d4b55ec56e0cdf5d839abc7147f6c929e30269"
+    },
+    {
+      "bytes": 20818,
+      "path": "robbottx-core/lib/plugin-update-checker/README.md",
+      "sha256": "47124242bb42eea86bfd9dbf39da95280fbe31eabc4ece2de325f03e835d0bf3"
+    },
+    {
+      "bytes": 702,
+      "path": "robbottx-core/lib/plugin-update-checker/VENDOR-RECEIPT.md",
+      "sha256": "8d8e7470aff2aefd6a33602bf103b4f93bf184b98dd81fb4ff878ae14c315efb"
+    },
+    {
+      "bytes": 696,
+      "path": "robbottx-core/lib/plugin-update-checker/composer.json",
+      "sha256": "5e22ae3e1490223c0759a1b2b1386c4c1388c83564ba56758156613aeb7f3f41"
+    },
+    {
+      "bytes": 1264,
+      "path": "robbottx-core/lib/plugin-update-checker/css/puc-debug-bar.css",
+      "sha256": "1345dede012788c054ba9baf38a44661f613386c02fbaba304d3ca2c6902a2d8"
+    },
+    {
+      "bytes": 1740,
+      "path": "robbottx-core/lib/plugin-update-checker/js/debug-bar.js",
+      "sha256": "c9f56a0c782ede2d46bac3949722a55976fd6b32dc62facc21ce695ae475ec2f"
+    },
+    {
+      "bytes": 1186,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-ca.mo",
+      "sha256": "d3bdbf4488d742cf79d90387ac4b98bb165e1fc8d3218f191601e2d93f4205d1"
+    },
+    {
+      "bytes": 1525,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-ca.po",
+      "sha256": "f967523044964f3c47f1f5de5ae4b5d6ce4b80b60972a238367712bf4a7f26a8"
+    },
+    {
+      "bytes": 1077,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-cs_CZ.mo",
+      "sha256": "fdc548b5c9f66e3aa651db0e81b9a83b1d854d10596252f5c1fb4b9b61d46adc"
+    },
+    {
+      "bytes": 1449,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-cs_CZ.po",
+      "sha256": "db06bffba172b1a8225cc91b5119a0913ea0ffe2de998c3ce0770471e4ef5d8e"
+    },
+    {
+      "bytes": 1010,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-da_DK.mo",
+      "sha256": "cd1d3fddd8d247e535eb5d1995fe8cfd0efc5ba5de12758ce1d10bd822927103"
+    },
+    {
+      "bytes": 1282,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-da_DK.po",
+      "sha256": "5da591d57ec30288512ce3fd8d5cd80c9b385e2933b890359012a5cb1990b304"
+    },
+    {
+      "bytes": 980,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-de_DE.mo",
+      "sha256": "9d88faa650197369f6b7f557173153601ba06c7a1854447e1faac279c528deab"
+    },
+    {
+      "bytes": 1155,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-de_DE.po",
+      "sha256": "84e203e147a1c3c21a1ba4d29753f67f68f858ed39e9f5c19062e81fd112e20b"
+    },
+    {
+      "bytes": 1455,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-el.mo",
+      "sha256": "b5adcc075f62fc696ce65f2dc2b99f6d0c7543d90379edcc673f1828cb205ce3"
+    },
+    {
+      "bytes": 1774,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-el.po",
+      "sha256": "daa91746c4024db9fbfa4be69540db07a1c2b25b95a750363bdff93cf61cab01"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_AR.mo",
+      "sha256": "4c55f45bb89235d16cad0a0a0459934cd43cde050582dcd6a337a5b3c6c53d5b"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_AR.po",
+      "sha256": "1392638a265b7ae6251ee0566c718404e845a2804db55054905903238bd17668"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_CL.mo",
+      "sha256": "711f1650d04c7c6183234b441fa93202ddd501e509b16f951574e9078397742e"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_CL.po",
+      "sha256": "87aab037c765399675de8387c126519ff832c3dcb99e6b8d69520fbe4b5ab556"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_CO.mo",
+      "sha256": "711f1650d04c7c6183234b441fa93202ddd501e509b16f951574e9078397742e"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_CO.po",
+      "sha256": "87aab037c765399675de8387c126519ff832c3dcb99e6b8d69520fbe4b5ab556"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_CR.mo",
+      "sha256": "711f1650d04c7c6183234b441fa93202ddd501e509b16f951574e9078397742e"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_CR.po",
+      "sha256": "87aab037c765399675de8387c126519ff832c3dcb99e6b8d69520fbe4b5ab556"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_DO.mo",
+      "sha256": "711f1650d04c7c6183234b441fa93202ddd501e509b16f951574e9078397742e"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_DO.po",
+      "sha256": "87aab037c765399675de8387c126519ff832c3dcb99e6b8d69520fbe4b5ab556"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_ES.mo",
+      "sha256": "ed6e0c7cfe572ecde692b0b9c138ade7507b523615b6e619f5b09d50959a56e2"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_ES.po",
+      "sha256": "4318b42a98ad8257b2491380fb880f01a9b447c35f5c08bcc5bdadcc78483a75"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_GT.mo",
+      "sha256": "711f1650d04c7c6183234b441fa93202ddd501e509b16f951574e9078397742e"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_GT.po",
+      "sha256": "87aab037c765399675de8387c126519ff832c3dcb99e6b8d69520fbe4b5ab556"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_HN.mo",
+      "sha256": "711f1650d04c7c6183234b441fa93202ddd501e509b16f951574e9078397742e"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_HN.po",
+      "sha256": "87aab037c765399675de8387c126519ff832c3dcb99e6b8d69520fbe4b5ab556"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_MX.mo",
+      "sha256": "a78e4c663f87f1468ecbab77954b7d86184a6bbc5efb6b85e20031a0f239d3b9"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_MX.po",
+      "sha256": "3bc199e7845dcfdd38a19b26389a1f76b545598c9d7d19f46a966affa9cb913e"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_PE.mo",
+      "sha256": "39aa6a5b7f0439852f5bdd9773a361e69f79e4906605ee6af491e3e2cdfa686c"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_PE.po",
+      "sha256": "9cf55db53cb867f01dda5097b99fc25aafce1f34d45d07084db18af5a4aeec0f"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_PR.mo",
+      "sha256": "39aa6a5b7f0439852f5bdd9773a361e69f79e4906605ee6af491e3e2cdfa686c"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_PR.po",
+      "sha256": "9cf55db53cb867f01dda5097b99fc25aafce1f34d45d07084db18af5a4aeec0f"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_UY.mo",
+      "sha256": "39aa6a5b7f0439852f5bdd9773a361e69f79e4906605ee6af491e3e2cdfa686c"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_UY.po",
+      "sha256": "9cf55db53cb867f01dda5097b99fc25aafce1f34d45d07084db18af5a4aeec0f"
+    },
+    {
+      "bytes": 1140,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_VE.mo",
+      "sha256": "a78e4c663f87f1468ecbab77954b7d86184a6bbc5efb6b85e20031a0f239d3b9"
+    },
+    {
+      "bytes": 1518,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-es_VE.po",
+      "sha256": "3bc199e7845dcfdd38a19b26389a1f76b545598c9d7d19f46a966affa9cb913e"
+    },
+    {
+      "bytes": 1128,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-fa_IR.mo",
+      "sha256": "cd8d9c1c3acc03ee49a829c55fad4cb58585abfd86f18c7b23d3a37ab7366c47"
+    },
+    {
+      "bytes": 1303,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-fa_IR.po",
+      "sha256": "f83c259aa3674fc1d2d4dbd890fe12082d8d931d830c01619d42f55c7a5fa53b"
+    },
+    {
+      "bytes": 1208,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-fr_CA.mo",
+      "sha256": "79b918f71844e4738008b9e37d6465996407fbf4a2cff7edf9b5911c0cbe220e"
+    },
+    {
+      "bytes": 1552,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-fr_CA.po",
+      "sha256": "44e61fc8d58705ef7f80aaf793705234cea07eb4a7938f17b59ba982b0453119"
+    },
+    {
+      "bytes": 1066,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-fr_FR.mo",
+      "sha256": "c934f43879e1eb7ccb44f80fe4acd3c53544552138547e4a2970940d33140d17"
+    },
+    {
+      "bytes": 1338,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-fr_FR.po",
+      "sha256": "17f2fc9a590e6f994a7c6cc9533f0c8c848d63710ba4de9af4958e48a1777f92"
+    },
+    {
+      "bytes": 982,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-hu_HU.mo",
+      "sha256": "164f463e17f7c8a1bf6cb1a8192287aed183474fb0ce34311f63f4ac62159b60"
+    },
+    {
+      "bytes": 1215,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-hu_HU.po",
+      "sha256": "61c972e7b26467a8e728a471b34495eda185de4182875cce8048f781a4329e76"
+    },
+    {
+      "bytes": 1135,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-it_IT.mo",
+      "sha256": "1a0c0ff66d9c9aba0fbe0c1c989774ad61b726f6c5d57b2a279ef81e5949cfd3"
+    },
+    {
+      "bytes": 1466,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-it_IT.po",
+      "sha256": "820e87ea5f64ec23fbe0b118e975476b06d86d1ba883b6092e993e58e9652b3d"
+    },
+    {
+      "bytes": 1454,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-ja.mo",
+      "sha256": "edb9e5b2a8cac7d31b16508996ca85e82b41b040a92fbdae889d5c55c9d8937a"
+    },
+    {
+      "bytes": 1771,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-ja.po",
+      "sha256": "35cf74cbd5b96d592a34da1be67ded1072b3c6a6841658416e4ba02753768d04"
+    },
+    {
+      "bytes": 1211,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-nl_BE.mo",
+      "sha256": "c585812d909631cb62eb36ff65d830321efd39de6cf2d7a9e2cbdaadfc87a228"
+    },
+    {
+      "bytes": 1550,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-nl_BE.po",
+      "sha256": "e858775e90be042f3382714cb332c7c19fe58235952409856238c650d5b1b398"
+    },
+    {
+      "bytes": 1211,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-nl_NL.mo",
+      "sha256": "63c4d497c807ecc1dcbe29305fc5fc0896844610a140429c7caedf0eea5215f0"
+    },
+    {
+      "bytes": 1550,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-nl_NL.po",
+      "sha256": "b5676badf0f4dc304f7b8021c23a90678f1c05daf6ee06f85f9204ec35114585"
+    },
+    {
+      "bytes": 1014,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-pt_BR.mo",
+      "sha256": "66a74d4e28a6cff6797cced4454b9648cf565c05a6d011edfcf9111befe8647d"
+    },
+    {
+      "bytes": 1562,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-pt_BR.po",
+      "sha256": "7edf19531984101f16317c71393f8602da80b416b2fbd51d632658f29d7106d0"
+    },
+    {
+      "bytes": 1337,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-ru_RU.mo",
+      "sha256": "37060fddf25e16ec3c32be6b45c52d6628c0ef38fe03f48568bbd29e6cdbb623"
+    },
+    {
+      "bytes": 1627,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-ru_RU.po",
+      "sha256": "b8fea410d9b6af4db6c89e9cb6fd8466a34c8d9af1a17ee88d170d366b9b68b2"
+    },
+    {
+      "bytes": 1203,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-sl_SI.mo",
+      "sha256": "3f61f54cc44dd781a9aec9d71b841ad7fce361bc18aafd44c295ce15a63c0d51"
+    },
+    {
+      "bytes": 1542,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-sl_SI.po",
+      "sha256": "027e6a4f8bc47d6a0c917b167063f0a9cc3989f53325e8d771697114417ea86c"
+    },
+    {
+      "bytes": 1414,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-sr_RS.mo",
+      "sha256": "eea1a291eb2f0fb215ff4b28b29dfe71b259921ce9ea1225f895d5a85b2d1e9d"
+    },
+    {
+      "bytes": 1808,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-sr_RS.po",
+      "sha256": "267f43278d53c288327c9ffcfbdc5a46751bb170780c8f73692a784cd312e2fc"
+    },
+    {
+      "bytes": 1006,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-sv_SE.mo",
+      "sha256": "4d70a56814fd99c35e4f5965b87456c0d81d76f4f15fcb36b5acd08669bbbbde"
+    },
+    {
+      "bytes": 1276,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-sv_SE.po",
+      "sha256": "cae5b34dee156a44e9dba6d80312cb46fec5ab9f403465d8b44557fbe0dd45c8"
+    },
+    {
+      "bytes": 1118,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-tr_TR.mo",
+      "sha256": "36874f864e2d3f7f32c4278149a7e8d40a179ffd7071c4e34d5ab5e11ba42e32"
+    },
+    {
+      "bytes": 1498,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-tr_TR.po",
+      "sha256": "2bccf0c428a2dd879da6f765ceb00e2433fec8ba70a882344b2a7c0e27e46d21"
+    },
+    {
+      "bytes": 1309,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-uk_UA.mo",
+      "sha256": "9ba284aabed69b99ee12b3fddc1bb574d4d18c2d6dc1ae592c556ff86eb4efdf"
+    },
+    {
+      "bytes": 1599,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-uk_UA.po",
+      "sha256": "276bd6f1aa64bb4240e10612f34e92ecc643adca8b0365680a1d3bccf0fef0e3"
+    },
+    {
+      "bytes": 1174,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-zh_CN.mo",
+      "sha256": "ac94e2b03953c056433675cd5f1bcb1bf973f7b3789681263ffe26f6db93048c"
+    },
+    {
+      "bytes": 1566,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker-zh_CN.po",
+      "sha256": "f7628c0d142f8cd63cd3fe5b1a5ce883bc4c798b8e4810298a44abdc0ae606fb"
+    },
+    {
+      "bytes": 1195,
+      "path": "robbottx-core/lib/plugin-update-checker/languages/plugin-update-checker.pot",
+      "sha256": "05c17de943d13d4e8abb6da789a4036abea023ab3d34673c650118593a214857"
+    },
+    {
+      "bytes": 1056,
+      "path": "robbottx-core/lib/plugin-update-checker/license.txt",
+      "sha256": "c60675ad267e5014eebbe20ed6eff19df344078eb5b99181d8e293c1006dd036"
+    },
+    {
+      "bytes": 1148,
+      "path": "robbottx-core/lib/plugin-update-checker/load-v5p6.php",
+      "sha256": "d21a3eea133e0a78e4f4b1c2d7d7b2f594edbca71dd30cd05bd695be770a0325"
+    },
+    {
+      "bytes": 218,
+      "path": "robbottx-core/lib/plugin-update-checker/plugin-update-checker.php",
+      "sha256": "550cfe2c283689a8c27518857632968a16f2e54f1102fd6ef07bd2be69c73f83"
+    },
+    {
+      "bytes": 94,
+      "path": "robbottx-core/lib/plugin-update-checker/vendor/Parsedown.php",
+      "sha256": "f50ac96282914f604012154405f2f946d5847e86669ca3da0a57f0977bd81153"
+    },
+    {
+      "bytes": 37601,
+      "path": "robbottx-core/lib/plugin-update-checker/vendor/ParsedownModern.php",
+      "sha256": "8eb141fa55be71aa21e7dbeb077ae552af78b7a63b1af37307493f10d8327196"
+    },
+    {
+      "bytes": 12406,
+      "path": "robbottx-core/lib/plugin-update-checker/vendor/PucReadmeParser.php",
+      "sha256": "7786172b3f63f6a558bc94dd2d4ddcf62ddc4565754e4d6f1cc2f9694145611a"
+    },
+    {
+      "bytes": 622,
+      "path": "robbottx-core/readme.txt",
+      "sha256": "d7453a7fb4f1353fcb5d99ad639a115ea4aa4ff3db8bcec77c0106acc712e3b1"
+    },
+    {
+      "bytes": 13538,
+      "path": "robbottx-core/resources/publication/golden-slice.v0.php",
+      "sha256": "12a2d109bcf54ff8ed9a885ffc9bb7dfd57a089753ac255b7d1d4d06167b7ab0"
+    },
+    {
+      "bytes": 2507,
+      "path": "robbottx-core/robbottx-core.php",
+      "sha256": "a78a186f562677c5b2996f72d006ca180e8d3b840d1d8763c0342f85fd607565"
+    },
+    {
+      "bytes": 423,
+      "path": "robbottx-core/src/Lifecycle.php",
+      "sha256": "df95582467da91e85c36e5cd0a9ede301d457253b9e3cb1b0ae92cf9bb8292b3"
+    },
+    {
+      "bytes": 2498,
+      "path": "robbottx-core/src/Plugin.php",
+      "sha256": "3abbf671ad7f68577e5ed43bfadafbac079c43ed4c0db74b77a6bf73e2d2cea5"
+    },
+    {
+      "bytes": 2923,
+      "path": "robbottx-core/src/Presentation/Assets.php",
+      "sha256": "985a71cc216c37a993510f6b73b4d144caa711c9f38cdc3c25969deb29a52913"
+    },
+    {
+      "bytes": 271,
+      "path": "robbottx-core/src/Presentation/Blocks.php",
+      "sha256": "c36643e47e17d94e4e0a946c2ca4358446478cd92e2e4f89a72865cbb2674e1b"
+    },
+    {
+      "bytes": 545,
+      "path": "robbottx-core/src/Presentation/GoldenSliceRenderer.php",
+      "sha256": "6cbc405a147300feb8224eec2f216051903e76f5d2307ac2dcc0021029ca88f2"
+    },
+    {
+      "bytes": 8253,
+      "path": "robbottx-core/src/Presentation/Seo.php",
+      "sha256": "e7e99f64af613ff3ae337b468a29c3e4a9b5b9b3fd73bed1b75c91130bf58143"
+    },
+    {
+      "bytes": 3003,
+      "path": "robbottx-core/src/Projection/MetaFields.php",
+      "sha256": "17f7d0345ca49e2f078b2ff5f9a022b38b3b92037377d6d6563c72f9f04d0381"
+    },
+    {
+      "bytes": 2428,
+      "path": "robbottx-core/src/Projection/PostTypes.php",
+      "sha256": "7081a9894a339d23b68729e94732a0e00cb6d7acf66da966f10036d435383b6d"
+    },
+    {
+      "bytes": 3805,
+      "path": "robbottx-core/src/Projection/PublicationGate.php",
+      "sha256": "cee7abe971ac8f996e261c16cc4caa9b40a4188c894260666e9262847e045359"
+    },
+    {
+      "bytes": 1796,
+      "path": "robbottx-core/src/Publication/SnapshotRepository.php",
+      "sha256": "07b2591476211db56bcf5059888943212229e4e480cd90835c9d392225712fc7"
+    },
+    {
+      "bytes": 3249,
+      "path": "robbottx-core/src/Rest/HealthController.php",
+      "sha256": "16fec4aa7068e56436d07b34e03a61ec3e1554757a4c7124c95e130e6042a74b"
+    },
+    {
+      "bytes": 905,
+      "path": "robbottx-core/src/Updates/UpdateChecker.php",
+      "sha256": "40fac7a0844118a2b234008a2f823cd588e085799f0c941c81c568db9893b234"
+    },
+    {
+      "bytes": 211,
+      "path": "robbottx-core/uninstall.php",
+      "sha256": "0bfeb2aebfb5dc47e8fb35d11ad28fafbc8f296a5612e1eda4dfc4026ecf1b5d"
+    },
+    {
+      "bytes": 6934,
+      "path": "robbottx-core/views/golden-slice.php",
+      "sha256": "e54376c5ee78402000a9cb2179c03f2c6abb1f4fc172db22f8174b62f273f253"
+    }
+  ],
+  "version": "0.1.4",
+  "zip_bytes": 182598,
+  "zip_sha256": "05b11ae1b7d3c7087ef08f5cb9a0a26e62c73411b692e2f5adc6b93da3386c0f"
+}

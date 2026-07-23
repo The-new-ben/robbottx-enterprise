@@ -14,6 +14,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ALLOWED_THEME_FILES = {
     "ASSET-LICENSES.json",
+    "assets/favicon.svg",
     "functions.php",
     "parts/footer.html",
     "parts/header.html",

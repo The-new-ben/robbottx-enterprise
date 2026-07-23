@@ -32,6 +32,28 @@ add_action(
 );
 
 add_action(
+    'wp_head',
+    static function (): void {
+        if (has_site_icon()) {
+            return;
+        }
+
+        $theme = wp_get_theme();
+        $iconUrl = add_query_arg(
+            'ver',
+            (string) $theme->get('Version'),
+            get_theme_file_uri('assets/favicon.svg')
+        );
+
+        printf(
+            '<link rel="icon" href="%s" type="image/svg+xml" sizes="any">' . "\n",
+            esc_url($iconUrl)
+        );
+    },
+    1
+);
+
+add_action(
     'init',
     static function (): void {
         register_block_pattern_category(

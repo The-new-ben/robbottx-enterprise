@@ -12,6 +12,7 @@ const requiredFiles = [
   'style.css',
   'theme.json',
   'functions.php',
+  'assets/favicon.svg',
   'templates/index.html',
   'templates/front-page.html',
   'parts/header.html',
@@ -35,7 +36,7 @@ if (!String(themeJson.$schema).includes('/wp/6.9/')) {
 const style = await fs.readFile(path.join(themeRoot, 'style.css'), 'utf8');
 for (const header of [
   'Theme Name: RobbottX Precision Atlas',
-  'Version: 0.1.3',
+  'Version: 0.1.4',
   'Requires at least: 6.9',
   'Requires PHP: 8.3'
 ]) {
@@ -47,11 +48,48 @@ const readme = await fs.readFile(path.join(themeRoot, 'readme.txt'), 'utf8');
 const assetLicenses = JSON.parse(
   await fs.readFile(path.join(themeRoot, 'ASSET-LICENSES.json'), 'utf8')
 );
-if (!readme.includes('Version: 0.1.3') || assetLicenses.version !== '0.1.3') {
+if (!readme.includes('Version: 0.1.4') || assetLicenses.version !== '0.1.4') {
   throw new Error('Theme style, readme, and asset receipt versions must agree.');
 }
 if (/url\(\s*['"]?https?:/i.test(style) || /@import/i.test(style)) {
   throw new Error('Theme CSS must not import remote assets.');
+}
+
+const favicon = await fs.readFile(
+  path.join(themeRoot, 'assets', 'favicon.svg'),
+  'utf8'
+);
+if (
+  !/<svg\b/i.test(favicon) ||
+  /<script\b|<foreignObject\b|(?:href|src)\s*=\s*["']https?:/i.test(favicon)
+) {
+  throw new Error('Theme favicon must be a local, inert SVG.');
+}
+
+const toLinear = (channel) => {
+  const normalized = channel / 255;
+  return normalized <= 0.04045
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+};
+const luminance = (hex) => {
+  const channels = hex
+    .slice(1)
+    .match(/.{2}/g)
+    .map((channel) => Number.parseInt(channel, 16));
+  return (
+    0.2126 * toLinear(channels[0]) +
+    0.7152 * toLinear(channels[1]) +
+    0.0722 * toLinear(channels[2])
+  );
+};
+const contrast = (foreground, background) => {
+  const lighter = Math.max(luminance(foreground), luminance(background));
+  const darker = Math.min(luminance(foreground), luminance(background));
+  return (lighter + 0.05) / (darker + 0.05);
+};
+if (contrast('#56666a', '#f7f7f2') < 5.5) {
+  throw new Error('Muted small text must retain at least 5.5:1 contrast.');
 }
 
 const files = await fs.readdir(path.join(themeRoot, 'templates'));
