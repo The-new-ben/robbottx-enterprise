@@ -34,11 +34,11 @@ test('plugin version header, constant, manifest, and block agree', async () => {
     path.join(repositoryRoot, 'plugin-dist', 'robbottx-core.json')
   );
 
-  assert.match(plugin, /\* Version:\s+0\.1\.1/);
-  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.1'\)/);
-  assert.equal(block.version, '0.1.1');
-  assert.equal(manifest.version, '0.1.1');
-  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.1.zip'));
+  assert.match(plugin, /\* Version:\s+0\.1\.2/);
+  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.2'\)/);
+  assert.equal(block.version, '0.1.2');
+  assert.equal(manifest.version, '0.1.2');
+  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.2.zip'));
 });
 
 test('healthcheck source reports the integrity-bound snapshot', async () => {
@@ -76,6 +76,31 @@ test('plugin emits a versioned rendered-body marker for deploy verification', as
 
   assert.ok(plugin.includes("add_action('wp_footer'"));
   assert.ok(plugin.includes('<!-- robbottx-core:'));
+});
+
+test('homepage SEO is deterministic and evidence-conservative', async () => {
+  const seo = await fs.readFile(
+    path.join(
+      repositoryRoot,
+      'wp-content',
+      'plugins',
+      'robbottx-core',
+      'src',
+      'Presentation',
+      'Seo.php'
+    ),
+    'utf8'
+  );
+
+  assert.ok(seo.includes("'rank_math/frontend/description'"));
+  assert.ok(seo.includes("'rank_math/json_ld'"));
+  assert.ok(seo.includes('$rankMathDescriptionHandled'));
+  assert.ok(seo.includes('$rankMathJsonLdHandled'));
+  assert.ok(seo.includes('PHP_INT_MAX'));
+  assert.ok(seo.includes('<meta name="description"'));
+  assert.ok(seo.includes("'@type'       => 'WebSite'"));
+  assert.ok(seo.includes("'@type'       => 'WebPage'"));
+  assert.ok(!seo.includes("'@type'       => 'Organization'"));
 });
 
 test('temporary deploy route is capability-gated and cache-purging', async () => {

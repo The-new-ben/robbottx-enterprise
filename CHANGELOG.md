@@ -10,6 +10,12 @@
 - Added local contract, forbidden-input, theme, PHP, snapshot, and preview
   verification.
 
+## 0.1.2
+
+- Added deterministic homepage description and conservative WebSite/WebPage
+  JSON-LD, using Rank Math filters when available and a guarded fallback when
+  its frontend head is absent.
+
 ## 0.1.1
 
 - Added the public integrity healthcheck and an in-body runtime marker used by

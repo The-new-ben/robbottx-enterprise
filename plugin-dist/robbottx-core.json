@@ -1,15 +1,15 @@
 {
   "name": "RobbottX Core",
   "slug": "robbottx-core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "RobbottX",
   "homepage": "https://robbottx.com/",
   "requires": "6.9",
   "tested": "7.0",
   "requires_php": "8.3",
-  "download_url": "https://raw.githubusercontent.com/The-new-ben/robbottx-enterprise/main/plugin-dist/robbottx-core-0.1.1.zip",
-  "last_updated": "2026-07-23 16:00:00",
+  "download_url": "https://raw.githubusercontent.com/The-new-ben/robbottx-enterprise/main/plugin-dist/robbottx-core-0.1.2.zip",
+  "last_updated": "2026-07-23 19:05:00",
   "sections": {
-    "changelog": "<h4>0.1.1</h4><ul><li>Adds an in-body runtime marker for independent deployment verification.</li></ul><h4>0.1.0</h4><ul><li>Introduces the evidence-backed RobbottX projection, publication gates, golden slice, public healthcheck, and update fallback.</li></ul>"
+    "changelog": "<h4>0.1.2</h4><ul><li>Adds deterministic homepage description and WebSite/WebPage structured data with Rank Math integration and a guarded fallback.</li></ul><h4>0.1.1</h4><ul><li>Adds an in-body runtime marker for independent deployment verification.</li></ul><h4>0.1.0</h4><ul><li>Introduces the evidence-backed RobbottX projection, publication gates, golden slice, public healthcheck, and update fallback.</li></ul>"
   }
 }

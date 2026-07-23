@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RobbottX\Core;
 
 use RobbottX\Core\Presentation\Blocks;
+use RobbottX\Core\Presentation\Seo;
 use RobbottX\Core\Projection\MetaFields;
 use RobbottX\Core\Projection\PostTypes;
 use RobbottX\Core\Projection\PublicationGate;
@@ -16,6 +17,7 @@ final class Plugin
 {
     public function boot(): void
     {
+        Seo::boot();
         add_action('init', array(PostTypes::class, 'register'));
         add_action('init', array(MetaFields::class, 'register'));
         add_action('init', array(Blocks::class, 'register'));
