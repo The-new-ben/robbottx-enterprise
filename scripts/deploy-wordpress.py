@@ -35,7 +35,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--render-path", default="/")
     parser.add_argument(
         "--new-body-marker",
-        default="<!-- robbottx-core:0.1.0 -->",
+        default="<!-- robbottx-core:0.1.1 -->",
     )
     parser.add_argument("--old-body-marker", default="Welcome to RobbottX")
     parser.add_argument("--execute", action="store_true")

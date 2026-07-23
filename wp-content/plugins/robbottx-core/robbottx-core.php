@@ -3,7 +3,7 @@
  * Plugin Name:       RobbottX Core
  * Plugin URI:        https://robbottx.com/
  * Description:       Projection-only publishing gates and evidence components for RobbottX.
- * Version:           0.1.0
+ * Version:           0.1.1
  * Requires at least: 6.9
  * Requires PHP:      8.3
  * Author:            RobbottX
@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('ROBBOTTX_CORE_VERSION', '0.1.0');
+define('ROBBOTTX_CORE_VERSION', '0.1.1');
 define('ROBBOTTX_CORE_FILE', __FILE__);
 define('ROBBOTTX_CORE_DIR', plugin_dir_path(__FILE__));
 define(

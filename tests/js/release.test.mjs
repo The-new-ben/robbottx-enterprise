@@ -34,11 +34,11 @@ test('plugin version header, constant, manifest, and block agree', async () => {
     path.join(repositoryRoot, 'plugin-dist', 'robbottx-core.json')
   );
 
-  assert.match(plugin, /\* Version:\s+0\.1\.0/);
-  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.0'\)/);
-  assert.equal(block.version, '0.1.0');
-  assert.equal(manifest.version, '0.1.0');
-  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.0.zip'));
+  assert.match(plugin, /\* Version:\s+0\.1\.1/);
+  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.1'\)/);
+  assert.equal(block.version, '0.1.1');
+  assert.equal(manifest.version, '0.1.1');
+  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.1.zip'));
 });
 
 test('healthcheck source reports the integrity-bound snapshot', async () => {

@@ -22,7 +22,7 @@ npm run qa
 python scripts/build-plugin-zip.py \
   --plugin-dir wp-content/plugins/robbottx-core \
   --slug robbottx-core \
-  --version 0.1.0 \
+  --version 0.1.1 \
   --main-file robbottx-core.php \
   --version-constant ROBBOTTX_CORE_VERSION \
   --output-dir plugin-dist \
