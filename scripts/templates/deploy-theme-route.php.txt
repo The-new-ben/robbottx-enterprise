@@ -12,6 +12,7 @@ add_action('rest_api_init', function () {
             require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
             $theme_slug = '{{THEME_SLUG}}';
+            $expected_version = '{{THEME_VERSION}}';
             $zip = '{{RAW_ZIP_URL}}?nlcb=' . time();
             $skin = new WP_Ajax_Upgrader_Skin();
             $upgrader = new Theme_Upgrader($skin);
@@ -23,6 +24,13 @@ add_action('rest_api_init', function () {
             if (is_wp_error($result)) {
                 return $result;
             }
+            if ($result !== true) {
+                return new WP_Error(
+                    'agenttheme_install_failed',
+                    'Theme_Upgrader did not confirm a successful install.',
+                    array('status' => 500)
+                );
+            }
 
             wp_clean_themes_cache();
             $theme = wp_get_theme($theme_slug);
@@ -30,6 +38,13 @@ add_action('rest_api_init', function () {
                 return new WP_Error(
                     'agenttheme_missing',
                     'The installed theme could not be resolved.',
+                    array('status' => 500)
+                );
+            }
+            if ((string) $theme->get('Version') !== $expected_version) {
+                return new WP_Error(
+                    'agenttheme_version_mismatch',
+                    'The installed theme version did not match the release.',
                     array('status' => 500)
                 );
             }

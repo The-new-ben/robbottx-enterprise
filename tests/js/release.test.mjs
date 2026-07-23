@@ -110,7 +110,7 @@ test('deploy cleanup retries deletion and independently proves route absence', a
   assert.ok(driver.includes('Temporary deploy route cleanup was not proven.'));
 });
 
-test('one-time theme bootstrap is capability-gated and self-cleaning compatible', async () => {
+test('one-time theme bootstrap is gated for hardened external cleanup', async () => {
   const template = await fs.readFile(
     path.join(
       repositoryRoot,
@@ -125,7 +125,9 @@ test('one-time theme bootstrap is capability-gated and self-cleaning compatible'
   assert.ok(template.includes("current_user_can('switch_themes')"));
   assert.ok(template.includes('new Theme_Upgrader($skin)'));
   assert.ok(template.includes("'overwrite_package' => true"));
+  assert.ok(template.includes('$result !== true'));
   assert.ok(template.includes("?nlcb=' . time()"));
+  assert.ok(template.includes("get('Version') !== $expected_version"));
   assert.ok(template.includes('switch_theme($theme_slug)'));
   assert.ok(template.includes("do_action('litespeed_purge_all')"));
   assert.ok(template.includes('wp_cache_flush()'));
