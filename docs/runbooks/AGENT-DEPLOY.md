@@ -30,7 +30,7 @@ python scripts/build-plugin-zip.py \
 python scripts/build-theme-zip.py \
   --theme-dir wp-content/themes/robbottx \
   --slug robbottx \
-  --version 0.1.0 \
+  --version 0.1.1 \
   --output-dir plugin-dist
 ```
 

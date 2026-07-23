@@ -15,6 +15,8 @@
 - Added deterministic homepage description and conservative WebSite/WebPage
   JSON-LD, using Rank Math filters when available and a guarded fallback when
   its frontend head is absent.
+- Serialized the static block-theme group wrappers so every public template
+  exposes exactly one keyboard-targetable `main` landmark.
 
 ## 0.1.1
 
