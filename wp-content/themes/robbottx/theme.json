@@ -1,0 +1,151 @@
+{
+  "$schema": "https://schemas.wp.org/wp/6.9/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "useRootPaddingAwareAlignments": true,
+    "layout": {
+      "contentSize": "760px",
+      "wideSize": "1240px"
+    },
+    "color": {
+      "custom": false,
+      "defaultDuotone": false,
+      "defaultGradients": false,
+      "defaultPalette": false,
+      "palette": [
+        {
+          "slug": "ink",
+          "name": "Ink",
+          "color": "#10191c"
+        },
+        {
+          "slug": "mineral",
+          "name": "Mineral",
+          "color": "#f7f7f2"
+        },
+        {
+          "slug": "fog",
+          "name": "Fog",
+          "color": "#e8ece8"
+        },
+        {
+          "slug": "paper",
+          "name": "Paper",
+          "color": "#ffffff"
+        },
+        {
+          "slug": "signal",
+          "name": "Signal cyan",
+          "color": "#52e8d6"
+        },
+        {
+          "slug": "uncertain",
+          "name": "Uncertainty amber",
+          "color": "#f3b65a"
+        },
+        {
+          "slug": "conflict",
+          "name": "Conflict red",
+          "color": "#c14949"
+        }
+      ]
+    },
+    "spacing": {
+      "blockGap": true,
+      "margin": true,
+      "padding": true,
+      "units": ["px", "rem", "em", "%", "vw", "vh"]
+    },
+    "typography": {
+      "customFontSize": false,
+      "fluid": true,
+      "fontFamilies": [
+        {
+          "slug": "humanist",
+          "name": "Humanist system",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+        },
+        {
+          "slug": "mono",
+          "name": "System mono",
+          "fontFamily": "\"SFMono-Regular\", Consolas, \"Liberation Mono\", monospace"
+        }
+      ],
+      "fontSizes": [
+        {
+          "slug": "small",
+          "name": "Small",
+          "size": "0.82rem"
+        },
+        {
+          "slug": "medium",
+          "name": "Medium",
+          "size": "1rem"
+        },
+        {
+          "slug": "large",
+          "name": "Large",
+          "size": "1.4rem"
+        },
+        {
+          "slug": "x-large",
+          "name": "Extra large",
+          "size": "2.4rem"
+        }
+      ]
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#f7f7f2",
+      "text": "#10191c"
+    },
+    "spacing": {
+      "blockGap": "1.5rem",
+      "padding": {
+        "left": "0",
+        "right": "0"
+      }
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--humanist)",
+      "fontSize": "1rem",
+      "fontWeight": "450",
+      "lineHeight": "1.5"
+    },
+    "elements": {
+      "button": {
+        "border": {
+          "radius": "999px"
+        },
+        "typography": {
+          "fontWeight": "700"
+        }
+      },
+      "heading": {
+        "typography": {
+          "fontWeight": "720",
+          "lineHeight": "1.05"
+        }
+      },
+      "link": {
+        "color": {
+          "text": "#0b6f69"
+        }
+      }
+    }
+  },
+  "templateParts": [
+    {
+      "area": "header",
+      "name": "header",
+      "title": "Header"
+    },
+    {
+      "area": "footer",
+      "name": "footer",
+      "title": "Footer"
+    }
+  ]
+}

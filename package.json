@@ -1,0 +1,21 @@
+{
+  "name": "robbottx-enterprise",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RobbottX canonical contracts, WordPress projection, original block theme, and release evidence.",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <27"
+  },
+  "scripts": {
+    "build": "npm run build:snapshot && npm run build:preview",
+    "build:snapshot": "node tools/build-publication-snapshot.mjs",
+    "build:preview": "node tools/build-preview.mjs",
+    "test": "node --test tests/js/*.test.mjs",
+    "validate:contracts": "node tools/qa/validate-contracts.mjs",
+    "validate:forbidden": "node tools/qa/validate-forbidden-inputs.mjs",
+    "validate:theme": "node tools/qa/validate-theme.mjs",
+    "validate:php": "node tools/qa/php-lint.mjs",
+    "qa": "npm run build && npm run validate:contracts && npm run validate:forbidden && npm run validate:theme && npm run validate:php && npm test"
+  }
+}

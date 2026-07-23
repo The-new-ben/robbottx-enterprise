@@ -1,0 +1,905 @@
+{
+  "schema_version": "0.1.0",
+  "dataset_id": "RBTX:S:019f8f7d-996c-7c8f-9035-1e398f9aa36f",
+  "dataset_status": "candidate",
+  "created_at": "2026-07-23T15:00:00Z",
+  "entities": [
+    {
+      "entity_id": "RBTX:E:019f8f7d-9580-7deb-98bb-e62e28cbebfb",
+      "kind": "organization",
+      "record_status": "candidate",
+      "scope_band": "enterprise"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9581-7d10-910f-f5cac5bf0692",
+      "kind": "model",
+      "record_status": "candidate",
+      "scope_band": "system"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9582-7d5e-8844-3c2dfff0a85a",
+      "kind": "model",
+      "record_status": "candidate",
+      "scope_band": "module"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9583-77f4-ac59-13c03c79d7b6",
+      "kind": "component",
+      "record_status": "candidate",
+      "scope_band": "component"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9584-77df-8ce7-e47347fdb79f",
+      "kind": "component",
+      "record_status": "candidate",
+      "scope_band": "component"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9585-73c2-9f12-924ba1f1e788",
+      "kind": "family",
+      "record_status": "candidate",
+      "scope_band": "component"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9586-7c7e-b546-d010fbc8229d",
+      "kind": "software",
+      "record_status": "candidate",
+      "scope_band": "module"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9587-7761-a7a8-1cd6054a4cef",
+      "kind": "software",
+      "record_status": "candidate",
+      "scope_band": "module"
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9588-7709-b78b-a1b135c09915",
+      "kind": "configuration",
+      "record_status": "candidate",
+      "scope_band": "system"
+    }
+  ],
+  "revisions": [
+    {
+      "revision_id": "RBTX:R:019f8f7d-9589-7ecd-9513-a7d3b907152d",
+      "entity_id": "RBTX:E:019f8f7d-9580-7deb-98bb-e62e28cbebfb",
+      "official_model_code": null,
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "active",
+      "fingerprint": "robotis-org-candidate-2026-07-23"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-958a-79a8-994e-56bdc49a8d2a",
+      "entity_id": "RBTX:E:019f8f7d-9581-7d10-910f-f5cac5bf0692",
+      "official_model_code": "TurtleBot3 Waffle Pi",
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "active",
+      "fingerprint": "tb3-waffle-pi-revision-unfrozen"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "entity_id": "RBTX:E:019f8f7d-9582-7d5e-8844-3c2dfff0a85a",
+      "official_model_code": "OpenMANIPULATOR-X",
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "active",
+      "fingerprint": "openmanipulator-x-revision-unfrozen"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-958c-7343-a558-abf7a2315d74",
+      "entity_id": "RBTX:E:019f8f7d-9583-77f4-ac59-13c03c79d7b6",
+      "official_model_code": "OpenCR",
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "unknown",
+      "fingerprint": "opencr-revision-unfrozen"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-958d-7df1-a7cc-00bc8b0b1fa9",
+      "entity_id": "RBTX:E:019f8f7d-9584-77df-8ce7-e47347fdb79f",
+      "official_model_code": "Raspberry Pi 4",
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "unknown",
+      "fingerprint": "raspberry-pi-4-memory-variant-unfrozen"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-958e-7beb-aa62-998e7527d3a0",
+      "entity_id": "RBTX:E:019f8f7d-9585-73c2-9f12-924ba1f1e788",
+      "official_model_code": "LDS-01 or LDS-02",
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "unknown",
+      "fingerprint": "lidar-selection-unresolved"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-958f-7ca3-835a-97b4a451cfdc",
+      "entity_id": "RBTX:E:019f8f7d-9586-7c7e-b546-d010fbc8229d",
+      "official_model_code": "ROS 2 Humble Hawksbill",
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "unknown",
+      "fingerprint": "ros2-humble-package-set-unfrozen"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-9590-74d0-8c9e-4887f095f4e5",
+      "entity_id": "RBTX:E:019f8f7d-9587-7761-a7a8-1cd6054a4cef",
+      "official_model_code": "Ubuntu 22.04",
+      "official_revision_code": null,
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "active",
+      "fingerprint": "ubuntu-22-04-patchlevel-unfrozen"
+    },
+    {
+      "revision_id": "RBTX:R:019f8f7d-9591-765f-9ca7-03ed36820fa6",
+      "entity_id": "RBTX:E:019f8f7d-9588-7709-b78b-a1b135c09915",
+      "official_model_code": "RBTX mobile manipulator candidate",
+      "official_revision_code": "0.1.0-candidate",
+      "regional_variant": null,
+      "revision_status": "candidate",
+      "lifecycle_state": "unknown",
+      "fingerprint": "tb3-waffle-pi-omx-candidate-v0-1-0"
+    }
+  ],
+  "labels": [
+    {
+      "entity_id": "RBTX:E:019f8f7d-9580-7deb-98bb-e62e28cbebfb",
+      "text": "ROBOTIS",
+      "language": "en",
+      "label_type": "official_international",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9581-7d10-910f-f5cac5bf0692",
+      "text": "TurtleBot3 Waffle Pi",
+      "language": "en",
+      "label_type": "official_international",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+        "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9582-7d5e-8844-3c2dfff0a85a",
+      "text": "OpenMANIPULATOR-X",
+      "language": "en",
+      "label_type": "official_international",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9583-77f4-ac59-13c03c79d7b6",
+      "text": "OpenCR",
+      "language": "en",
+      "label_type": "official_international",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9584-77df-8ce7-e47347fdb79f",
+      "text": "Raspberry Pi 4",
+      "language": "en",
+      "label_type": "official_international",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9585-73c2-9f12-924ba1f1e788",
+      "text": "LDS-01 or LDS-02 selection",
+      "language": "en",
+      "label_type": "alias",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9586-7c7e-b546-d010fbc8229d",
+      "text": "ROS 2 Humble Hawksbill",
+      "language": "en",
+      "label_type": "official_international",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9587-7761-a7a8-1cd6054a4cef",
+      "text": "Ubuntu 22.04",
+      "language": "en",
+      "label_type": "official_international",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ]
+    },
+    {
+      "entity_id": "RBTX:E:019f8f7d-9588-7709-b78b-a1b135c09915",
+      "text": "TurtleBot3 Waffle Pi + OpenMANIPULATOR-X",
+      "language": "en",
+      "label_type": "translated",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+      "evidence_class": "manufacturer_primary",
+      "publisher": "ROBOTIS",
+      "url": "https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/",
+      "source_date": null,
+      "retrieved_at": "2026-07-23T15:00:00Z",
+      "language": "en",
+      "locator": "Manipulation > TurtleBot3 with OpenMANIPULATOR; Hardware Assembly; ROS 2 note",
+      "response_sha256": "d0f255f3376c2dec8bb938d529824053c018f3105085ba1495c06a07dc6e77f5",
+      "rights_status": "citation_permitted"
+    },
+    {
+      "evidence_id": "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e",
+      "evidence_class": "manufacturer_primary",
+      "publisher": "ROBOTIS",
+      "url": "https://emanual.robotis.com/docs/en/platform/openmanipulator_x/specification/",
+      "source_date": null,
+      "retrieved_at": "2026-07-23T15:00:00Z",
+      "language": "en",
+      "locator": "Specification > Hardware Specification table",
+      "response_sha256": "2513bc1bb2069fff8fd8ab770b28b63fb3c5b1905cfec59fbf386f991d007cf1",
+      "rights_status": "citation_permitted"
+    },
+    {
+      "evidence_id": "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82",
+      "evidence_class": "manufacturer_primary",
+      "publisher": "ROBOTIS",
+      "url": "https://emanual.robotis.com/docs/en/platform/turtlebot3/features/",
+      "source_date": null,
+      "retrieved_at": "2026-07-23T15:00:00Z",
+      "language": "en",
+      "locator": "Features > Hardware Specification table > Waffle Pi",
+      "response_sha256": "66332579829aa5ac60b88b204be00a7162a7ea318b0a889f127e3a894e95ad3c",
+      "rights_status": "citation_permitted"
+    },
+    {
+      "evidence_id": "RBTX:EV:019f8f7d-9595-7cec-b493-54210abe02a5",
+      "evidence_class": "manufacturer_primary",
+      "publisher": "ROBOTIS-GIT",
+      "url": "https://github.com/ROBOTIS-GIT/turtlebot3/releases/tag/2.3.6",
+      "source_date": "2025-12-15",
+      "retrieved_at": "2026-07-23T15:00:00Z",
+      "language": "en",
+      "locator": "Release 2.3.6",
+      "response_sha256": "b3b09a7080c4c60f07831a484124020a684e6a8fe13d97001470efba4510b13a",
+      "rights_status": "open_license"
+    },
+    {
+      "evidence_id": "RBTX:EV:019f8f7d-9596-7554-8882-fbaa2a9beb2a",
+      "evidence_class": "manufacturer_primary",
+      "publisher": "ROBOTIS-GIT",
+      "url": "https://github.com/ROBOTIS-GIT/open_manipulator/releases/tag/4.1.4",
+      "source_date": "2026-04-29",
+      "retrieved_at": "2026-07-23T15:00:00Z",
+      "language": "en",
+      "locator": "Release 4.1.4",
+      "response_sha256": "25af19dadd4b57d1a3f90c0e98fbbd2d74ea4494f7f95c5b389a13284b1a2c21",
+      "rights_status": "open_license"
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "RBTX:A:019f8f7d-9597-78ab-9dc8-cadd54d95257",
+      "subject_revision_id": "RBTX:R:019f8f7d-9591-765f-9ca7-03ed36820fa6",
+      "predicate": "compatibility.manufacturer_statement",
+      "value": {
+        "raw": "OpenMANIPULATOR-X is compatible with TurtleBot3 Waffle as a mobile manipulator",
+        "normalized": "manufacturer_claimed_mobile_manipulator_relationship",
+        "unit": null,
+        "qualifier": "claimed"
+      },
+      "conditions": "The text names Waffle; the hardware-assembly CAD label names Waffle Pi. Exact revision applicability is unresolved.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ],
+      "confidence": 0.8,
+      "review_status": "conflicting"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-9598-78b3-831a-37d111db3b16",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "electrical.input_voltage",
+      "value": {
+        "raw": "12 V",
+        "normalized": 12,
+        "unit": "V",
+        "qualifier": "exact"
+      },
+      "conditions": "Manufacturer hardware specification; exact product revision not frozen.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.95,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-9599-70f9-b750-ab14306459bb",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "kinematics.degrees_of_freedom",
+      "value": {
+        "raw": "5 (4 DOF + 1 DOF Gripper)",
+        "normalized": 5,
+        "unit": "count",
+        "qualifier": "exact"
+      },
+      "conditions": "Includes one gripper degree of freedom.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.95,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-959a-773c-8f5e-6b639041f2a9",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "performance.payload",
+      "value": {
+        "raw": "500 g",
+        "normalized": 0.5,
+        "unit": "kg",
+        "qualifier": "claimed"
+      },
+      "conditions": "Manufacturer specification; orientation, reach, acceleration, duty cycle, and safety factor are not stated in the table.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-959b-7d55-825b-f96d8b8bc3a3",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "performance.repeatability",
+      "value": {
+        "raw": "< 0.2 mm",
+        "normalized": 0.2,
+        "unit": "mm",
+        "qualifier": "less_than"
+      },
+      "conditions": "Manufacturer specification; test method and operating conditions are not stated in the table.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-959c-71c1-8d41-47482970f1ec",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "physical.mass",
+      "value": {
+        "raw": "0.70 kg",
+        "normalized": 0.7,
+        "unit": "kg",
+        "qualifier": "exact"
+      },
+      "conditions": "Manufacturer summary specification. The inertia section separately states 711.37 g; this candidate does not silently merge the two values.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-959d-71da-8aaa-942d46ad8a45",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "geometry.reach",
+      "value": {
+        "raw": "380 mm",
+        "normalized": 380,
+        "unit": "mm",
+        "qualifier": "exact"
+      },
+      "conditions": "Manufacturer summary specification; reference frame is not stated in the table.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-959e-7a8b-9a2f-7ddb960da015",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "geometry.gripper_stroke",
+      "value": {
+        "raw": "20-75 mm",
+        "normalized": "20..75",
+        "unit": "mm",
+        "qualifier": "range",
+        "minimum": 20,
+        "maximum": 75
+      },
+      "conditions": "Manufacturer summary specification.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.95,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-959f-7a15-8eec-d6df116d0014",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "communications.bus",
+      "value": {
+        "raw": "TTL Level Multidrop BUS",
+        "normalized": "ttl_multidrop",
+        "unit": null,
+        "qualifier": "claimed"
+      },
+      "conditions": "Connector, pinout, baud, device IDs, and firmware compatibility require separate evidence.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-95a0-7f27-9128-82fa92e441c5",
+      "subject_revision_id": "RBTX:R:019f8f7d-958a-79a8-994e-56bdc49a8d2a",
+      "predicate": "geometry.envelope",
+      "value": {
+        "raw": "281 mm x 306 mm x 141 mm",
+        "normalized": "281x306x141",
+        "unit": "mm",
+        "qualifier": "exact"
+      },
+      "conditions": "Waffle Pi row in the manufacturer hardware specification.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82"
+      ],
+      "confidence": 0.95,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-95a1-708d-8c51-8ab968d7354f",
+      "subject_revision_id": "RBTX:R:019f8f7d-9591-765f-9ca7-03ed36820fa6",
+      "predicate": "software.tested_baseline",
+      "value": {
+        "raw": "Ubuntu 22.04 and ROS 2 Humble Hawksbill",
+        "normalized": "ubuntu-22.04|ros2-humble",
+        "unit": null,
+        "qualifier": "claimed"
+      },
+      "conditions": "Manufacturer documentation says the instructions were tested on this baseline; exact package, firmware, and patch versions are not frozen.",
+      "claim_class": "manufacturer_claim",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-95a2-7e80-b28b-4362525a1f28",
+      "subject_revision_id": "RBTX:R:019f8f7d-958f-7ca3-835a-97b4a451cfdc",
+      "predicate": "software.repository_release",
+      "value": {
+        "raw": "turtlebot3 2.3.6",
+        "normalized": "2.3.6",
+        "unit": null,
+        "qualifier": "exact"
+      },
+      "conditions": "Latest official repository release observed on the retrieval date; not yet frozen as the configuration package baseline.",
+      "claim_class": "sourced_fact",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9595-7cec-b493-54210abe02a5"
+      ],
+      "confidence": 0.95,
+      "review_status": "candidate"
+    },
+    {
+      "assertion_id": "RBTX:A:019f8f7d-95a3-78e4-94b6-d81cc3934008",
+      "subject_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "software.repository_release",
+      "value": {
+        "raw": "open_manipulator 4.1.4",
+        "normalized": "4.1.4",
+        "unit": null,
+        "qualifier": "exact"
+      },
+      "conditions": "Latest official repository release observed on the retrieval date; not yet frozen as the configuration package baseline.",
+      "claim_class": "sourced_fact",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9596-7554-8882-fbaa2a9beb2a"
+      ],
+      "confidence": 0.95,
+      "review_status": "candidate"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "RBTX:ED:019f8f7d-95a4-7e7f-8135-8467f5c3a006",
+      "subject_id": "RBTX:R:019f8f7d-958a-79a8-994e-56bdc49a8d2a",
+      "predicate": "manufactured_by",
+      "object_id": "RBTX:E:019f8f7d-9580-7deb-98bb-e62e28cbebfb",
+      "scope": "identity",
+      "conditions": "",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ],
+      "confidence": 0.99,
+      "review_status": "candidate"
+    },
+    {
+      "edge_id": "RBTX:ED:019f8f7d-95a5-75be-a974-b53302338b04",
+      "subject_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "predicate": "manufactured_by",
+      "object_id": "RBTX:E:019f8f7d-9580-7deb-98bb-e62e28cbebfb",
+      "scope": "identity",
+      "conditions": "",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+      ],
+      "confidence": 0.99,
+      "review_status": "candidate"
+    },
+    {
+      "edge_id": "RBTX:ED:019f8f7d-95a6-7965-bb87-593dfe1472ac",
+      "subject_id": "RBTX:C:019f8f7d-9968-784f-a650-52695f2f6dbb",
+      "predicate": "contains",
+      "object_id": "RBTX:R:019f8f7d-958a-79a8-994e-56bdc49a8d2a",
+      "scope": "candidate_bom",
+      "conditions": "Exact hardware revision is not frozen.",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "edge_id": "RBTX:ED:019f8f7d-95a7-78cf-bb77-4c3cc8fd65ad",
+      "subject_id": "RBTX:C:019f8f7d-9968-784f-a650-52695f2f6dbb",
+      "predicate": "contains",
+      "object_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+      "scope": "candidate_bom",
+      "conditions": "Exact hardware revision and mounting set are not frozen.",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "edge_id": "RBTX:ED:019f8f7d-996d-739a-af77-d61304cc9a77",
+      "subject_id": "RBTX:C:019f8f7d-9968-784f-a650-52695f2f6dbb",
+      "predicate": "tested_documentation_baseline",
+      "object_id": "RBTX:R:019f8f7d-958f-7ca3-835a-97b4a451cfdc",
+      "scope": "software",
+      "conditions": "Package versions and firmware are not frozen.",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    },
+    {
+      "edge_id": "RBTX:ED:019f8f7d-996e-7f8a-9320-f0372a2def5e",
+      "subject_id": "RBTX:C:019f8f7d-9968-784f-a650-52695f2f6dbb",
+      "predicate": "runs_on",
+      "object_id": "RBTX:R:019f8f7d-9590-74d0-8c9e-4887f095f4e5",
+      "scope": "software",
+      "conditions": "Patch level and image are not frozen.",
+      "evidence_ids": [
+        "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+      ],
+      "confidence": 0.9,
+      "review_status": "candidate"
+    }
+  ],
+  "configuration": {
+    "configuration_id": "RBTX:C:019f8f7d-9968-784f-a650-52695f2f6dbb",
+    "configuration_entity_id": "RBTX:E:019f8f7d-9588-7709-b78b-a1b135c09915",
+    "version": "0.1.0-candidate",
+    "purpose": "Research and educational mobile manipulation; no safety-rated or production claim.",
+    "environment": "Indoor, controlled research environment; exact limits unresolved.",
+    "bom_id": "RBTX:B:019f8f7d-9969-79b1-954e-46e43936e5ab",
+    "ruleset_version": "0.1.0-candidate",
+    "status": "candidate"
+  },
+  "bom": {
+    "bom_id": "RBTX:B:019f8f7d-9969-79b1-954e-46e43936e5ab",
+    "role": "as_designed",
+    "version": "0.1.0-candidate",
+    "status": "candidate",
+    "items": [
+      {
+        "find_number": "10",
+        "item_revision_id": "RBTX:R:019f8f7d-958a-79a8-994e-56bdc49a8d2a",
+        "role": "mobile_base_opaque_assembly",
+        "quantity": 1,
+        "unit": "each",
+        "required": true,
+        "alternate_group": null,
+        "selection_state": "opaque_assembly",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+          "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82"
+        ]
+      },
+      {
+        "find_number": "20",
+        "item_revision_id": "RBTX:R:019f8f7d-958b-710f-b20d-d49a004b0fd8",
+        "role": "manipulator_opaque_assembly",
+        "quantity": 1,
+        "unit": "each",
+        "required": true,
+        "alternate_group": null,
+        "selection_state": "opaque_assembly",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ]
+      },
+      {
+        "find_number": "30",
+        "item_revision_id": "RBTX:R:019f8f7d-958c-7343-a558-abf7a2315d74",
+        "role": "robot_controller",
+        "quantity": 1,
+        "unit": "each",
+        "required": true,
+        "alternate_group": null,
+        "selection_state": "unresolved",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+        ]
+      },
+      {
+        "find_number": "40",
+        "item_revision_id": "RBTX:R:019f8f7d-958d-7df1-a7cc-00bc8b0b1fa9",
+        "role": "onboard_compute",
+        "quantity": 1,
+        "unit": "each",
+        "required": true,
+        "alternate_group": null,
+        "selection_state": "unresolved",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82"
+        ]
+      },
+      {
+        "find_number": "50",
+        "item_revision_id": "RBTX:R:019f8f7d-958e-7beb-aa62-998e7527d3a0",
+        "role": "lidar",
+        "quantity": 1,
+        "unit": "each",
+        "required": true,
+        "alternate_group": "LIDAR-A",
+        "selection_state": "unresolved",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+        ]
+      },
+      {
+        "find_number": "60",
+        "item_revision_id": "RBTX:R:019f8f7d-958f-7ca3-835a-97b4a451cfdc",
+        "role": "robotics_middleware",
+        "quantity": 1,
+        "unit": "installation",
+        "required": true,
+        "alternate_group": null,
+        "selection_state": "unresolved",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+          "RBTX:EV:019f8f7d-9595-7cec-b493-54210abe02a5",
+          "RBTX:EV:019f8f7d-9596-7554-8882-fbaa2a9beb2a"
+        ]
+      },
+      {
+        "find_number": "70",
+        "item_revision_id": "RBTX:R:019f8f7d-9590-74d0-8c9e-4887f095f4e5",
+        "role": "operating_system",
+        "quantity": 1,
+        "unit": "installation",
+        "required": true,
+        "alternate_group": null,
+        "selection_state": "unresolved",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+        ]
+      }
+    ]
+  },
+  "compatibility": {
+    "assessment_id": "RBTX:CA:019f8f7d-996a-75b3-a320-69776e50a865",
+    "ruleset_version": "0.1.0-candidate",
+    "evaluated_at": "2026-07-23T15:00:00Z",
+    "overall_state": "engineering_review_required",
+    "rules": [
+      {
+        "rule_id": "RBTX:BR:019f8f7d-996b-7b77-aeb2-337646aae737",
+        "version": "0.1.0-candidate",
+        "dimension": "mechanical_geometry",
+        "logic": "A manufacturer relationship is not sufficient for confirmation unless the exact base variant, arm revision, mounting CAD revision, fastener set, LiDAR relocation, and stability inputs are frozen.",
+        "required_inputs": [
+          "base_revision",
+          "arm_revision",
+          "mounting_cad_revision",
+          "fastener_set",
+          "lidar_variant",
+          "center_of_mass",
+          "stability_envelope"
+        ],
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+        ],
+        "test_cases": [
+          {
+            "case": "all required inputs frozen and source applicability exact",
+            "expected": "eligible_for_engineering_review"
+          },
+          {
+            "case": "Waffle versus Waffle Pi applicability unresolved",
+            "expected": "conflicting_evidence"
+          },
+          {
+            "case": "mounting or stability input missing",
+            "expected": "engineering_review_required"
+          }
+        ]
+      }
+    ],
+    "results": [
+      {
+        "dimension": "mechanical_geometry",
+        "state": "conflicting_evidence",
+        "basis": "The compatibility sentence names Waffle while the assembly CAD label names Waffle Pi; exact revisions, fasteners, and stability inputs are not frozen.",
+        "conditions": "Do not treat visual fit or generic family naming as engineering confirmation.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+        ]
+      },
+      {
+        "dimension": "electrical_power",
+        "state": "unverified",
+        "basis": "The arm is specified at 12 V, but the complete system power budget, protection, connectors, cable limits, and transient behavior are not closed.",
+        "conditions": "Requires exact revisions and a reviewed power budget.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ]
+      },
+      {
+        "dimension": "connector_pinout",
+        "state": "unverified",
+        "basis": "No reviewed connector and pinout matrix is present in this candidate.",
+        "conditions": "Requires exact harness and interface documentation.",
+        "evidence_ids": []
+      },
+      {
+        "dimension": "protocol_communications",
+        "state": "conditional",
+        "basis": "The manufacturer specifies a TTL multidrop bus and OpenCR as a controller option.",
+        "conditions": "Device IDs, baud, connector, firmware, and topology must be frozen.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ]
+      },
+      {
+        "dimension": "firmware_software_licensing",
+        "state": "version_constrained",
+        "basis": "The instructions were tested on Ubuntu 22.04 and ROS 2 Humble, and current official repository releases are recorded.",
+        "conditions": "Package commits, firmware, OS patch, dependencies, and configuration must be frozen and reproduced.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+          "RBTX:EV:019f8f7d-9595-7cec-b493-54210abe02a5",
+          "RBTX:EV:019f8f7d-9596-7554-8882-fbaa2a9beb2a"
+        ]
+      },
+      {
+        "dimension": "performance_timing",
+        "state": "engineering_review_required",
+        "basis": "Arm specifications exist, but integrated reach, payload, base stability, duty cycle, latency, and task envelope are not evaluated.",
+        "conditions": "Requires calculations, simulation, and declared physical-test status.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ]
+      },
+      {
+        "dimension": "thermal_environmental",
+        "state": "unverified",
+        "basis": "No complete configuration environmental envelope is recorded.",
+        "conditions": "Indoor research purpose is descriptive, not a rated limit.",
+        "evidence_ids": []
+      },
+      {
+        "dimension": "safety_regulatory",
+        "state": "engineering_review_required",
+        "basis": "No system risk assessment, protective function, emergency stop, certification scope, or intended-user boundary is approved.",
+        "conditions": "No safety-rated, medical, industrial-production, or autonomous public-space claim.",
+        "evidence_ids": []
+      },
+      {
+        "dimension": "lifecycle_supply_region",
+        "state": "unverified",
+        "basis": "No authorized seller, exact SKU, region, stock, lifecycle, warranty, or lead-time snapshot is frozen.",
+        "conditions": "Commercial information must remain separate from canonical identity.",
+        "evidence_ids": []
+      },
+      {
+        "dimension": "mission_planetary_environment",
+        "state": "not_applicable",
+        "basis": "This first candidate has no off-Earth qualification or mission claim.",
+        "conditions": "Future planetary profiles require separate radiation, vacuum/atmosphere, dust, thermal, autonomy, communications-delay, repairability, and contamination evidence.",
+        "evidence_ids": []
+      }
+    ]
+  },
+  "offers": [],
+  "assets_3d": [],
+  "publication": {
+    "eligible": false,
+    "intended_visibility": "research_preview",
+    "indexability": "noindex",
+    "blockers": [
+      {
+        "code": "VARIANT_APPLICABILITY_UNRESOLVED",
+        "severity": "blocking",
+        "description": "The official text names Waffle while the hardware-assembly CAD label names Waffle Pi."
+      },
+      {
+        "code": "EXACT_REVISIONS_UNFROZEN",
+        "severity": "blocking",
+        "description": "Hardware, controller, LiDAR, compute, firmware, operating-system patch, and package revisions are not frozen."
+      },
+      {
+        "code": "BOM_NOT_CLOSED",
+        "severity": "blocking",
+        "description": "Mounting hardware, harnesses, power elements, and documented alternates are not closed."
+      },
+      {
+        "code": "COMPATIBILITY_GAPS",
+        "severity": "blocking",
+        "description": "Required power, connector, performance, thermal, safety, and lifecycle dimensions remain unverified or require engineering review."
+      },
+      {
+        "code": "PHYSICAL_VALIDATION_UNAVAILABLE",
+        "severity": "blocking",
+        "description": "RobbottX has not inspected or physically tested the exact configuration."
+      },
+      {
+        "code": "ASSET_RIGHTS_AND_VALIDATION_OPEN",
+        "severity": "blocking",
+        "description": "No public 3D asset has approved rights, revision binding, coordinate metadata, checksum, validation, and static fallback."
+      },
+      {
+        "code": "COMMERCIAL_SCOPE_UNFROZEN",
+        "severity": "warning",
+        "description": "Authorized offers, regions, price, stock, lead time, warranty, shipping, taxes, and relationships are not frozen."
+      },
+      {
+        "code": "CANONICAL_HOSTING_PATH_UNDECIDED",
+        "severity": "warning",
+        "description": "The target canonical service and checksum object-storage hosting path is not yet selected."
+      }
+    ],
+    "public_language": "en"
+  }
+}

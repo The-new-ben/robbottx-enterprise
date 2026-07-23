@@ -1,0 +1,14 @@
+/.artifacts/
+/.cache/
+/dist/
+/node_modules/
+/vendor/
+/.wp-env/
+/.DS_Store
+Thumbs.db
+*.log
+*.zip
+!/plugin-dist/*.zip
+*.sql
+*.env
+*.local

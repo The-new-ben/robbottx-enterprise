@@ -1,0 +1,343 @@
+{
+  "format_version": "0.1.0",
+  "generated_at": "2026-07-23T15:00:00Z",
+  "payload": {
+    "blockers": [
+      {
+        "code": "VARIANT_APPLICABILITY_UNRESOLVED",
+        "description": "The official text names Waffle while the hardware-assembly CAD label names Waffle Pi.",
+        "severity": "blocking"
+      },
+      {
+        "code": "EXACT_REVISIONS_UNFROZEN",
+        "description": "Hardware, controller, LiDAR, compute, firmware, operating-system patch, and package revisions are not frozen.",
+        "severity": "blocking"
+      },
+      {
+        "code": "BOM_NOT_CLOSED",
+        "description": "Mounting hardware, harnesses, power elements, and documented alternates are not closed.",
+        "severity": "blocking"
+      },
+      {
+        "code": "COMPATIBILITY_GAPS",
+        "description": "Required power, connector, performance, thermal, safety, and lifecycle dimensions remain unverified or require engineering review.",
+        "severity": "blocking"
+      },
+      {
+        "code": "PHYSICAL_VALIDATION_UNAVAILABLE",
+        "description": "RobbottX has not inspected or physically tested the exact configuration.",
+        "severity": "blocking"
+      },
+      {
+        "code": "ASSET_RIGHTS_AND_VALIDATION_OPEN",
+        "description": "No public 3D asset has approved rights, revision binding, coordinate metadata, checksum, validation, and static fallback.",
+        "severity": "blocking"
+      },
+      {
+        "code": "COMMERCIAL_SCOPE_UNFROZEN",
+        "description": "Authorized offers, regions, price, stock, lead time, warranty, shipping, taxes, and relationships are not frozen.",
+        "severity": "warning"
+      },
+      {
+        "code": "CANONICAL_HOSTING_PATH_UNDECIDED",
+        "description": "The target canonical service and checksum object-storage hosting path is not yet selected.",
+        "severity": "warning"
+      }
+    ],
+    "compatibility": [
+      {
+        "basis": "The compatibility sentence names Waffle while the assembly CAD label names Waffle Pi; exact revisions, fasteners, and stability inputs are not frozen.",
+        "conditions": "Do not treat visual fit or generic family naming as engineering confirmation.",
+        "dimension": "mechanical_geometry",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+        ],
+        "label": "Mechanical + geometry",
+        "state": "conflicting_evidence",
+        "state_label": "Conflicting evidence"
+      },
+      {
+        "basis": "The arm is specified at 12 V, but the complete system power budget, protection, connectors, cable limits, and transient behavior are not closed.",
+        "conditions": "Requires exact revisions and a reviewed power budget.",
+        "dimension": "electrical_power",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Electrical + power",
+        "state": "unverified",
+        "state_label": "Unverified"
+      },
+      {
+        "basis": "No reviewed connector and pinout matrix is present in this candidate.",
+        "conditions": "Requires exact harness and interface documentation.",
+        "dimension": "connector_pinout",
+        "evidence_ids": [],
+        "label": "Connector + pinout",
+        "state": "unverified",
+        "state_label": "Unverified"
+      },
+      {
+        "basis": "The manufacturer specifies a TTL multidrop bus and OpenCR as a controller option.",
+        "conditions": "Device IDs, baud, connector, firmware, and topology must be frozen.",
+        "dimension": "protocol_communications",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Protocol + communications",
+        "state": "conditional",
+        "state_label": "Conditional"
+      },
+      {
+        "basis": "The instructions were tested on Ubuntu 22.04 and ROS 2 Humble, and current official repository releases are recorded.",
+        "conditions": "Package commits, firmware, OS patch, dependencies, and configuration must be frozen and reproduced.",
+        "dimension": "firmware_software_licensing",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+          "RBTX:EV:019f8f7d-9595-7cec-b493-54210abe02a5",
+          "RBTX:EV:019f8f7d-9596-7554-8882-fbaa2a9beb2a"
+        ],
+        "label": "Firmware + software + licensing",
+        "state": "version_constrained",
+        "state_label": "Version constrained"
+      },
+      {
+        "basis": "Arm specifications exist, but integrated reach, payload, base stability, duty cycle, latency, and task envelope are not evaluated.",
+        "conditions": "Requires calculations, simulation, and declared physical-test status.",
+        "dimension": "performance_timing",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Performance + timing",
+        "state": "engineering_review_required",
+        "state_label": "Engineering review required"
+      },
+      {
+        "basis": "No complete configuration environmental envelope is recorded.",
+        "conditions": "Indoor research purpose is descriptive, not a rated limit.",
+        "dimension": "thermal_environmental",
+        "evidence_ids": [],
+        "label": "Thermal + environmental",
+        "state": "unverified",
+        "state_label": "Unverified"
+      },
+      {
+        "basis": "No system risk assessment, protective function, emergency stop, certification scope, or intended-user boundary is approved.",
+        "conditions": "No safety-rated, medical, industrial-production, or autonomous public-space claim.",
+        "dimension": "safety_regulatory",
+        "evidence_ids": [],
+        "label": "Safety + regulatory",
+        "state": "engineering_review_required",
+        "state_label": "Engineering review required"
+      },
+      {
+        "basis": "No authorized seller, exact SKU, region, stock, lifecycle, warranty, or lead-time snapshot is frozen.",
+        "conditions": "Commercial information must remain separate from canonical identity.",
+        "dimension": "lifecycle_supply_region",
+        "evidence_ids": [],
+        "label": "Lifecycle + supply + region",
+        "state": "unverified",
+        "state_label": "Unverified"
+      },
+      {
+        "basis": "This first candidate has no off-Earth qualification or mission claim.",
+        "conditions": "Future planetary profiles require separate radiation, vacuum/atmosphere, dust, thermal, autonomy, communications-delay, repairability, and contamination evidence.",
+        "dimension": "mission_planetary_environment",
+        "evidence_ids": [],
+        "label": "Mission + planetary environment",
+        "state": "not_applicable",
+        "state_label": "Not applicable"
+      }
+    ],
+    "disclosures": [
+      "Manufacturer-published facts are not RobbottX physical test results.",
+      "Unknown compatibility never passes.",
+      "No price, stock, certification, safety rating, or planetary qualification is claimed.",
+      "The retired catalog CSV and image collection were not used."
+    ],
+    "evidence_summary": {
+      "assertion_count": 13,
+      "primary_sources": 5,
+      "public_language": "en",
+      "relationship_count": 6,
+      "unsupported_compatibility_passes": 0
+    },
+    "graph_path": [
+      "Research mission",
+      "Mobile manipulator configuration",
+      "TurtleBot3 Waffle Pi",
+      "OpenMANIPULATOR-X",
+      "OpenCR + Raspberry Pi 4",
+      "ROS 2 Humble on Ubuntu 22.04",
+      "Primary evidence"
+    ],
+    "identity": {
+      "canonical_id": "RBTX:E:019f8f7d-9588-7709-b78b-a1b135c09915",
+      "category": "Mobile manipulator configuration",
+      "configuration_revision_id": "RBTX:C:019f8f7d-9968-784f-a650-52695f2f6dbb",
+      "manufacturer": "ROBOTIS",
+      "name": "TurtleBot3 Waffle Pi + OpenMANIPULATOR-X",
+      "version": "0.1.0-candidate"
+    },
+    "sources": [
+      {
+        "evidence_class": "manufacturer_primary",
+        "evidence_id": "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae",
+        "locator": "Manipulation > TurtleBot3 with OpenMANIPULATOR; Hardware Assembly; ROS 2 note",
+        "publisher": "ROBOTIS",
+        "response_sha256": "d0f255f3376c2dec8bb938d529824053c018f3105085ba1495c06a07dc6e77f5",
+        "retrieved_at": "2026-07-23T15:00:00Z",
+        "url": "https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/"
+      },
+      {
+        "evidence_class": "manufacturer_primary",
+        "evidence_id": "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e",
+        "locator": "Specification > Hardware Specification table",
+        "publisher": "ROBOTIS",
+        "response_sha256": "2513bc1bb2069fff8fd8ab770b28b63fb3c5b1905cfec59fbf386f991d007cf1",
+        "retrieved_at": "2026-07-23T15:00:00Z",
+        "url": "https://emanual.robotis.com/docs/en/platform/openmanipulator_x/specification/"
+      },
+      {
+        "evidence_class": "manufacturer_primary",
+        "evidence_id": "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82",
+        "locator": "Features > Hardware Specification table > Waffle Pi",
+        "publisher": "ROBOTIS",
+        "response_sha256": "66332579829aa5ac60b88b204be00a7162a7ea318b0a889f127e3a894e95ad3c",
+        "retrieved_at": "2026-07-23T15:00:00Z",
+        "url": "https://emanual.robotis.com/docs/en/platform/turtlebot3/features/"
+      },
+      {
+        "evidence_class": "manufacturer_primary",
+        "evidence_id": "RBTX:EV:019f8f7d-9595-7cec-b493-54210abe02a5",
+        "locator": "Release 2.3.6",
+        "publisher": "ROBOTIS-GIT",
+        "response_sha256": "b3b09a7080c4c60f07831a484124020a684e6a8fe13d97001470efba4510b13a",
+        "retrieved_at": "2026-07-23T15:00:00Z",
+        "url": "https://github.com/ROBOTIS-GIT/turtlebot3/releases/tag/2.3.6"
+      },
+      {
+        "evidence_class": "manufacturer_primary",
+        "evidence_id": "RBTX:EV:019f8f7d-9596-7554-8882-fbaa2a9beb2a",
+        "locator": "Release 4.1.4",
+        "publisher": "ROBOTIS-GIT",
+        "response_sha256": "25af19dadd4b57d1a3f90c0e98fbbd2d74ea4494f7f95c5b389a13284b1a2c21",
+        "retrieved_at": "2026-07-23T15:00:00Z",
+        "url": "https://github.com/ROBOTIS-GIT/open_manipulator/releases/tag/4.1.4"
+      }
+    ],
+    "specifications": [
+      {
+        "assertion_id": "RBTX:A:019f8f7d-9598-78b3-831a-37d111db3b16",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Manufacturer hardware specification; exact product revision not frozen.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Arm input voltage",
+        "predicate": "electrical.input_voltage",
+        "value": "12 V"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-9599-70f9-b750-ab14306459bb",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Includes one gripper degree of freedom.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Arm degrees of freedom",
+        "predicate": "kinematics.degrees_of_freedom",
+        "value": "5"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-959a-773c-8f5e-6b639041f2a9",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Manufacturer specification; orientation, reach, acceleration, duty cycle, and safety factor are not stated in the table.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Arm payload (manufacturer claim)",
+        "predicate": "performance.payload",
+        "value": "0.5 kg"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-959b-7d55-825b-f96d8b8bc3a3",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Manufacturer specification; test method and operating conditions are not stated in the table.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Arm repeatability (manufacturer claim)",
+        "predicate": "performance.repeatability",
+        "value": "< 0.2 mm"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-959c-71c1-8d41-47482970f1ec",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Manufacturer summary specification. The inertia section separately states 711.37 g; this candidate does not silently merge the two values.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Arm summary mass",
+        "predicate": "physical.mass",
+        "value": "0.7 kg"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-959d-71da-8aaa-942d46ad8a45",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Manufacturer summary specification; reference frame is not stated in the table.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Arm reach",
+        "predicate": "geometry.reach",
+        "value": "380 mm"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-959e-7a8b-9a2f-7ddb960da015",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Manufacturer summary specification.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9593-78dc-99d4-1e268039db1e"
+        ],
+        "label": "Gripper stroke",
+        "predicate": "geometry.gripper_stroke",
+        "value": "20-75 mm"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-95a0-7f27-9128-82fa92e441c5",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Waffle Pi row in the manufacturer hardware specification.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9594-7e39-8a42-80cccc977f82"
+        ],
+        "label": "Base envelope",
+        "predicate": "geometry.envelope",
+        "value": "281x306x141 mm"
+      },
+      {
+        "assertion_id": "RBTX:A:019f8f7d-95a1-708d-8c51-8ab968d7354f",
+        "claim_class": "manufacturer_claim",
+        "conditions": "Manufacturer documentation says the instructions were tested on this baseline; exact package, firmware, and patch versions are not frozen.",
+        "evidence_ids": [
+          "RBTX:EV:019f8f7d-9592-701a-8bcc-b11e42d541ae"
+        ],
+        "label": "Documented test baseline",
+        "predicate": "software.tested_baseline",
+        "value": "Ubuntu 22.04 and ROS 2 Humble Hawksbill"
+      }
+    ],
+    "status": {
+      "indexability": "noindex",
+      "label": "Research candidate",
+      "overall_compatibility": "engineering_review_required",
+      "publication_eligible": false,
+      "verified_on": "2026-07-23"
+    },
+    "summary": "An evidence-backed research preview of a TurtleBot3 Waffle Pi base with an OpenMANIPULATOR-X. Manufacturer documentation supports the relationship, but exact revision applicability and multiple engineering dimensions remain open."
+  },
+  "payload_sha256": "973198f5b865217395802094cd059fa26b61f40ab542e29b45f299f4fa0503a3",
+  "projection_state": "candidate",
+  "snapshot_id": "RBTX:S:019f8f7d-996f-7937-a365-c1dd812cb0db",
+  "source_dataset_id": "RBTX:S:019f8f7d-996c-7c8f-9035-1e398f9aa36f",
+  "source_dataset_sha256": "6bcf98e577786db49a2fd11dfbea20daf240e2dec34dfa27713c419ea5e09707"
+}

@@ -1,0 +1,28 @@
+# Inputs forbidden from this clean foundation
+
+The retired catalog CSV or any derivative of it
+The retired catalog image collection or any derivative of it
+Legacy robot importer exports
+Legacy shortcode catalog payloads
+Production database exports
+Production uploads or customer records
+Credentials, cookies, tokens, API keys, private keys, or session files
+Handoff archives and browser-profile data
+Unlicensed third-party imagery, CAD, meshes, fonts, icons, or copy
+
+# Current repository deny patterns
+
+*.csv
+*legacy-catalog*
+*old-catalog*
+*robot-catalog*
+*catalog-images*
+*.sql
+*.sqlite
+*.pem
+*.key
+*.p12
+*.env
+*cookies*
+*credentials*
+*handoff*.zip
