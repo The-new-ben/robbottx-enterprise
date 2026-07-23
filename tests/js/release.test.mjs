@@ -95,3 +95,16 @@ test('temporary deploy route is capability-gated and cache-purging', async () =>
   assert.ok(template.includes("do_action('litespeed_purge_all')"));
   assert.ok(template.includes('wp_cache_flush()'));
 });
+
+test('deploy cleanup retries deletion and independently proves route absence', async () => {
+  const driver = await fs.readFile(
+    path.join(repositoryRoot, 'scripts', 'deploy-wordpress.py'),
+    'utf8'
+  );
+
+  assert.ok(driver.includes('def delete_temporary_snippet('));
+  assert.ok(driver.includes('def prove_deploy_route_absent('));
+  assert.ok(driver.includes('attempts: int = 3'));
+  assert.ok(driver.includes('snippet_deleted and route_absent'));
+  assert.ok(driver.includes('Temporary deploy route cleanup was not proven.'));
+});

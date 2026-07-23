@@ -86,6 +86,11 @@ def request(
     except urllib.error.HTTPError as error:
         body = error.read().decode("utf-8", errors="replace")
         return error.code, error.headers.get("Content-Type", ""), body
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
+        host = urllib.parse.urlsplit(url).netloc
+        raise DeployFailure(
+            f"Transport failure while requesting {host}."
+        ) from error
 
 
 def json_body(status: int, content_type: str, body: str, context: str) -> dict:
@@ -104,6 +109,63 @@ def json_body(status: int, content_type: str, body: str, context: str) -> dict:
 def add_cache_buster(url: str) -> str:
     separator = "&" if "?" in url else "?"
     return f"{url}{separator}rbtxcb={int(time.time())}"
+
+
+def delete_temporary_snippet(
+    base_url: str,
+    snippet_id: int,
+    auth: str,
+    *,
+    attempts: int = 3,
+) -> tuple[bool, list[str]]:
+    failures: list[str] = []
+    for attempt in range(1, attempts + 1):
+        try:
+            status, _, _ = request(
+                f"{base_url}/wp-json/code-snippets/v1/snippets/{snippet_id}",
+                method="DELETE",
+                auth=auth,
+                payload={},
+                timeout=30,
+            )
+            if 200 <= status < 300 or status == 404:
+                return True, failures
+            failures.append(f"delete attempt {attempt} returned HTTP {status}")
+        except Exception as error:  # cleanup must continue to the absence proof
+            failures.append(
+                f"delete attempt {attempt} raised {type(error).__name__}"
+            )
+        if attempt < attempts:
+            time.sleep(attempt)
+    return False, failures
+
+
+def prove_deploy_route_absent(
+    base_url: str,
+    auth: str,
+    *,
+    attempts: int = 3,
+) -> tuple[bool, list[str]]:
+    failures: list[str] = []
+    for attempt in range(1, attempts + 1):
+        try:
+            status, _, _ = request(
+                f"{base_url}/wp-json/agentdeploy/v1/run",
+                method="POST",
+                auth=auth,
+                payload={},
+                timeout=30,
+            )
+            if status == 404:
+                return True, failures
+            failures.append(f"absence attempt {attempt} returned HTTP {status}")
+        except Exception as error:  # retry independently of deletion outcome
+            failures.append(
+                f"absence attempt {attempt} raised {type(error).__name__}"
+            )
+        if attempt < attempts:
+            time.sleep(attempt)
+    return False, failures
 
 
 def main() -> int:
@@ -214,32 +276,32 @@ def main() -> int:
     except Exception as exception:  # deletion must still execute
         failure = exception
     finally:
+        cleanup_failures: list[str] = []
+        snippet_deleted = snippet_id is None
         if snippet_id is not None:
-            status, content_type, body = request(
-                f"{base_url}/wp-json/code-snippets/v1/snippets/{snippet_id}",
-                method="DELETE",
-                auth=auth,
-                payload={},
+            snippet_deleted, delete_failures = delete_temporary_snippet(
+                base_url,
+                snippet_id,
+                auth,
             )
-            if status >= 200 and status < 300:
-                route_removed = True
-            elif failure is None:
-                failure = DeployFailure(
-                    f"Temporary route deletion failed with HTTP {status}."
-                )
+            cleanup_failures.extend(delete_failures)
 
-        status, _, _ = request(
-            f"{base_url}/wp-json/agentdeploy/v1/run",
-            method="POST",
-            auth=auth,
-            payload={},
+        route_absent, absence_failures = prove_deploy_route_absent(
+            base_url,
+            auth,
         )
-        if status != 404:
-            route_removed = False
+        cleanup_failures.extend(absence_failures)
+        route_removed = snippet_deleted and route_absent
+
+        if not route_removed:
+            cleanup_summary = "; ".join(cleanup_failures)
+            cleanup_error = "Temporary deploy route cleanup was not proven."
+            if cleanup_summary:
+                cleanup_error = f"{cleanup_error} {cleanup_summary}."
             if failure is None:
-                failure = DeployFailure(
-                    f"Former deploy route returned HTTP {status}, expected 404."
-                )
+                failure = DeployFailure(cleanup_error)
+            else:
+                failure = DeployFailure(f"{failure} {cleanup_error}")
 
     if failure is not None:
         raise DeployFailure(str(failure))
