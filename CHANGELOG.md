@@ -17,6 +17,8 @@
   its frontend head is absent.
 - Serialized the static block-theme group wrappers so every public template
   exposes exactly one keyboard-targetable `main` landmark.
+- Relied on WordPress core for the single skip link and capability-gated theme
+  overwrites with `update_themes`.
 
 ## 0.1.1
 

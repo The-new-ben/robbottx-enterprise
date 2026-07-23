@@ -147,6 +147,7 @@ test('one-time theme bootstrap is gated for hardened external cleanup', async ()
   );
 
   assert.ok(template.includes("current_user_can('install_themes')"));
+  assert.ok(template.includes("current_user_can('update_themes')"));
   assert.ok(template.includes("current_user_can('switch_themes')"));
   assert.ok(template.includes('new Theme_Upgrader($skin)'));
   assert.ok(template.includes("'overwrite_package' => true"));
