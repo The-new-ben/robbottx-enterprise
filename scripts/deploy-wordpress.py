@@ -33,7 +33,10 @@ def parse_args() -> argparse.Namespace:
         default="/wp-json/robbottx/v1/healthcheck",
     )
     parser.add_argument("--render-path", default="/")
-    parser.add_argument("--new-body-marker", default='class="rbtx-hero"')
+    parser.add_argument(
+        "--new-body-marker",
+        default="<!-- robbottx-core:0.1.0 -->",
+    )
     parser.add_argument("--old-body-marker", default="Welcome to RobbottX")
     parser.add_argument("--execute", action="store_true")
     return parser.parse_args()

@@ -34,6 +34,7 @@ final class Plugin
         add_filter('wp_robots', array(PublicationGate::class, 'filterRobots'));
         add_action('admin_notices', array(PublicationGate::class, 'renderNotice'));
         add_action('admin_notices', array($this, 'renderSnapshotHealth'));
+        add_action('wp_footer', array($this, 'renderRuntimeMarker'), 9999);
     }
 
     public function renderSnapshotHealth(): void
@@ -52,5 +53,10 @@ final class Plugin
             );
             echo '</p></div>';
         }
+    }
+
+    public function renderRuntimeMarker(): void
+    {
+        echo "\n<!-- robbottx-core:" . esc_html(ROBBOTTX_CORE_VERSION) . " -->\n";
     }
 }

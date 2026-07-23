@@ -61,6 +61,23 @@ test('healthcheck source reports the integrity-bound snapshot', async () => {
   assert.equal(snapshot.projection_state, 'candidate');
 });
 
+test('plugin emits a versioned rendered-body marker for deploy verification', async () => {
+  const plugin = await fs.readFile(
+    path.join(
+      repositoryRoot,
+      'wp-content',
+      'plugins',
+      'robbottx-core',
+      'src',
+      'Plugin.php'
+    ),
+    'utf8'
+  );
+
+  assert.ok(plugin.includes("add_action('wp_footer'"));
+  assert.ok(plugin.includes('<!-- robbottx-core:'));
+});
+
 test('temporary deploy route is capability-gated and cache-purging', async () => {
   const template = await fs.readFile(
     path.join(
