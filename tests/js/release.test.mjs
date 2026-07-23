@@ -105,6 +105,7 @@ test('deploy cleanup retries deletion and independently proves route absence', a
   assert.ok(driver.includes('def delete_temporary_snippet('));
   assert.ok(driver.includes('def prove_deploy_route_absent('));
   assert.ok(driver.includes('attempts: int = 3'));
+  assert.ok(driver.includes('f"{snippet_id}?_method=DELETE"'));
   assert.ok(driver.includes('snippet_deleted and route_absent'));
   assert.ok(driver.includes('Temporary deploy route cleanup was not proven.'));
 });

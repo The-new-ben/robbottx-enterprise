@@ -122,8 +122,11 @@ def delete_temporary_snippet(
     for attempt in range(1, attempts + 1):
         try:
             status, _, _ = request(
-                f"{base_url}/wp-json/code-snippets/v1/snippets/{snippet_id}",
-                method="DELETE",
+                (
+                    f"{base_url}/wp-json/code-snippets/v1/snippets/"
+                    f"{snippet_id}?_method=DELETE"
+                ),
+                method="POST",
                 auth=auth,
                 payload={},
                 timeout=30,
