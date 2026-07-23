@@ -109,3 +109,24 @@ test('deploy cleanup retries deletion and independently proves route absence', a
   assert.ok(driver.includes('snippet_deleted and route_absent'));
   assert.ok(driver.includes('Temporary deploy route cleanup was not proven.'));
 });
+
+test('one-time theme bootstrap is capability-gated and self-cleaning compatible', async () => {
+  const template = await fs.readFile(
+    path.join(
+      repositoryRoot,
+      'scripts',
+      'templates',
+      'deploy-theme-route.php.txt'
+    ),
+    'utf8'
+  );
+
+  assert.ok(template.includes("current_user_can('install_themes')"));
+  assert.ok(template.includes("current_user_can('switch_themes')"));
+  assert.ok(template.includes('new Theme_Upgrader($skin)'));
+  assert.ok(template.includes("'overwrite_package' => true"));
+  assert.ok(template.includes("?nlcb=' . time()"));
+  assert.ok(template.includes('switch_theme($theme_slug)'));
+  assert.ok(template.includes("do_action('litespeed_purge_all')"));
+  assert.ok(template.includes('wp_cache_flush()'));
+});
