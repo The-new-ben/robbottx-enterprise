@@ -111,12 +111,17 @@ def main() -> int:
     auth = make_auth(user, password)
 
     status, content_type, body = request(
-        f"{base_url}/wp-json/wp/v2/users/me?_fields=id,roles",
+        f"{base_url}/wp-json/wp/v2/users/me?context=edit&_fields=id,roles,capabilities",
         auth=auth,
     )
     identity = json_body(status, content_type, body, "Application Password verification")
-    if "administrator" not in identity.get("roles", []):
-        raise DeployFailure("Authenticated WordPress user is not an administrator.")
+    if (
+        "administrator" not in identity.get("roles", [])
+        or identity.get("capabilities", {}).get("update_plugins") is not True
+    ):
+        raise DeployFailure(
+            "Authenticated WordPress user lacks administrator/update_plugins authority."
+        )
 
     zip_status, zip_content_type, _ = request(args.zip_url, timeout=90)
     if zip_status != 200 or "html" in zip_content_type:
