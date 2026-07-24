@@ -6,7 +6,7 @@ namespace RobbottX\Core\Presentation;
 
 final class Seo
 {
-    private const HOME_DESCRIPTION = 'Explore robotics systems, components, software, compatibility records, and technical documents with RobbottX.';
+    private const HOME_DESCRIPTION = 'Explore the RobbottX flagship robotics concept through an interactive system view, BOM hierarchy, component classes, interfaces, and mission configuration.';
 
     private static bool $rankMathDescriptionHandled = false;
     private static bool $rankMathJsonLdHandled = false;

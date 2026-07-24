@@ -36,7 +36,7 @@ if (!String(themeJson.$schema).includes('/wp/6.9/')) {
 const style = await fs.readFile(path.join(themeRoot, 'style.css'), 'utf8');
 for (const header of [
   'Theme Name: RobbottX Precision Atlas',
-  'Version: 0.1.5',
+  'Version: 0.1.6',
   'Requires at least: 6.9',
   'Requires PHP: 8.3'
 ]) {
@@ -48,7 +48,7 @@ const readme = await fs.readFile(path.join(themeRoot, 'readme.txt'), 'utf8');
 const assetLicenses = JSON.parse(
   await fs.readFile(path.join(themeRoot, 'ASSET-LICENSES.json'), 'utf8')
 );
-if (!readme.includes('Version: 0.1.5') || assetLicenses.version !== '0.1.5') {
+if (!readme.includes('Version: 0.1.6') || assetLicenses.version !== '0.1.6') {
   throw new Error('Theme style, readme, and asset receipt versions must agree.');
 }
 if (/url\(\s*['"]?https?:/i.test(style) || /@import/i.test(style)) {
@@ -118,6 +118,19 @@ const publicMarkup = await Promise.all(
     'patterns/home-methodology.php'
   ].map((relative) => fs.readFile(path.join(themeRoot, relative), 'utf8'))
 );
+const frontPage = await fs.readFile(
+  path.join(themeRoot, 'templates', 'front-page.html'),
+  'utf8'
+);
+if (!frontPage.includes('wp:robbottx/flagship-system')) {
+  throw new Error('Homepage must render the plugin-owned flagship system block.');
+}
+if (
+  frontPage.includes('wp:pattern {"slug":"robbottx/home-precision-atlas"}') ||
+  frontPage.includes('wp:robbottx/golden-slice')
+) {
+  throw new Error('Homepage still renders the superseded atlas or featured configuration.');
+}
 const combined = publicMarkup.join('\n');
 if (/href\s*=\s*["']#main-content["']/i.test(combined)) {
   throw new Error(

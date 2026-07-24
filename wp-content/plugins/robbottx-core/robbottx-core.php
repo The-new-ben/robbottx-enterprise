@@ -3,7 +3,7 @@
  * Plugin Name:       RobbottX Core
  * Plugin URI:        https://robbottx.com/
  * Description:       Source-backed robotics records and compatibility views for RobbottX.
- * Version:           0.1.6
+ * Version:           0.1.7
  * Requires at least: 6.9
  * Requires PHP:      8.3
  * Author:            RobbottX
@@ -17,9 +17,10 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('ROBBOTTX_CORE_VERSION', '0.1.6');
+define('ROBBOTTX_CORE_VERSION', '0.1.7');
 define('ROBBOTTX_CORE_FILE', __FILE__);
 define('ROBBOTTX_CORE_DIR', plugin_dir_path(__FILE__));
+define('ROBBOTTX_CORE_URL', plugin_dir_url(__FILE__));
 define(
     'ROBBOTTX_CORE_MANIFEST_URL',
     'https://raw.githubusercontent.com/The-new-ben/robbottx-enterprise/main/plugin-dist/robbottx-core.json'

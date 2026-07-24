@@ -1,0 +1,98 @@
+{
+  "artifact": "robbottx-0.1.6.zip",
+  "files": [
+    {
+      "bytes": 329,
+      "path": "robbottx/ASSET-LICENSES.json",
+      "sha256": "b2ced899845c5987e67b02bfebfe8d04a30a12cbec7087721296bc9f53c74e8a"
+    },
+    {
+      "bytes": 326,
+      "path": "robbottx/assets/favicon.svg",
+      "sha256": "7e98a2b38fdfa89dfa35d74ed5a396f66a87811d461489acf97577f171517afe"
+    },
+    {
+      "bytes": 1438,
+      "path": "robbottx/functions.php",
+      "sha256": "b430aa80b04d9cc6e2802128617941f2be4194bda728f62055476fa301de40d0"
+    },
+    {
+      "bytes": 894,
+      "path": "robbottx/parts/footer.html",
+      "sha256": "20fd0564bc1540e7556056152d0caead1bc6055a284cb932986d6d9ba8ae150a"
+    },
+    {
+      "bytes": 685,
+      "path": "robbottx/parts/header.html",
+      "sha256": "b8ca20c2eb761adba5c9ab0fd59bb418f019ede62e2e07064c17fc9dd7bcf684"
+    },
+    {
+      "bytes": 1578,
+      "path": "robbottx/patterns/home-methodology.php",
+      "sha256": "03d7dd212d05a0b484ad7acb1d7f9d6116b81adb031c7b82074b8291ca8cade3"
+    },
+    {
+      "bytes": 4142,
+      "path": "robbottx/patterns/home-precision-atlas.php",
+      "sha256": "b869216c97c64ddf9b1532b4cfe1807a7ce6c8597c8fd5d840813f3aedc32a04"
+    },
+    {
+      "bytes": 281,
+      "path": "robbottx/readme.txt",
+      "sha256": "eadf49621c551a124504bfd1cded349379135bb7dcadc429a2eab50d7793eea9"
+    },
+    {
+      "bytes": 23203,
+      "path": "robbottx/style.css",
+      "sha256": "d85c39cb0af0087c051f3c8613d1d89e1c124edb9aa21458305977c9aad55c39"
+    },
+    {
+      "bytes": 664,
+      "path": "robbottx/templates/404.html",
+      "sha256": "c616ed85beb4c686a3d9d8e0d46a6fd5c811a403e804ff8c09d33dcef0d34cf8"
+    },
+    {
+      "bytes": 471,
+      "path": "robbottx/templates/front-page.html",
+      "sha256": "1a4860ed17b11a3183d416ffcf5ba6ae454e582935e7cf537466826dda16f1c7"
+    },
+    {
+      "bytes": 944,
+      "path": "robbottx/templates/index.html",
+      "sha256": "3c539d41a27a2abaeabeb5faefccb6281c7faf0da9c520d57d18d91be1fb2b04"
+    },
+    {
+      "bytes": 444,
+      "path": "robbottx/templates/page.html",
+      "sha256": "868e7dbb8509e9bfb7191b249d0e5aa884e2de24b199f243e9ddf92af5c2e83b"
+    },
+    {
+      "bytes": 1038,
+      "path": "robbottx/templates/search.html",
+      "sha256": "6ec4cd5ea5affd8955ed607602c22c746a7f626ea6f2db1c8d6f86de02a930b6"
+    },
+    {
+      "bytes": 496,
+      "path": "robbottx/templates/single-rbtx_config.html",
+      "sha256": "9a66dbaa9919f10e1984f065ee5530b54d7e89ef72767c8b36a2d437963189dc"
+    },
+    {
+      "bytes": 444,
+      "path": "robbottx/templates/single-rbtx_entity.html",
+      "sha256": "868e7dbb8509e9bfb7191b249d0e5aa884e2de24b199f243e9ddf92af5c2e83b"
+    },
+    {
+      "bytes": 467,
+      "path": "robbottx/templates/single.html",
+      "sha256": "103a3ca30a920699a8849e0a7587ff39226ead6985b06aeff125b03badda5044"
+    },
+    {
+      "bytes": 3174,
+      "path": "robbottx/theme.json",
+      "sha256": "42316ca7fd8b85955b3b3d00d0ed2546cb2a6d9d3b388616327b0572989b2475"
+    }
+  ],
+  "version": "0.1.6",
+  "zip_bytes": 14499,
+  "zip_sha256": "314fff13b0030e1844fb68f6f13a950021f154595fecb1675e4469bea0c8a0f6"
+}

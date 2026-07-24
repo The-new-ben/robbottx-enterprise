@@ -11,5 +11,8 @@ final class Blocks
         register_block_type(
             ROBBOTTX_CORE_DIR . 'blocks' . DIRECTORY_SEPARATOR . 'golden-slice'
         );
+        register_block_type(
+            ROBBOTTX_CORE_DIR . 'blocks' . DIRECTORY_SEPARATOR . 'flagship-system'
+        );
     }
 }

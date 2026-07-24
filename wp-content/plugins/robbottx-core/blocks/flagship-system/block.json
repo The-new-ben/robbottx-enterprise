@@ -1,15 +1,15 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "robbottx/golden-slice",
+  "name": "robbottx/flagship-system",
   "version": "0.1.7",
-  "title": "RobbottX featured configuration",
+  "title": "RobbottX flagship system",
   "category": "widgets",
-  "icon": "networking",
-  "description": "Renders a source-backed RobbottX system configuration.",
+  "icon": "superhero-alt",
+  "description": "Renders the interactive RobbottX flagship concept and BOM pyramid.",
   "textdomain": "robbottx-core",
   "supports": {
-    "align": ["wide", "full"],
+    "align": ["full"],
     "html": false,
     "multiple": false
   },

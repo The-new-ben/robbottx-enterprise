@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
@@ -38,21 +39,21 @@ test('plugin version header, constant, manifest, and block agree', async () => {
     path.join(
       repositoryRoot,
       'plugin-dist',
-      'robbottx-core-0.1.6.inventory.json'
+      'robbottx-core-0.1.7.inventory.json'
     )
   );
   const snapshot = await readJson(snapshotPath);
 
-  assert.match(plugin, /\* Version:\s+0\.1\.6/);
-  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.6'\)/);
-  assert.equal(block.version, '0.1.6');
-  assert.equal(manifest.version, '0.1.6');
-  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.6.zip'));
+  assert.match(plugin, /\* Version:\s+0\.1\.7/);
+  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.7'\)/);
+  assert.equal(block.version, '0.1.7');
+  assert.equal(manifest.version, '0.1.7');
+  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.7.zip'));
   assert.equal(manifest.download_sha256, inventory.zip_sha256);
   assert.equal(manifest.download_size, inventory.zip_bytes);
   assert.ok(
     manifest.inventory_url.endsWith(
-      'robbottx-core-0.1.6.inventory.json'
+      'robbottx-core-0.1.7.inventory.json'
     )
   );
   assert.equal(manifest.record_hash, snapshot.payload_sha256);
@@ -299,12 +300,14 @@ test('theme release preserves the catalog container and exposes deployment ident
     'utf8'
   );
 
-  assert.ok(style.includes('Version: 0.1.5'));
+  assert.ok(style.includes('Version: 0.1.6'));
   assert.ok(style.includes('.rbtx-golden-slice'));
   assert.ok(style.includes('.rbtx-featured-configuration'));
   assert.ok(functions.includes("'wp_body_open'"));
   assert.ok(functions.includes('<!-- robbottx-theme:%s -->'));
   assert.ok(frontPage.includes('rbtx-main rbtx-atlas-home'));
+  assert.ok(frontPage.includes('wp:robbottx/flagship-system'));
+  assert.ok(!frontPage.includes('wp:robbottx/golden-slice'));
 });
 
 test('theme ships an original cache-versioned favicon with guarded output', async () => {
@@ -337,7 +340,7 @@ test('theme ships an original cache-versioned favicon with guarded output', asyn
       favicon
     )
   );
-  assert.equal(receipt.version, '0.1.5');
+  assert.equal(receipt.version, '0.1.6');
   assert.equal(receipt.assets[0].path, 'assets/favicon.svg');
 });
 
@@ -478,4 +481,81 @@ test('package builders enforce reviewed inventories and emit checksums', async (
   assert.ok(themeBuilder.includes('Unexpected theme package files'));
   assert.ok(themeBuilder.includes('.inventory.json'));
   assert.ok(themeBuilder.includes('"zip_sha256": digest'));
+});
+
+test('flagship release is interactive, count-bound, original, and public-safe', async () => {
+  const pluginRoot = path.join(
+    repositoryRoot,
+    'wp-content',
+    'plugins',
+    'robbottx-core'
+  );
+  const renderer = await fs.readFile(
+    path.join(pluginRoot, 'src', 'Presentation', 'FlagshipSystemRenderer.php'),
+    'utf8'
+  );
+  const view = await fs.readFile(
+    path.join(pluginRoot, 'views', 'flagship-system.php'),
+    'utf8'
+  );
+  const script = await fs.readFile(
+    path.join(pluginRoot, 'assets', 'flagship-system.js'),
+    'utf8'
+  );
+  const style = await fs.readFile(
+    path.join(pluginRoot, 'assets', 'flagship-system.css'),
+    'utf8'
+  );
+  const block = await readJson(
+    path.join(pluginRoot, 'blocks', 'flagship-system', 'block.json')
+  );
+  const assetReceipt = await readJson(
+    path.join(pluginRoot, 'assets', 'ASSET-LICENSES.json')
+  );
+  const image = await fs.readFile(
+    path.join(pluginRoot, 'assets', 'flagship-concept-v1.png')
+  );
+  const publicSource = [renderer, view, script, style].join('\n');
+
+  assert.equal(block.name, 'robbottx/flagship-system');
+  assert.equal(block.version, '0.1.7');
+  assert.equal([...renderer.matchAll(/'id'\s*=>/g)].length, 8);
+  for (const runtimeCount of [
+    "$counts['systems'] !== 8",
+    "$counts['assemblies'] !== 28",
+    "$counts['components'] !== 48",
+    "$counts['materials'] !== 12"
+  ]) {
+    assert.ok(renderer.includes(runtimeCount));
+  }
+  for (const marker of [
+    'interactive-bom-pyramid',
+    'rbtx-flagship-stage',
+    'data-rbtx-canvas',
+    'data-rbtx-system',
+    'data-rbtx-build-brief',
+    'Concept system'
+  ]) {
+    assert.ok(view.includes(marker));
+  }
+  for (const behavior of [
+    'pointerdown',
+    'pointermove',
+    'wheel',
+    'keydown',
+    'prefers-reduced-motion',
+    'IntersectionObserver'
+  ]) {
+    assert.ok(script.includes(behavior));
+  }
+  assert.ok(!/https?:\/\//i.test(script + style));
+  assert.ok(!/\u2014/u.test(publicSource));
+  assert.ok(!/\bRBTX-(?:RS|RP)-\d{3}\b/i.test(publicSource));
+  assert.ok(!/\b(?:Tesla|Atlas|Figure|Unitree|Apptronik)\b/.test(publicSource));
+  assert.equal(assetReceipt.version, '0.1.7');
+  assert.equal(assetReceipt.assets[0].bytes, image.byteLength);
+  assert.equal(
+    assetReceipt.assets[0].sha256,
+    crypto.createHash('sha256').update(image).digest('hex')
+  );
 });

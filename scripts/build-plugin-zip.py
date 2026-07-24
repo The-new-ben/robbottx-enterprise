@@ -13,6 +13,12 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 
 ALLOWED_APPLICATION_FILES = {
+    "assets/ASSET-LICENSES.json",
+    "assets/flagship-concept-v1.png",
+    "assets/flagship-system.css",
+    "assets/flagship-system.js",
+    "blocks/flagship-system/block.json",
+    "blocks/flagship-system/render.php",
     "blocks/golden-slice/block.json",
     "blocks/golden-slice/render.php",
     "readme.txt",
@@ -23,6 +29,7 @@ ALLOWED_APPLICATION_FILES = {
     "src/Plugin.php",
     "src/Presentation/Assets.php",
     "src/Presentation/Blocks.php",
+    "src/Presentation/FlagshipSystemRenderer.php",
     "src/Presentation/GoldenSliceRenderer.php",
     "src/Presentation/Seo.php",
     "src/Projection/MetaFields.php",
@@ -32,6 +39,7 @@ ALLOWED_APPLICATION_FILES = {
     "src/Rest/HealthController.php",
     "src/Updates/UpdateChecker.php",
     "uninstall.php",
+    "views/flagship-system.php",
     "views/golden-slice.php",
 }
 VENDORED_PREFIX = "lib/plugin-update-checker/"

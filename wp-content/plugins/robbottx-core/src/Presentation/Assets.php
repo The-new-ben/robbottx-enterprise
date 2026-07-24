@@ -57,6 +57,27 @@ CSS;
         );
         wp_enqueue_style('robbottx-core');
         wp_add_inline_style('robbottx-core', self::RESPONSIVE_CSS);
+
+        if (! self::isCatalogFrontPage()) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'robbottx-flagship-system',
+            ROBBOTTX_CORE_URL . 'assets/flagship-system.css',
+            array('robbottx-core'),
+            ROBBOTTX_CORE_VERSION
+        );
+        wp_enqueue_script(
+            'robbottx-flagship-system',
+            ROBBOTTX_CORE_URL . 'assets/flagship-system.js',
+            array(),
+            ROBBOTTX_CORE_VERSION,
+            array(
+                'strategy'  => 'defer',
+                'in_footer' => true,
+            )
+        );
     }
 
     public static function prepareFrontPage(): void

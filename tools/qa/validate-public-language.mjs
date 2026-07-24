@@ -16,9 +16,15 @@ const publicFiles = [
   'wp-content/themes/robbottx/templates/search.html',
   'wp-content/themes/robbottx/style.css',
   'wp-content/plugins/robbottx-core/views/golden-slice.php',
+  'wp-content/plugins/robbottx-core/views/flagship-system.php',
+  'wp-content/plugins/robbottx-core/src/Presentation/FlagshipSystemRenderer.php',
+  'wp-content/plugins/robbottx-core/assets/flagship-system.css',
+  'wp-content/plugins/robbottx-core/assets/flagship-system.js',
+  'wp-content/plugins/robbottx-core/assets/ASSET-LICENSES.json',
   'wp-content/plugins/robbottx-core/src/Presentation/Seo.php',
   'wp-content/plugins/robbottx-core/readme.txt',
   'wp-content/plugins/robbottx-core/blocks/golden-slice/block.json',
+  'wp-content/plugins/robbottx-core/blocks/flagship-system/block.json',
   'plugin-dist/robbottx-core.json',
   'wp-content/themes/robbottx/readme.txt',
   'wp-content/themes/robbottx/ASSET-LICENSES.json',
@@ -26,6 +32,7 @@ const publicFiles = [
 ];
 
 const forbidden = [
+  ['em dash character', /\u2014/u],
   ['em dash', /—/u],
   ['golden vertical slice', /\bgolden vertical slice\b/i],
   ['visible golden slice', />[^<]*\bgolden slice\b[^<]*</i],

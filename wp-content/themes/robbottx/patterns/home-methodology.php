@@ -9,21 +9,21 @@
 <!-- wp:html -->
 <section class="rbtx-methodology" aria-labelledby="rbtx-methodology-title">
   <div>
-    <p class="rbtx-eyebrow">How RobbottX records work</p>
-    <h2 id="rbtx-methodology-title">Technical records built for comparison.</h2>
+    <p class="rbtx-eyebrow">How the system map works</p>
+    <h2 id="rbtx-methodology-title">From mission to material family.</h2>
   </div>
   <div class="rbtx-method-steps">
-    <article class="rbtx-method-step"><div><h3>Product identity</h3><p>Manufacturer, family, model, revision, configuration, part number, and supplier offer remain separate.</p></div></article>
-    <article class="rbtx-method-step"><div><h3>Specifications and sources</h3><p>Specifications use normalized units. The source list shows publisher, document location, link, and checksum prefix.</p></div></article>
-    <article class="rbtx-method-step"><div><h3>Compatibility by system layer</h3><p>Mechanical, electrical, protocol, software, performance, safety, and supply conditions are evaluated separately.</p></div></article>
-    <article class="rbtx-method-step"><div><h3>Commercial information</h3><p>Availability is not confirmed for this configuration. Verify price, stock, lead time, warranty, and region with the relevant supplier.</p></div></article>
+    <article class="rbtx-method-step"><div><h3>Mission profile</h3><p>Begin with the task, operating setting, work envelope, and interaction model.</p></div></article>
+    <article class="rbtx-method-step"><div><h3>System architecture</h3><p>Trace mobility, manipulation, perception, compute, energy, safety, tools, and structure as connected domains.</p></div></article>
+    <article class="rbtx-method-step"><div><h3>BOM hierarchy</h3><p>Move from the complete system through assemblies and component classes to material and interface families.</p></div></article>
+    <article class="rbtx-method-step"><div><h3>Configuration brief</h3><p>Turn customer choices into a concise application brief for technical and commercial review.</p></div></article>
   </div>
 </section>
 <section class="rbtx-cta-band" aria-labelledby="rbtx-cta-title">
-  <h2 id="rbtx-cta-title">Explore the featured system configuration.</h2>
+  <h2 id="rbtx-cta-title">Shape the system around your mission.</h2>
   <div class="rbtx-cta-actions">
-    <a class="rbtx-button rbtx-button--primary" href="#featured-configuration">View configuration</a>
-    <a class="rbtx-button rbtx-button--secondary" href="#atlas-search">Search RobbottX</a>
+    <a class="rbtx-button rbtx-button--primary" href="#mission-profile">Build a mission profile</a>
+    <a class="rbtx-button rbtx-button--secondary" href="#system-viewer">Explore the system</a>
   </div>
 </section>
 <!-- /wp:html -->

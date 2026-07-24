@@ -1,0 +1,14 @@
+{
+  "version": "0.1.7",
+  "assets": [
+    {
+      "path": "assets/flagship-concept-v1.png",
+      "source": "Original RobbottX concept artwork created for the flagship system experience",
+      "license": "GPL-2.0-or-later",
+      "public_revision": "flagship-concept-v1",
+      "bytes": 1799790,
+      "sha256": "4a5ab8d3d595c57d1949b7c2d59e5cbd9da1cc4cf9eea786a9682c007cf1e5f1"
+    }
+  ],
+  "note": "The interactive system geometry, interface code, and concept artwork are original RobbottX release assets. No third-party robot model, CAD file, external font, or runtime library is included."
+}
