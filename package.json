@@ -11,18 +11,27 @@
     "build": "npm run build:snapshot && npm run build:preview",
     "build:snapshot": "node tools/build-publication-snapshot.mjs",
     "build:preview": "node tools/build-preview.mjs",
+    "configure:commerce": "python scripts/configure-wordpress-commerce.py",
+    "deploy:robots": "python scripts/deploy-wordpress-robots.py",
     "deploy:theme": "python scripts/deploy-wordpress-theme.py",
     "test": "node --test tests/js/*.test.mjs",
     "test:python": "python -m unittest discover -s tests/python -p \"test_*.py\"",
     "validate:contracts": "node tools/qa/validate-contracts.mjs",
     "validate:forbidden": "node tools/qa/validate-forbidden-inputs.mjs",
+    "validate:boundary": "python scripts/validate-proprietary-boundary.py",
     "validate:language": "node tools/qa/validate-public-language.mjs",
     "validate:theme": "node tools/qa/validate-theme.mjs",
     "validate:php": "node tools/qa/php-lint.mjs",
-    "qa": "npm run build && npm run validate:contracts && npm run validate:forbidden && npm run validate:language && npm run validate:theme && npm run validate:php && npm run test:python && npm test"
+    "verify:lighthouse": "python scripts/run-lighthouse.py",
+    "verify:live": "python scripts/verify-live-release.py",
+    "qa": "npm run build && npm run validate:contracts && npm run validate:forbidden && npm run validate:boundary && npm run validate:language && npm run validate:theme && npm run validate:php && npm run test:python && npm test"
   },
   "devDependencies": {
     "ajv": "8.20.0",
-    "ajv-formats": "2.1.1"
+    "ajv-formats": "2.1.1",
+    "css-tree": "3.2.1",
+    "lighthouse": "13.4.1",
+    "meriyah": "6.1.4",
+    "puppeteer-core": "25.3.0"
   }
 }

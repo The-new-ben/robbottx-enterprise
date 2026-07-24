@@ -54,6 +54,19 @@ add_action(
 );
 
 add_action(
+    'wp_body_open',
+    static function (): void {
+        $theme = wp_get_theme();
+
+        printf(
+            '<!-- robbottx-theme:%s -->' . "\n",
+            esc_html((string) $theme->get('Version'))
+        );
+    },
+    1
+);
+
+add_action(
     'init',
     static function (): void {
         register_block_pattern_category(

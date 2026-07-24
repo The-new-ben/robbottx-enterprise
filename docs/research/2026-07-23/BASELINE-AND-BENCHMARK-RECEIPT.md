@@ -83,19 +83,19 @@ visible. It is an evidence artifact, not part of the desired public design.
 
 Live baseline:
 
-- `screenshots/live-home-desktop-1440x1000.png`
-- `screenshots/live-home-mobile-390x844.png`
+- `screenshots/live-home-desktop-1440x1000.jpg`
+- `screenshots/live-home-mobile-390x844.jpg`
 
 Current benchmark families:
 
 - Premium product:
-  `screenshots/benchmark-premium-apple-macbook-pro-1440x1000.png`
+  `screenshots/benchmark-premium-apple-macbook-pro-1440x1000.jpg`
 - Robotics ecosystem:
-  `screenshots/benchmark-ecosystem-nvidia-robotics-1440x1000.png`
+  `screenshots/benchmark-ecosystem-nvidia-robotics-1440x1000.jpg`
 - Engineering commerce:
-  `screenshots/benchmark-commerce-digikey-products-1440x1000.png`
+  `screenshots/benchmark-commerce-digikey-products-1440x1000.jpg`
 - Closest direct marketplace:
-  `screenshots/benchmark-direct-rbtx-1440x1000.png`
+  `screenshots/benchmark-direct-rbtx-1440x1000.jpg`
 
 Capture limitations:
 
@@ -176,4 +176,3 @@ results, evidence, conditions, exact revisions, and visible unknowns.
    publication snapshot passes evidence and indexability gates.
 5. Treat the current 17 updates and full opcode cache as a separate operations
    workstream, not as an excuse to mix unrelated risk into the first release.
-

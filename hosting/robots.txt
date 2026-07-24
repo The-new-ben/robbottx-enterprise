@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://robbottx.com/wp-sitemap.xml
