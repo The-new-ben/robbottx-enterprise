@@ -11,7 +11,7 @@ const harness = path.join(
   'public-discovery-harness.php'
 );
 
-test('public discovery excludes inherited records without hiding commerce', () => {
+test('public discovery excludes inherited and inactive commerce records', () => {
   const result = spawnSync('php', [harness], {
     cwd: repositoryRoot,
     encoding: 'utf8'
@@ -21,5 +21,5 @@ test('public discovery excludes inherited records without hiding commerce', () =
 
   const receipt = JSON.parse(result.stdout);
   assert.equal(receipt.status, 'PASS');
-  assert.equal(receipt.assertions, 169);
+  assert.equal(receipt.assertions, 560);
 });

@@ -1,0 +1,259 @@
+add_action( 'rest_api_init', static function (): void {
+    $expected_sha256 = '{{ROBOTS_SHA256}}';
+    $expected_size   = {{ROBOTS_SIZE}};
+    $source_url      = base64_decode( '{{RAW_ROBOTS_URL_B64}}', true );
+    $target          = ABSPATH . 'robots.txt';
+
+    $permission = static function (): bool {
+        return current_user_can( 'update_plugins' )
+            && current_user_can( 'manage_options' );
+    };
+
+    $read_state = static function () use (
+        $expected_sha256,
+        $expected_size,
+        $target
+    ): array {
+        clearstatcache( true, $target );
+        $exists  = file_exists( $target ) || is_link( $target );
+        $regular = $exists && ! is_link( $target ) && is_file( $target );
+        $size    = $regular ? filesize( $target ) : false;
+        $sha256  = $regular ? hash_file( 'sha256', $target ) : false;
+        $matches = (
+            $regular
+            && $size === $expected_size
+            && is_string( $sha256 )
+            && hash_equals( $expected_sha256, $sha256 )
+        );
+        $temporary_files = glob(
+            ABSPATH . '.robots-*.tmp',
+            GLOB_NOSORT
+        );
+
+        return array(
+            'exists'                => $exists,
+            'regular_file'          => $regular,
+            'matches'               => $matches,
+            'bytes'                 => is_int( $size ) ? $size : 0,
+            'sha256'                => is_string( $sha256 ) ? $sha256 : '',
+            'temporary_files_absent' => (
+                is_array( $temporary_files )
+                && array() === $temporary_files
+            ),
+        );
+    };
+
+    register_rest_route(
+        'agentrobots/v1',
+        '/run-{{ROUTE_TOKEN}}',
+        array(
+            array(
+                'methods'             => 'GET',
+                'permission_callback' => $permission,
+                'callback'            => static function () use ( $read_state ): array {
+                    return $read_state();
+                },
+            ),
+            array(
+                'methods'             => 'POST',
+                'permission_callback' => $permission,
+                'callback'            => static function () use (
+                    $expected_sha256,
+                    $expected_size,
+                    $read_state,
+                    $source_url,
+                    $target
+                ) {
+                    if (
+                        ! is_string( $source_url )
+                        || ! preg_match(
+                            '#^https://raw\.githubusercontent\.com/'
+                            . 'The-new-ben/robbottx-enterprise/'
+                            . '[0-9a-f]{40}/hosting/robots\.txt$#D',
+                            $source_url
+                        )
+                    ) {
+                        return new WP_Error(
+                            'agentrobots_invalid_source',
+                            'The reviewed robots source URL is invalid.',
+                            array( 'status' => 500 )
+                        );
+                    }
+
+                    $response = wp_safe_remote_get(
+                        $source_url,
+                        array(
+                            'headers'             => array(
+                                'Accept' => 'text/plain',
+                            ),
+                            'limit_response_size' => $expected_size + 1,
+                            'redirection'         => 0,
+                            'timeout'             => 60,
+                        )
+                    );
+                    if ( is_wp_error( $response ) ) {
+                        return new WP_Error(
+                            'agentrobots_download_failed',
+                            'The reviewed robots source could not be downloaded.',
+                            array( 'status' => 500 )
+                        );
+                    }
+
+                    $status       = wp_remote_retrieve_response_code( $response );
+                    $content_type = wp_remote_retrieve_header(
+                        $response,
+                        'content-type'
+                    );
+                    $media_type   = strtolower(
+                        trim( explode( ';', (string) $content_type, 2 )[0] )
+                    );
+                    $payload      = wp_remote_retrieve_body( $response );
+                    if (
+                        200 !== $status
+                        || 'text/plain' !== $media_type
+                        || ! is_string( $payload )
+                        || strlen( $payload ) !== $expected_size
+                        || ! hash_equals(
+                            $expected_sha256,
+                            hash( 'sha256', $payload )
+                        )
+                    ) {
+                        return new WP_Error(
+                            'agentrobots_artifact_mismatch',
+                            'The downloaded robots source did not match the reviewed artifact.',
+                            array( 'status' => 500 )
+                        );
+                    }
+
+                    $before = $read_state();
+                    if ( $before['exists'] && ! $before['matches'] ) {
+                        return new WP_Error(
+                            'agentrobots_existing_conflict',
+                            'The existing root robots file differs from the reviewed artifact.',
+                            array( 'status' => 409 )
+                        );
+                    }
+
+                    $created = false;
+                    $temp    = '';
+                    try {
+                        if ( ! $before['exists'] ) {
+                            $temp = ABSPATH . '.robots-'
+                                . wp_generate_uuid4()
+                                . '.tmp';
+                            $handle = @fopen( $temp, 'x+b' );
+                            if ( false === $handle ) {
+                                throw new RuntimeException(
+                                    'temporary robots file could not be created'
+                                );
+                            }
+
+                            $offset = 0;
+                            $length = strlen( $payload );
+                            while ( $offset < $length ) {
+                                $written = fwrite(
+                                    $handle,
+                                    substr( $payload, $offset )
+                                );
+                                if ( false === $written || 0 === $written ) {
+                                    fclose( $handle );
+                                    throw new RuntimeException(
+                                        'temporary robots file write failed'
+                                    );
+                                }
+                                $offset += $written;
+                            }
+                            if ( ! fflush( $handle ) ) {
+                                fclose( $handle );
+                                throw new RuntimeException(
+                                    'temporary robots file flush failed'
+                                );
+                            }
+                            if (
+                                function_exists( 'fsync' )
+                                && ! fsync( $handle )
+                            ) {
+                                fclose( $handle );
+                                throw new RuntimeException(
+                                    'temporary robots file sync failed'
+                                );
+                            }
+                            if ( ! fclose( $handle ) ) {
+                                throw new RuntimeException(
+                                    'temporary robots file close failed'
+                                );
+                            }
+                            if (
+                                ! @chmod( $temp, 0644 )
+                                || filesize( $temp ) !== $expected_size
+                                || ! hash_equals(
+                                    $expected_sha256,
+                                    (string) hash_file( 'sha256', $temp )
+                                )
+                            ) {
+                                throw new RuntimeException(
+                                    'temporary robots file verification failed'
+                                );
+                            }
+
+                            if ( ! @link( $temp, $target ) ) {
+                                $raced = $read_state();
+                                if ( ! $raced['matches'] ) {
+                                    throw new RuntimeException(
+                                        'root robots file appeared with different bytes'
+                                    );
+                                }
+                            } else {
+                                $created = true;
+                            }
+                            if ( ! @unlink( $temp ) ) {
+                                throw new RuntimeException(
+                                    'temporary robots file cleanup failed'
+                                );
+                            }
+                            $temp = '';
+                        }
+
+                        $after = $read_state();
+                        if (
+                            ! $after['matches']
+                            || ! $after['temporary_files_absent']
+                        ) {
+                            throw new RuntimeException(
+                                'root robots file postcondition failed'
+                            );
+                        }
+
+                        do_action( 'litespeed_purge_all' );
+                        $cache_flush_sent = wp_cache_flush();
+                        if ( true !== $cache_flush_sent ) {
+                            throw new RuntimeException(
+                                'WordPress cache flush failed'
+                            );
+                        }
+
+                        return array(
+                            'result'            => true,
+                            'created'           => $created,
+                            'existing_exact'    => ! $created,
+                            'artifact_verified' => true,
+                            'bytes'             => $expected_size,
+                            'sha256'            => $expected_sha256,
+                            'cache_flush_sent'  => true,
+                            'temporary_files_absent' => true,
+                        );
+                    } catch ( Throwable $error ) {
+                        if ( '' !== $temp && file_exists( $temp ) ) {
+                            @unlink( $temp );
+                        }
+                        return new WP_Error(
+                            'agentrobots_write_failed',
+                            'The reviewed root robots file could not be established.',
+                            array( 'status' => 500 )
+                        );
+                    }
+                },
+            ),
+        )
+    );
+} );

@@ -29,8 +29,18 @@ vertical slice.
 - Do not create a staging environment or backup.
 - Do not store credentials, tokens, cookies, customer data, production exports,
   or secrets in this repository.
+- Do not store unpublished proprietary robot requirements, CAD, URDF/USD,
+  engineering BOMs, calculations, simulations, test data, cost models, supplier
+  negotiations, threat models, vulnerabilities, or manufacturing knowledge in
+  this public repository.
+- Do not export a private engineering record automatically. Only a deliberately
+  approved, field-whitelisted public snapshot may cross the private boundary.
 - Do not publish unsupported engineering, compatibility, certification, stock,
   price, safety, or space-qualification claims.
+- Do not publish an empty storefront, placeholder commerce page, or purchase
+  control without exact product and current supplier, region, quantity-basis,
+  timestamp, and offer-record evidence. Apply the globally installed
+  `robbottx-commerce-evidence-release` skill to all commerce work.
 - Do not turn WordPress posts and taxonomies into the canonical engineering
   database.
 - Do not create mass indexable pages before identity, evidence, canonical,

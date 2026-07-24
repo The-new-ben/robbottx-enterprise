@@ -7,6 +7,15 @@ namespace RobbottX\Core\Discovery;
 final class PublicDiscovery
 {
     private const RETIRED_POST_TYPE = 'robot';
+    private const INACTIVE_COMMERCE_POST_TYPE = 'product';
+    private const INACTIVE_COMMERCE_TAXONOMIES = array(
+        'product_cat',
+        'product_tag',
+        'product_brand',
+        'product_shipping_class',
+        'product_type',
+        'product_visibility',
+    );
 
     /**
      * @var array<string, list<int>>
@@ -20,10 +29,18 @@ final class PublicDiscovery
      */
     private const EXCLUDED_CONTENT = array(
         'post' => array('hello-world'),
-        'page' => array('sample-page', 'robots-catalog'),
+        'page' => array(
+            'sample-page',
+            'robots-catalog',
+            'shop',
+            'cart',
+            'checkout',
+            'my-account',
+        ),
     );
 
     private const EXCLUDED_CATEGORY = 'uncategorized';
+    private const RETIRED_REQUEST_FLAG = '_robbottx_retired_request';
 
     public static function boot(): void
     {
@@ -44,13 +61,63 @@ final class PublicDiscovery
             2
         );
         add_filter(
+            'wp_sitemaps_taxonomies',
+            array(self::class, 'filterSitemapTaxonomies')
+        );
+        add_filter(
             'wp_sitemaps_add_provider',
             array(self::class, 'filterSitemapProvider'),
             10,
             2
         );
+        add_filter(
+            'rank_math/sitemap/exclude_post_type',
+            array(self::class, 'filterRankMathSitemapPostType'),
+            10,
+            2
+        );
+        add_filter(
+            'rank_math/sitemap/exclude_taxonomy',
+            array(self::class, 'filterRankMathSitemapTaxonomy'),
+            10,
+            2
+        );
+        add_filter(
+            'rank_math/sitemap/html_sitemap_post_types',
+            array(self::class, 'filterRankMathHtmlSitemapPostTypes')
+        );
+        add_filter(
+            'rank_math/sitemap/html_sitemap_taxonomies',
+            array(self::class, 'filterRankMathHtmlSitemapTaxonomies')
+        );
 
         add_action('pre_get_posts', array(self::class, 'filterMainQuery'));
+        add_action(
+            'wp_loaded',
+            array(self::class, 'blockClassicCommerceRequest'),
+            -PHP_INT_MAX
+        );
+        add_action(
+            'template_redirect',
+            array(self::class, 'retireFrontendRequest'),
+            0
+        );
+        add_filter(
+            'redirect_canonical',
+            array(self::class, 'filterCanonicalRedirect'),
+            PHP_INT_MAX,
+            2
+        );
+        add_filter(
+            'old_slug_redirect_post_id',
+            array(self::class, 'filterOldSlugRedirectPostId'),
+            PHP_INT_MAX
+        );
+        add_filter(
+            'old_slug_redirect_url',
+            array(self::class, 'filterOldSlugRedirectUrl'),
+            PHP_INT_MAX
+        );
         add_filter('wp_robots', array(self::class, 'filterRobots'), 30);
         add_filter(
             'rank_math/frontend/robots',
@@ -81,6 +148,35 @@ final class PublicDiscovery
             array(self::class, 'filterRestRobotQuery'),
             10,
             2
+        );
+        add_filter(
+            'rest_product_query',
+            array(self::class, 'filterRestProductQuery'),
+            10,
+            2
+        );
+        add_filter(
+            'rest_product_cat_query',
+            array(self::class, 'filterRestProductTaxonomyQuery'),
+            10,
+            2
+        );
+        add_filter(
+            'rest_product_tag_query',
+            array(self::class, 'filterRestProductTaxonomyQuery'),
+            10,
+            2
+        );
+        add_filter(
+            'rest_product_brand_query',
+            array(self::class, 'filterRestProductTaxonomyQuery'),
+            10,
+            2
+        );
+        add_action(
+            'init',
+            array(self::class, 'registerInactiveCommerceRestFilters'),
+            PHP_INT_MAX
         );
         add_filter(
             'rest_term_search_query',
@@ -150,6 +246,7 @@ final class PublicDiscovery
     public static function filterSitemapPostTypes(array $postTypes): array
     {
         unset($postTypes[self::RETIRED_POST_TYPE]);
+        unset($postTypes[self::INACTIVE_COMMERCE_POST_TYPE]);
 
         return $postTypes;
     }
@@ -162,7 +259,16 @@ final class PublicDiscovery
         array $arguments,
         string $postType
     ): array {
-        if ($postType === self::RETIRED_POST_TYPE) {
+        if (
+            in_array(
+                $postType,
+                array(
+                    self::RETIRED_POST_TYPE,
+                    self::INACTIVE_COMMERCE_POST_TYPE,
+                ),
+                true
+            )
+        ) {
             return self::forceNoPostResults($arguments);
         }
 
@@ -180,6 +286,10 @@ final class PublicDiscovery
         array $arguments,
         string $taxonomy
     ): array {
+        if (self::isInactiveCommerceTaxonomy($taxonomy)) {
+            return self::forceNoTermResults($arguments);
+        }
+
         if ($taxonomy !== 'category') {
             return $arguments;
         }
@@ -187,11 +297,101 @@ final class PublicDiscovery
         return self::excludeTermId($arguments);
     }
 
+    /**
+     * @param array<string, mixed> $taxonomies
+     * @return array<string, mixed>
+     */
+    public static function filterSitemapTaxonomies(
+        array $taxonomies
+    ): array {
+        foreach (array_keys($taxonomies) as $taxonomy) {
+            if (self::isInactiveCommerceTaxonomy((string) $taxonomy)) {
+                unset($taxonomies[$taxonomy]);
+            }
+        }
+
+        return $taxonomies;
+    }
+
     public static function filterSitemapProvider(
         mixed $provider,
         string $name
     ): mixed {
         return $name === 'users' ? false : $provider;
+    }
+
+    public static function filterRankMathSitemapPostType(
+        mixed $excluded,
+        string $postType
+    ): bool {
+        return (bool) $excluded
+            || in_array(
+                $postType,
+                array(
+                    self::RETIRED_POST_TYPE,
+                    self::INACTIVE_COMMERCE_POST_TYPE,
+                ),
+                true
+            );
+    }
+
+    public static function filterRankMathSitemapTaxonomy(
+        mixed $excluded,
+        string $taxonomy
+    ): bool {
+        return (bool) $excluded
+            || self::isInactiveCommerceTaxonomy($taxonomy);
+    }
+
+    /**
+     * @param array<int|string, mixed> $postTypes
+     * @return array<int|string, mixed>
+     */
+    public static function filterRankMathHtmlSitemapPostTypes(
+        array $postTypes
+    ): array {
+        $wasList = array_is_list($postTypes);
+
+        foreach ($postTypes as $key => $value) {
+            $name = self::namedItemName($key, $value);
+
+            if (
+                in_array(
+                    $name,
+                    array(
+                        self::RETIRED_POST_TYPE,
+                        self::INACTIVE_COMMERCE_POST_TYPE,
+                    ),
+                    true
+                )
+            ) {
+                unset($postTypes[$key]);
+            }
+        }
+
+        return $wasList ? array_values($postTypes) : $postTypes;
+    }
+
+    /**
+     * @param array<int|string, mixed> $taxonomies
+     * @return array<int|string, mixed>
+     */
+    public static function filterRankMathHtmlSitemapTaxonomies(
+        array $taxonomies
+    ): array {
+        $wasList = array_is_list($taxonomies);
+
+        foreach ($taxonomies as $key => $value) {
+            if (
+                self::isInactiveCommerceTaxonomy(
+                    self::namedItemName($key, $value)
+                )
+            ) {
+                unset($taxonomies[$key]);
+            }
+        }
+
+        return $wasList ? array_values($taxonomies) : $taxonomies;
     }
 
     public static function filterMainQuery(object $query): void
@@ -213,8 +413,23 @@ final class PublicDiscovery
         $isHiddenCategory = self::isExcludedCategoryQuery($query);
         $isRetiredArchive = method_exists($query, 'is_post_type_archive')
             && $query->is_post_type_archive(self::RETIRED_POST_TYPE);
+        $isInactiveCommerceArchive = method_exists(
+            $query,
+            'is_post_type_archive'
+        ) && $query->is_post_type_archive(
+            self::INACTIVE_COMMERCE_POST_TYPE
+        );
+        $isInactiveCommerceTaxonomy = self::isInactiveCommerceTaxonomyQuery(
+            $query
+        );
 
-        if ($isAuthor || $isHiddenCategory || $isRetiredArchive) {
+        if (
+            $isAuthor
+            || $isHiddenCategory
+            || $isRetiredArchive
+            || $isInactiveCommerceArchive
+            || $isInactiveCommerceTaxonomy
+        ) {
             self::forceQueryNoResults($query);
             return;
         }
@@ -226,8 +441,83 @@ final class PublicDiscovery
         self::excludeIdsFromQuery($query, self::excludedContentIds());
 
         if ($isSearch || $isFeed) {
-            self::excludeRetiredPostType($query, $isSearch);
+            self::excludeHiddenPostTypes($query, $isSearch);
         }
+    }
+
+    public static function blockClassicCommerceRequest(): void
+    {
+        if (
+            is_admin()
+            || self::canEditHiddenContent()
+            || ! self::isClassicCommerceRequest()
+        ) {
+            return;
+        }
+
+        status_header(404);
+        nocache_headers();
+        wp_die(
+            esc_html__('Not found.', 'robbottx-core'),
+            esc_html__('Page not found.', 'robbottx-core'),
+            array('response' => 404)
+        );
+    }
+
+    public static function retireFrontendRequest(): void
+    {
+        if (
+            is_admin()
+            || self::canEditHiddenContent()
+            || ! self::isExcludedFrontendRequest()
+        ) {
+            return;
+        }
+
+        global $wp_query;
+
+        if (
+            ! is_object($wp_query)
+            || ! method_exists($wp_query, 'set')
+            || ! method_exists($wp_query, 'set_404')
+        ) {
+            status_header(410);
+            nocache_headers();
+            wp_die(
+                esc_html__(
+                    'This address is no longer available.',
+                    'robbottx-core'
+                ),
+                esc_html__('Page not found.', 'robbottx-core'),
+                array('response' => 410)
+            );
+
+            return;
+        }
+
+        $wp_query->set(self::RETIRED_REQUEST_FLAG, true);
+        $wp_query->set_404();
+        status_header(410);
+        nocache_headers();
+    }
+
+    public static function filterCanonicalRedirect(
+        mixed $redirectUrl,
+        mixed $requestedUrl
+    ): mixed {
+        return self::isRetiredQueryFlagged() ? false : $redirectUrl;
+    }
+
+    public static function filterOldSlugRedirectPostId(
+        mixed $postId
+    ): mixed {
+        return self::isRetiredQueryFlagged() ? 0 : $postId;
+    }
+
+    public static function filterOldSlugRedirectUrl(
+        mixed $redirectUrl
+    ): mixed {
+        return self::isRetiredQueryFlagged() ? false : $redirectUrl;
     }
 
     /**
@@ -278,16 +568,26 @@ final class PublicDiscovery
         }
 
         $method = strtoupper((string) $request->get_method());
+        $route  = rtrim((string) $request->get_route(), '/');
+
+        if (
+            ! self::canEditHiddenContent()
+            && preg_match('#^/wc/store(?:/|$)#', $route) === 1
+        ) {
+            return new \WP_Error(
+                'rest_not_found',
+                'Not found.',
+                array('status' => 404)
+            );
+        }
 
         if (! in_array($method, array('GET', 'HEAD'), true)) {
             return $result;
         }
 
-        $route = rtrim((string) $request->get_route(), '/');
-
         if (
             preg_match(
-                '#^/wp/v2/(robot|posts|pages|categories|users)/([0-9]+)$#',
+                '#^/wp/v2/([a-z0-9_-]+)/([0-9]+)$#i',
                 $route,
                 $matches
             ) !== 1
@@ -295,7 +595,7 @@ final class PublicDiscovery
             return $result;
         }
 
-        $resource = $matches[1];
+        $resource = strtolower($matches[1]);
         $resourceId = (int) $matches[2];
 
         if (! self::isBlockedRestDetail($resource, $resourceId)) {
@@ -332,7 +632,7 @@ final class PublicDiscovery
             $postTypes = self::publicSearchPostTypes(true);
         }
 
-        $filtered = self::withoutRetiredPostType($postTypes);
+        $filtered = self::withoutHiddenPostTypes($postTypes);
 
         if ($filtered === array()) {
             return self::forceNoPostResults($arguments);
@@ -382,6 +682,44 @@ final class PublicDiscovery
         return self::canEditHiddenContent()
             ? $arguments
             : self::forceNoPostResults($arguments);
+    }
+
+    /**
+     * @param array<string, mixed> $arguments
+     * @return array<string, mixed>
+     */
+    public static function filterRestProductQuery(
+        array $arguments,
+        mixed $request
+    ): array {
+        return self::canEditHiddenContent()
+            ? $arguments
+            : self::forceNoPostResults($arguments);
+    }
+
+    /**
+     * @param array<string, mixed> $arguments
+     * @return array<string, mixed>
+     */
+    public static function filterRestProductTaxonomyQuery(
+        array $arguments,
+        mixed $request
+    ): array {
+        return self::canEditHiddenContent()
+            ? $arguments
+            : self::forceNoTermResults($arguments);
+    }
+
+    public static function registerInactiveCommerceRestFilters(): void
+    {
+        foreach (self::inactiveCommerceTaxonomies() as $taxonomy) {
+            add_filter(
+                'rest_' . $taxonomy . '_query',
+                array(self::class, 'filterRestProductTaxonomyQuery'),
+                10,
+                2
+            );
+        }
     }
 
     /**
@@ -523,7 +861,14 @@ final class PublicDiscovery
                     $objectId = (int) ($item->object_id ?? 0);
 
                     if (
-                        $object === self::RETIRED_POST_TYPE
+                        in_array(
+                            $object,
+                            array(
+                                self::RETIRED_POST_TYPE,
+                                self::INACTIVE_COMMERCE_POST_TYPE,
+                            ),
+                            true
+                        )
                         && in_array(
                             $type,
                             array('post_type', 'post_type_archive'),
@@ -542,9 +887,14 @@ final class PublicDiscovery
 
                     if (
                         $type === 'taxonomy'
-                        && $object === 'category'
-                        && $excludedTermId > 0
-                        && $objectId === $excludedTermId
+                        && (
+                            (
+                                $object === 'category'
+                                && $excludedTermId > 0
+                                && $objectId === $excludedTermId
+                            )
+                            || self::isInactiveCommerceTaxonomy($object)
+                        )
                     ) {
                         return false;
                     }
@@ -584,8 +934,21 @@ final class PublicDiscovery
         string $resource,
         int $resourceId
     ): bool {
-        if ($resource === self::RETIRED_POST_TYPE) {
+        if (
+            in_array(
+                $resource,
+                array(
+                    self::RETIRED_POST_TYPE,
+                    self::INACTIVE_COMMERCE_POST_TYPE,
+                ),
+                true
+            )
+        ) {
             return ! current_user_can('edit_post', $resourceId);
+        }
+
+        if (self::isInactiveCommerceRestResource($resource)) {
+            return ! self::canEditHiddenContent();
         }
 
         if ($resource === 'posts') {
@@ -642,6 +1005,30 @@ final class PublicDiscovery
         return $categoryId > 0 && $categoryId === self::excludedCategoryId();
     }
 
+    private static function namedItemName(
+        int|string $key,
+        mixed $value
+    ): string {
+        if (is_string($key)) {
+            return $key;
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        return is_object($value)
+            ? (string) ($value->name ?? '')
+            : '';
+    }
+
+    private static function isInactiveCommerceTaxonomyQuery(
+        object $query
+    ): bool {
+        return method_exists($query, 'is_tax')
+            && (bool) $query->is_tax(self::inactiveCommerceTaxonomies());
+    }
+
     private static function forceQueryNoResults(object $query): void
     {
         if (method_exists($query, 'set')) {
@@ -669,7 +1056,7 @@ final class PublicDiscovery
         $query->set('post__not_in', self::mergeIds($existing, $ids));
     }
 
-    private static function excludeRetiredPostType(
+    private static function excludeHiddenPostTypes(
         object $query,
         bool $isSearch
     ): void {
@@ -688,14 +1075,23 @@ final class PublicDiscovery
         } elseif ($postTypes === 'any') {
             $postTypes = self::publicSearchPostTypes(false);
         } elseif (is_string($postTypes)) {
-            if ($postTypes === self::RETIRED_POST_TYPE) {
+            if (
+                in_array(
+                    $postTypes,
+                    array(
+                        self::RETIRED_POST_TYPE,
+                        self::INACTIVE_COMMERCE_POST_TYPE,
+                    ),
+                    true
+                )
+            ) {
                 self::forceQueryNoResults($query);
             }
 
             return;
         }
 
-        $filtered = self::withoutRetiredPostType($postTypes);
+        $filtered = self::withoutHiddenPostTypes($postTypes);
 
         if ($filtered === array()) {
             self::forceQueryNoResults($query);
@@ -724,7 +1120,10 @@ final class PublicDiscovery
         return array_values(
             array_diff(
                 array_map('strval', (array) $postTypes),
-                array(self::RETIRED_POST_TYPE)
+                array(
+                    self::RETIRED_POST_TYPE,
+                    self::INACTIVE_COMMERCE_POST_TYPE,
+                )
             )
         );
     }
@@ -732,7 +1131,7 @@ final class PublicDiscovery
     /**
      * @return list<string>
      */
-    private static function withoutRetiredPostType(mixed $postTypes): array
+    private static function withoutHiddenPostTypes(mixed $postTypes): array
     {
         $postTypes = is_array($postTypes) ? $postTypes : array($postTypes);
 
@@ -740,7 +1139,14 @@ final class PublicDiscovery
             array_filter(
                 array_map('strval', $postTypes),
                 static fn (string $postType): bool => $postType !== ''
-                    && $postType !== self::RETIRED_POST_TYPE
+                    && ! in_array(
+                        $postType,
+                        array(
+                            self::RETIRED_POST_TYPE,
+                            self::INACTIVE_COMMERCE_POST_TYPE,
+                        ),
+                        true
+                    )
             )
         );
     }
@@ -818,6 +1224,17 @@ final class PublicDiscovery
     }
 
     /**
+     * @param array<string, mixed> $arguments
+     * @return array<string, mixed>
+     */
+    private static function forceNoTermResults(array $arguments): array
+    {
+        $arguments['include'] = array(0);
+
+        return $arguments;
+    }
+
+    /**
      * @return list<int>
      */
     private static function excludedContentIds(): array
@@ -873,14 +1290,151 @@ final class PublicDiscovery
         return self::$excludedCategoryIdCache;
     }
 
+    /**
+     * @return list<string>
+     */
+    private static function inactiveCommerceTaxonomies(): array
+    {
+        if (function_exists('get_object_taxonomies')) {
+            $taxonomies = array_values(
+                array_unique(
+                    array_filter(
+                        array_map(
+                            'strval',
+                            (array) get_object_taxonomies(
+                                self::INACTIVE_COMMERCE_POST_TYPE,
+                                'names'
+                            )
+                        ),
+                        static fn (string $taxonomy): bool => $taxonomy !== ''
+                    )
+                )
+            );
+
+            if ($taxonomies !== array()) {
+                return $taxonomies;
+            }
+        }
+
+        return self::INACTIVE_COMMERCE_TAXONOMIES;
+    }
+
+    private static function isInactiveCommerceTaxonomy(
+        string $taxonomy
+    ): bool {
+        return in_array(
+            $taxonomy,
+            self::inactiveCommerceTaxonomies(),
+            true
+        ) || str_starts_with($taxonomy, 'pa_');
+    }
+
+    private static function isInactiveCommerceRestResource(
+        string $resource
+    ): bool {
+        if (self::isInactiveCommerceTaxonomy($resource)) {
+            return true;
+        }
+
+        foreach (self::inactiveCommerceTaxonomies() as $taxonomy) {
+            if (! function_exists('get_taxonomy')) {
+                continue;
+            }
+
+            $taxonomyObject = get_taxonomy($taxonomy);
+            $restBase = is_object($taxonomyObject)
+                ? (string) ($taxonomyObject->rest_base ?? '')
+                : '';
+
+            if ($restBase !== '' && strtolower($restBase) === $resource) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function isClassicCommerceRequest(): bool
+    {
+        foreach (array('wc-ajax', 'add-to-cart') as $requestKey) {
+            if (
+                array_key_exists($requestKey, $_GET)
+                || array_key_exists($requestKey, $_POST)
+                || array_key_exists($requestKey, $_REQUEST)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function isInactiveCommerceTaxonomyPath(
+        string $path
+    ): bool {
+        $rewriteSlugs = array(
+            'product-category',
+            'product-tag',
+            'product-brand',
+        );
+
+        if (function_exists('get_taxonomy')) {
+            foreach (self::inactiveCommerceTaxonomies() as $taxonomy) {
+                $taxonomyObject = get_taxonomy($taxonomy);
+                $rewrite = is_object($taxonomyObject)
+                    ? ($taxonomyObject->rewrite ?? null)
+                    : null;
+                $rewriteSlug = is_array($rewrite)
+                    ? (string) ($rewrite['slug'] ?? '')
+                    : (is_string($rewrite) ? $rewrite : '');
+
+                if ($rewriteSlug !== '') {
+                    $rewriteSlugs[] = trim($rewriteSlug, '/');
+                }
+            }
+        }
+
+        foreach (array_unique($rewriteSlugs) as $rewriteSlug) {
+            if (
+                $rewriteSlug !== ''
+                && preg_match(
+                    '#(?:^|/)'
+                    . preg_quote($rewriteSlug, '#')
+                    . '(?:/|$)#',
+                    $path
+                ) === 1
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static function isExcludedFrontendRequest(): bool
     {
+        if (self::isRetiredQueryFlagged()) {
+            return true;
+        }
+
         return is_singular(self::RETIRED_POST_TYPE)
+            || is_singular(self::INACTIVE_COMMERCE_POST_TYPE)
             || is_post_type_archive(self::RETIRED_POST_TYPE)
+            || is_post_type_archive(self::INACTIVE_COMMERCE_POST_TYPE)
+            || is_tax(self::inactiveCommerceTaxonomies())
             || is_page(self::EXCLUDED_CONTENT['page'])
             || is_single(self::EXCLUDED_CONTENT['post'])
             || is_category(self::EXCLUDED_CATEGORY)
             || is_author();
+    }
+
+    private static function isRetiredQueryFlagged(): bool
+    {
+        global $wp_query;
+
+        return is_object($wp_query)
+            && method_exists($wp_query, 'get')
+            && (bool) $wp_query->get(self::RETIRED_REQUEST_FLAG);
     }
 
     /**
@@ -951,17 +1505,18 @@ final class PublicDiscovery
         }
 
         return preg_match(
-            '#(?:^|/)(?:robots-catalog|sample-page|hello-world)$#',
+            '#(?:^|/)(?:robots-catalog|sample-page|hello-world|shop|cart|checkout|my-account)(?:/|$)#',
             $path
         ) === 1
             || preg_match(
-                '#(?:^|/)(?:robot|robots)(?:/[^/]+)?$#',
+                '#(?:^|/)(?:robot|robots|product)(?:/|$)#',
                 $path
             ) === 1
             || preg_match(
                 '#(?:^|/)category/uncategorized$#',
                 $path
             ) === 1
+            || self::isInactiveCommerceTaxonomyPath($path)
             || preg_match('#(?:^|/)author/[^/]+$#', $path) === 1;
     }
 }

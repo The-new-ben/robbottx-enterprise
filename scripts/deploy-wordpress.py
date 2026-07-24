@@ -8,15 +8,20 @@ import base64
 import hashlib
 import io
 import json
+import math
 import os
 import re
 import secrets
+import stat
+import subprocess
 import sys
 import time
+import types
 import urllib.error
 import urllib.parse
 import urllib.request
-from pathlib import Path
+from datetime import datetime, timedelta, timezone
+from pathlib import Path, PurePosixPath
 from zipfile import BadZipFile, ZipFile
 
 
@@ -49,6 +54,31 @@ MAX_PUBLIC_ZIP_BYTES = 256 * 1024 * 1024
 MAX_TEXT_ARCHIVE_MEMBER_BYTES = 16 * 1024 * 1024
 MAX_TEXT_RESPONSE_BYTES = 16 * 1024 * 1024
 MAX_UNCOMPRESSED_ARCHIVE_BYTES = 1024 * 1024 * 1024
+MAX_BOUNDARY_RECEIPT_BYTES = 64 * 1024
+MAX_BOUNDARY_SCANNER_BYTES = 4 * 1024 * 1024
+MAX_DEPLOY_ROUTE_TEMPLATE_BYTES = 1024 * 1024
+MAX_BOUNDARY_RELEASE_ARTIFACTS = 10_000
+MAX_TRUSTED_GIT_EXECUTABLE_BYTES = 128 * 1024 * 1024
+MAX_TRUSTED_GIT_OUTPUT_BYTES = 128 * 1024 * 1024
+MAX_CODE_SNIPPETS_RECORDS = 98
+BOUNDARY_RECEIPT_TYPE = "robbottx_public_boundary_release"
+BOUNDARY_RECEIPT_MAX_AGE = timedelta(minutes=15)
+BOUNDARY_RECEIPT_MAX_FUTURE_SKEW = timedelta(0)
+BOUNDARY_SCANNER_MODULE_NAME = "_robbottx_reviewed_boundary_scanner"
+TRUSTED_GIT_TIMEOUT_SECONDS = 60
+TRUSTED_GIT_SUBCOMMANDS = {
+    "cat-file",
+    "check-ignore",
+    "ls-files",
+    "rev-parse",
+    "status",
+}
+DEPLOY_CALLBACK_FIELDS = {
+    "result",
+    "active",
+    "version",
+    "artifact_verified",
+}
 
 
 class DeployFailure(RuntimeError):
@@ -91,6 +121,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--zip-sha256", required=True)
     parser.add_argument("--zip-size", required=True, type=int)
     parser.add_argument("--record-hash", required=True)
+    parser.add_argument(
+        "--boundary-receipt",
+        required=True,
+        type=Path,
+    )
     parser.add_argument("--package-marker", required=True)
     parser.add_argument("--plugin-slug", default="robbottx-core")
     parser.add_argument("--plugin-main-file", default="robbottx-core.php")
@@ -194,6 +229,816 @@ def validate_release_inputs(
     return expected_inventory_url, expected_manifest_url
 
 
+def _json_object_without_duplicate_keys(
+    pairs: list[tuple[str, object]],
+) -> dict[str, object]:
+    document: dict[str, object] = {}
+    for key, value in pairs:
+        if key in document:
+            raise ValueError("duplicate JSON object key")
+        document[key] = value
+    return document
+
+
+def _reject_json_constant(value: str) -> object:
+    raise ValueError(f"invalid JSON constant: {value}")
+
+
+def _parse_finite_json_float(value: str) -> float:
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError("non-finite JSON number")
+    return parsed
+
+
+def _strict_json_loads(body: str) -> object:
+    return json.loads(
+        body,
+        object_pairs_hook=_json_object_without_duplicate_keys,
+        parse_constant=_reject_json_constant,
+        parse_float=_parse_finite_json_float,
+    )
+
+
+def _is_sha256(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+    )
+
+
+def _has_exact_keys(value: object, expected: set[str]) -> bool:
+    return isinstance(value, dict) and set(value) == expected
+
+
+def _trusted_windows_git_roots() -> list[Path]:
+    roots = [Path("C:/Program Files/Git")]
+    try:
+        import winreg
+    except ImportError:
+        return roots
+
+    access_modes = [winreg.KEY_READ]
+    for attribute in ("KEY_WOW64_64KEY", "KEY_WOW64_32KEY"):
+        mode = getattr(winreg, attribute, 0)
+        if mode:
+            access_modes.append(winreg.KEY_READ | mode)
+    for access_mode in access_modes:
+        try:
+            with winreg.OpenKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SOFTWARE\GitForWindows",
+                0,
+                access_mode,
+            ) as key:
+                install_path, value_type = winreg.QueryValueEx(
+                    key,
+                    "InstallPath",
+                )
+        except OSError:
+            continue
+        if (
+            value_type in (winreg.REG_SZ, winreg.REG_EXPAND_SZ)
+            and isinstance(install_path, str)
+            and install_path
+        ):
+            roots.append(Path(install_path))
+    return roots
+
+
+def _posix_system_owned_path(path: Path) -> bool:
+    current = path
+    while True:
+        try:
+            metadata = current.stat()
+        except OSError:
+            return False
+        if metadata.st_uid != 0 or metadata.st_mode & 0o022:
+            return False
+        if current.parent == current:
+            return True
+        current = current.parent
+
+
+def resolve_trusted_git_executable() -> Path:
+    candidates: list[tuple[Path, Path | None]] = []
+    if os.name == "nt":
+        for root in _trusted_windows_git_roots():
+            candidates.extend(
+                (
+                    (root / "cmd" / "git.exe", root),
+                    (root / "bin" / "git.exe", root),
+                )
+            )
+    else:
+        candidates.extend(
+            (Path(value), None)
+            for value in (
+                "/usr/bin/git",
+                "/bin/git",
+                "/usr/local/bin/git",
+            )
+        )
+
+    seen: set[Path] = set()
+    for candidate, trusted_root in candidates:
+        try:
+            resolved = candidate.resolve(strict=True)
+            metadata = resolved.stat()
+        except (OSError, RuntimeError):
+            continue
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_size <= 0
+            or metadata.st_size > MAX_TRUSTED_GIT_EXECUTABLE_BYTES
+        ):
+            continue
+        if trusted_root is not None:
+            try:
+                resolved.relative_to(trusted_root.resolve(strict=True))
+            except (OSError, RuntimeError, ValueError):
+                continue
+        elif not _posix_system_owned_path(resolved):
+            continue
+        return resolved
+    raise DeployFailure(
+        "No protected absolute Git executable is available for boundary verification."
+    )
+
+
+def _trusted_git_environment(git_executable: Path) -> dict[str, str]:
+    path_entries = [str(git_executable.parent)]
+    if os.name == "nt":
+        git_root = git_executable.parent.parent
+        path_entries.extend(
+            str(path)
+            for path in (
+                git_root / "cmd",
+                git_root / "bin",
+                git_root / "mingw64" / "bin",
+                Path("C:/Windows/System32"),
+            )
+            if path.is_dir()
+        )
+    else:
+        path_entries.extend(("/usr/bin", "/bin"))
+    return {
+        "PATH": os.pathsep.join(dict.fromkeys(path_entries)),
+        "LANG": "C",
+        "LC_ALL": "C",
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_CONFIG_COUNT": "1",
+        "GIT_CONFIG_KEY_0": "core.fsmonitor",
+        "GIT_CONFIG_VALUE_0": "false",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "GIT_PAGER": "cat",
+        "GIT_TERMINAL_PROMPT": "0",
+        "PAGER": "cat",
+    }
+
+
+class _TrustedGitSubprocess:
+    def __init__(
+        self,
+        run_callable,
+        git_executable: Path,
+        repository_root: Path,
+    ) -> None:
+        self._run_callable = run_callable
+        self._git_executable = git_executable
+        self._repository_root = repository_root
+        self._environment = _trusted_git_environment(git_executable)
+
+    def run(self, command, *positional, **kwargs):
+        if (
+            not isinstance(command, (list, tuple))
+            or len(command) < 4
+            or len(command) > 16
+            or any(
+                not isinstance(argument, str)
+                or "\x00" in argument
+                or len(argument) > 32_768
+                for argument in command
+            )
+            or command[0] != "git"
+            or command[1] != "-C"
+            or command[3] not in TRUSTED_GIT_SUBCOMMANDS
+            or positional
+            or not set(kwargs).issubset(
+                {"capture_output", "check", "text"}
+            )
+            or kwargs.get("capture_output") is not True
+            or kwargs.get("check") not in (None, False)
+            or kwargs.get("text") not in (None, False, True)
+        ):
+            raise OSError("unreviewed Git invocation")
+        try:
+            command_root = Path(command[2]).resolve(strict=True)
+        except (OSError, RuntimeError, TypeError, ValueError) as error:
+            raise OSError("Git repository root could not be resolved") from error
+        if command_root != self._repository_root:
+            raise OSError("Git invocation escaped the reviewed repository")
+
+        kwargs["timeout"] = TRUSTED_GIT_TIMEOUT_SECONDS
+        kwargs["env"] = self._environment
+        result = self._run_callable(
+            [str(self._git_executable), *command[1:]],
+            **kwargs,
+        )
+        for stream in (result.stdout, result.stderr):
+            if (
+                isinstance(stream, (bytes, str))
+                and len(stream) > MAX_TRUSTED_GIT_OUTPUT_BYTES
+            ):
+                raise OSError("Git output exceeded the boundary verification limit")
+        return result
+
+
+def read_clean_index_file(
+    repository_root: Path,
+    relative_path: str,
+    *,
+    max_bytes: int,
+) -> tuple[bytes, str]:
+    try:
+        resolved_root = Path(repository_root).resolve(strict=True)
+    except (OSError, RuntimeError, TypeError, ValueError) as error:
+        raise DeployFailure(
+            "Reviewed repository root could not be resolved."
+        ) from error
+    candidate = PurePosixPath(relative_path)
+    if (
+        candidate.is_absolute()
+        or not candidate.parts
+        or "." in candidate.parts
+        or ".." in candidate.parts
+        or candidate.as_posix() != relative_path
+        or max_bytes <= 0
+    ):
+        raise DeployFailure("Reviewed repository file path is invalid.")
+
+    git_executable = resolve_trusted_git_executable()
+    git = _TrustedGitSubprocess(
+        subprocess.run,
+        git_executable,
+        resolved_root,
+    )
+
+    def read_head_and_status() -> str:
+        head_result = git.run(
+            ["git", "-C", str(resolved_root), "rev-parse", "HEAD"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        status_result = git.run(
+            ["git", "-C", str(resolved_root), "status", "--porcelain=v1"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        head = (
+            head_result.stdout.strip()
+            if head_result.returncode == 0
+            and isinstance(head_result.stdout, str)
+            else ""
+        )
+        if (
+            re.fullmatch(r"[0-9a-f]{40}", head) is None
+            or status_result.returncode != 0
+            or not isinstance(status_result.stdout, str)
+            or status_result.stdout
+        ):
+            raise DeployFailure(
+                "Reviewed repository must be clean before loading release code."
+            )
+        return head
+
+    initial_head = read_head_and_status()
+    index_result = git.run(
+        [
+            "git",
+            "-C",
+            str(resolved_root),
+            "ls-files",
+            "-z",
+            "--cached",
+            "--stage",
+            "--",
+            relative_path,
+        ],
+        check=False,
+        capture_output=True,
+    )
+    if (
+        index_result.returncode != 0
+        or not isinstance(index_result.stdout, bytes)
+    ):
+        raise DeployFailure(
+            "Reviewed repository file index entry could not be read."
+        )
+    entries = [
+        entry
+        for entry in index_result.stdout.split(b"\x00")
+        if entry
+    ]
+    if len(entries) != 1:
+        raise DeployFailure(
+            "Reviewed repository file has no unique index entry."
+        )
+    try:
+        metadata, raw_path = entries[0].split(b"\t", 1)
+        mode, object_id_bytes, stage = metadata.split()
+        indexed_path = raw_path.decode(
+            "utf-8",
+            errors="surrogateescape",
+        ).replace("\\", "/")
+        object_id = object_id_bytes.decode("ascii")
+    except (UnicodeDecodeError, ValueError) as error:
+        raise DeployFailure(
+            "Reviewed repository file index entry is malformed."
+        ) from error
+    if (
+        mode not in {b"100644", b"100755"}
+        or stage != b"0"
+        or indexed_path != relative_path
+        or re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", object_id)
+        is None
+    ):
+        raise DeployFailure(
+            "Reviewed repository file index entry is not an exact regular file."
+        )
+
+    size_result = git.run(
+        [
+            "git",
+            "-C",
+            str(resolved_root),
+            "cat-file",
+            "-s",
+            object_id,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    try:
+        object_size = int(size_result.stdout.strip())
+    except (AttributeError, TypeError, ValueError) as error:
+        raise DeployFailure(
+            "Reviewed repository file size could not be established."
+        ) from error
+    if (
+        size_result.returncode != 0
+        or object_size <= 0
+        or object_size > max_bytes
+    ):
+        raise DeployFailure(
+            "Reviewed repository file exceeds its execution limit."
+        )
+
+    blob_result = git.run(
+        [
+            "git",
+            "-C",
+            str(resolved_root),
+            "cat-file",
+            "blob",
+            object_id,
+        ],
+        check=False,
+        capture_output=True,
+    )
+    if (
+        blob_result.returncode != 0
+        or not isinstance(blob_result.stdout, bytes)
+        or len(blob_result.stdout) != object_size
+    ):
+        raise DeployFailure(
+            "Reviewed repository file bytes could not be read exactly."
+        )
+
+    worktree_path = resolved_root.joinpath(*candidate.parts)
+    try:
+        metadata = worktree_path.lstat()
+        if (
+            worktree_path.is_symlink()
+            or not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_size != object_size
+            or metadata.st_size > max_bytes
+        ):
+            raise OSError("worktree file metadata mismatch")
+        with worktree_path.open("rb") as handle:
+            worktree_payload = handle.read(max_bytes + 1)
+    except OSError as error:
+        raise DeployFailure(
+            "Reviewed worktree file could not be verified."
+        ) from error
+    if (
+        len(worktree_payload) != object_size
+        or not secrets.compare_digest(
+            worktree_payload,
+            blob_result.stdout,
+        )
+    ):
+        raise DeployFailure(
+            "Reviewed worktree file differs from its clean Git index bytes."
+        )
+
+    final_head = read_head_and_status()
+    if final_head != initial_head:
+        raise DeployFailure(
+            "Reviewed repository changed while release code was loaded."
+        )
+    return blob_result.stdout, initial_head
+
+
+def run_reviewed_boundary_scan(repository_root: Path) -> object:
+    expected_root = Path(__file__).resolve().parents[1]
+    try:
+        resolved_root = Path(repository_root).resolve(strict=True)
+    except (OSError, RuntimeError, TypeError, ValueError) as error:
+        raise DeployFailure(
+            "Reviewed public-boundary scanner repository could not be resolved."
+        ) from error
+    if resolved_root != expected_root:
+        raise DeployFailure(
+            "Reviewed public-boundary scanner must run from this repository."
+        )
+
+    scanner_path = resolved_root / "scripts" / "validate-proprietary-boundary.py"
+    scanner_payload, bootstrap_head = read_clean_index_file(
+        resolved_root,
+        "scripts/validate-proprietary-boundary.py",
+        max_bytes=MAX_BOUNDARY_SCANNER_BYTES,
+    )
+
+    previous_module = sys.modules.get(BOUNDARY_SCANNER_MODULE_NAME)
+    had_previous_module = BOUNDARY_SCANNER_MODULE_NAME in sys.modules
+    try:
+        scanner_module = types.ModuleType(BOUNDARY_SCANNER_MODULE_NAME)
+        scanner_module.__file__ = str(scanner_path)
+        scanner_module.__package__ = None
+        sys.modules[BOUNDARY_SCANNER_MODULE_NAME] = scanner_module
+        scanner_code = compile(
+            scanner_payload,
+            str(scanner_path),
+            "exec",
+        )
+        exec(scanner_code, scanner_module.__dict__)
+        if (
+            not callable(
+                getattr(scanner_module, "resolve_trusted_git_executable", None)
+            )
+            or not callable(getattr(scanner_module, "run_git", None))
+        ):
+            raise AttributeError(
+                "boundary scanner protected Git execution unavailable"
+            )
+        scanner = getattr(scanner_module, "scan_repository_report", None)
+        if not callable(scanner):
+            raise AttributeError("boundary scanner entry point unavailable")
+        report = scanner(resolved_root)
+        if (
+            getattr(report, "git_head", None) != bootstrap_head
+            or getattr(report, "git_dirty", None) is not False
+        ):
+            raise ValueError(
+                "boundary scanner did not retain the reviewed clean commit"
+            )
+        return report
+    except Exception as error:
+        raise DeployFailure(
+            "Reviewed public-boundary scanner could not be executed."
+        ) from error
+    finally:
+        if had_previous_module:
+            sys.modules[BOUNDARY_SCANNER_MODULE_NAME] = previous_module
+        else:
+            sys.modules.pop(BOUNDARY_SCANNER_MODULE_NAME, None)
+
+
+def verify_current_boundary_scan(
+    scan_report: object,
+    receipt: dict[str, object],
+    *,
+    expected_artifact_path: str,
+    expected_zip_sha256: str,
+    expected_record_hash: str,
+) -> None:
+    try:
+        findings = scan_report.findings
+        git_head = scan_report.git_head
+        git_dirty = scan_report.git_dirty
+        git_index_sha256 = scan_report.git_index_content_sha256
+        worktree_sha256 = scan_report.worktree_content_sha256
+        repository_sha256 = scan_report.repository_content_sha256
+        asset_manifest_sha256 = scan_report.asset_manifest_sha256
+        public_snapshot_sha256 = (
+            scan_report.public_snapshot_payload_sha256
+        )
+        release_artifacts = scan_report.release_artifacts
+    except (AttributeError, TypeError) as error:
+        raise DeployFailure(
+            "Reviewed public-boundary scanner returned an invalid report."
+        ) from error
+
+    if (
+        not isinstance(findings, tuple)
+        or findings
+        or git_dirty is not False
+        or not isinstance(git_head, str)
+        or re.fullmatch(r"[0-9a-f]{40}", git_head) is None
+        or not _is_sha256(git_index_sha256)
+        or not _is_sha256(worktree_sha256)
+        or not _is_sha256(repository_sha256)
+        or not _is_sha256(asset_manifest_sha256)
+        or not _is_sha256(public_snapshot_sha256)
+        or git_index_sha256 != worktree_sha256
+        or repository_sha256 != worktree_sha256
+        or public_snapshot_sha256 != expected_record_hash
+        or not isinstance(release_artifacts, tuple)
+        or len(release_artifacts) > MAX_BOUNDARY_RELEASE_ARTIFACTS
+    ):
+        raise DeployFailure(
+            "Reviewed public-boundary scan did not prove a clean current release."
+        )
+
+    matching_artifact_hashes: list[str] = []
+    for entry in release_artifacts:
+        if (
+            not isinstance(entry, tuple)
+            or len(entry) != 2
+            or not isinstance(entry[0], str)
+            or not _is_sha256(entry[1])
+        ):
+            raise DeployFailure(
+                "Reviewed public-boundary scanner returned an invalid artifact inventory."
+            )
+        if entry[0] == expected_artifact_path:
+            matching_artifact_hashes.append(entry[1])
+    if matching_artifact_hashes != [expected_zip_sha256]:
+        raise DeployFailure(
+            "Reviewed public-boundary scan did not match the exact release artifact."
+        )
+
+    repository = receipt["repository"]
+    public_boundary = receipt["public_boundary"]
+    artifact = receipt["artifact"]
+    assert isinstance(repository, dict)
+    assert isinstance(public_boundary, dict)
+    assert isinstance(artifact, dict)
+    if (
+        repository["git_head"] != git_head
+        or repository["git_dirty"] is not False
+        or repository["git_index_content_sha256"] != git_index_sha256
+        or repository["worktree_content_sha256"] != worktree_sha256
+        or public_boundary["repository_content_sha256"]
+        != repository_sha256
+        or public_boundary["asset_manifest_sha256"]
+        != asset_manifest_sha256
+        or public_boundary["public_snapshot_payload_sha256"]
+        != public_snapshot_sha256
+        or public_boundary["finding_count"] != 0
+        or artifact["path"] != expected_artifact_path
+        or artifact["sha256"] != expected_zip_sha256
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt does not match the current reviewed repository."
+        )
+
+
+def validate_boundary_receipt(
+    receipt_path: Path,
+    *,
+    version: str,
+    slug: str,
+    zip_sha256: str,
+    record_hash: str,
+    artifact_path: str | None = None,
+    repository_root: Path | None = None,
+    current_time: datetime | None = None,
+    scan_report: object | None = None,
+) -> dict[str, str]:
+    try:
+        with Path(receipt_path).open("rb") as receipt_file:
+            payload = receipt_file.read(MAX_BOUNDARY_RECEIPT_BYTES + 1)
+    except (OSError, TypeError, ValueError) as error:
+        raise DeployFailure(
+            "Public boundary release receipt could not be read."
+        ) from error
+    if len(payload) > MAX_BOUNDARY_RECEIPT_BYTES:
+        raise DeployFailure(
+            "Public boundary release receipt exceeds the safe size limit."
+        )
+
+    try:
+        receipt = json.loads(
+            payload.decode("utf-8"),
+            object_pairs_hook=_json_object_without_duplicate_keys,
+        )
+    except (
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+        RecursionError,
+        ValueError,
+    ) as error:
+        raise DeployFailure(
+            "Public boundary release receipt is invalid JSON."
+        ) from error
+
+    if not _has_exact_keys(
+        receipt,
+        {
+            "schema_version",
+            "receipt_type",
+            "release_mode",
+            "created_at",
+            "repository",
+            "public_boundary",
+            "artifact",
+            "receipt_body_sha256",
+        },
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt has an unexpected shape."
+        )
+    assert isinstance(receipt, dict)
+
+    stored_body_sha256 = receipt["receipt_body_sha256"]
+    if not _is_sha256(stored_body_sha256):
+        raise DeployFailure(
+            "Public boundary release receipt body hash is invalid."
+        )
+    receipt_body = {
+        key: value
+        for key, value in receipt.items()
+        if key != "receipt_body_sha256"
+    }
+    try:
+        canonical_body = json.dumps(
+            receipt_body,
+            ensure_ascii=False,
+            allow_nan=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    except (TypeError, ValueError, RecursionError) as error:
+        raise DeployFailure(
+            "Public boundary release receipt body is not canonicalizable."
+        ) from error
+    recomputed_body_sha256 = hashlib.sha256(canonical_body).hexdigest()
+    assert isinstance(stored_body_sha256, str)
+    if not secrets.compare_digest(
+        stored_body_sha256,
+        recomputed_body_sha256,
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt body hash does not match."
+        )
+
+    repository = receipt["repository"]
+    public_boundary = receipt["public_boundary"]
+    artifact = receipt["artifact"]
+    if (
+        type(receipt["schema_version"]) is not int
+        or receipt["schema_version"] != 1
+        or receipt["receipt_type"] != BOUNDARY_RECEIPT_TYPE
+        or receipt["release_mode"] is not True
+        or not _has_exact_keys(
+            repository,
+            {
+                "git_head",
+                "git_dirty",
+                "git_index_content_sha256",
+                "worktree_content_sha256",
+            },
+        )
+        or not _has_exact_keys(
+            public_boundary,
+            {
+                "repository_content_sha256",
+                "asset_manifest_sha256",
+                "public_snapshot_payload_sha256",
+                "finding_count",
+            },
+        )
+        or not _has_exact_keys(artifact, {"path", "sha256"})
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt is not a valid release receipt."
+        )
+    assert isinstance(repository, dict)
+    assert isinstance(public_boundary, dict)
+    assert isinstance(artifact, dict)
+
+    created_at = receipt["created_at"]
+    if (
+        not isinstance(created_at, str)
+        or re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
+            r"(?:\.\d{1,6})?(?:Z|\+00:00)",
+            created_at,
+        )
+        is None
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt timestamp is not UTC."
+        )
+    try:
+        parsed_created_at = datetime.fromisoformat(
+            created_at.removesuffix("Z") + (
+                "+00:00" if created_at.endswith("Z") else ""
+            )
+        )
+    except ValueError as error:
+        raise DeployFailure(
+            "Public boundary release receipt timestamp is invalid."
+        ) from error
+    if parsed_created_at.utcoffset() != timedelta(0):
+        raise DeployFailure(
+            "Public boundary release receipt timestamp is not UTC."
+        )
+    now = current_time or datetime.now(timezone.utc)
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise DeployFailure(
+            "Current release time must include a UTC offset."
+        )
+    now = now.astimezone(timezone.utc)
+    receipt_age = now - parsed_created_at
+    if (
+        receipt_age > BOUNDARY_RECEIPT_MAX_AGE
+        or receipt_age < -BOUNDARY_RECEIPT_MAX_FUTURE_SKEW
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt timestamp is outside the release window."
+        )
+
+    git_head = repository["git_head"]
+    if (
+        repository["git_dirty"] is not False
+        or not isinstance(git_head, str)
+        or re.fullmatch(r"[0-9a-f]{40}", git_head) is None
+        or not _is_sha256(repository["git_index_content_sha256"])
+        or not _is_sha256(repository["worktree_content_sha256"])
+        or not _is_sha256(public_boundary["repository_content_sha256"])
+        or not _is_sha256(public_boundary["asset_manifest_sha256"])
+        or not _is_sha256(public_boundary["public_snapshot_payload_sha256"])
+        or type(public_boundary["finding_count"]) is not int
+        or public_boundary["finding_count"] != 0
+        or repository["git_index_content_sha256"]
+        != repository["worktree_content_sha256"]
+        or public_boundary["repository_content_sha256"]
+        != repository["worktree_content_sha256"]
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt did not pass the release gate."
+        )
+
+    if artifact_path is not None and artifact_path != "hosting/robots.txt":
+        raise DeployFailure(
+            "Public boundary release artifact path is not approved."
+        )
+    expected_artifact_path = (
+        artifact_path
+        if artifact_path is not None
+        else f"plugin-dist/{slug}-{version}.zip"
+    )
+    expected_zip_sha256 = zip_sha256.lower()
+    expected_record_hash = record_hash.lower()
+    if (
+        artifact["path"] != expected_artifact_path
+        or artifact["sha256"] != expected_zip_sha256
+        or public_boundary["public_snapshot_payload_sha256"]
+        != expected_record_hash
+    ):
+        raise DeployFailure(
+            "Public boundary release receipt does not match the reviewed release."
+        )
+
+    if scan_report is None:
+        scan_report = run_reviewed_boundary_scan(
+            repository_root or Path(__file__).resolve().parents[1]
+        )
+    verify_current_boundary_scan(
+        scan_report,
+        receipt,
+        expected_artifact_path=expected_artifact_path,
+        expected_zip_sha256=expected_zip_sha256,
+        expected_record_hash=expected_record_hash,
+    )
+
+    return {
+        "receipt_body_sha256": recomputed_body_sha256,
+        "git_head": git_head,
+        "artifact_path": expected_artifact_path,
+    }
+
+
 def make_auth(user: str, password: str) -> str:
     encoded = base64.b64encode(f"{user}:{password}".encode()).decode()
     return f"Basic {encoded}"
@@ -295,12 +1140,56 @@ def json_body(status: int, content_type: str, body: str, context: str) -> dict:
     if status < 200 or status >= 300:
         kind = "managed-host HTML/WAF response" if "html" in content_type else "JSON/API response"
         raise DeployFailure(f"{context} failed with HTTP {status} ({kind}).")
+    if content_type.split(";", 1)[0].strip().lower() != "application/json":
+        raise DeployFailure(f"{context} returned an unexpected content type.")
     try:
-        parsed = json.loads(body)
-    except json.JSONDecodeError as error:
+        parsed = _strict_json_loads(body)
+    except (
+        json.JSONDecodeError,
+        RecursionError,
+        UnicodeError,
+        ValueError,
+    ) as error:
         raise DeployFailure(f"{context} returned invalid JSON.") from error
     if not isinstance(parsed, dict):
         raise DeployFailure(f"{context} returned an unexpected JSON shape.")
+    return parsed
+
+
+def verify_deploy_callback(
+    status: int,
+    content_type: str,
+    body: str,
+    *,
+    expected_version: str,
+) -> dict[str, object]:
+    if status != 200 or "json" not in content_type.lower():
+        raise DeployFailure(
+            "Plugin deploy callback did not exactly confirm the bound release."
+        )
+    try:
+        parsed = json.loads(
+            body,
+            object_pairs_hook=_json_object_without_duplicate_keys,
+        )
+    except (
+        json.JSONDecodeError,
+        RecursionError,
+        ValueError,
+    ) as error:
+        raise DeployFailure(
+            "Plugin deploy callback did not exactly confirm the bound release."
+        ) from error
+    if (
+        not _has_exact_keys(parsed, DEPLOY_CALLBACK_FIELDS)
+        or parsed["result"] is not True
+        or parsed["active"] is not True
+        or parsed["version"] != expected_version
+        or parsed["artifact_verified"] is not True
+    ):
+        raise DeployFailure(
+            "Plugin deploy callback did not exactly confirm the bound release."
+        )
     return parsed
 
 
@@ -388,13 +1277,33 @@ def verify_manifest(
     inventory_url: str,
     record_hash: str,
 ) -> dict[str, str | int]:
-    missing = sorted(REQUIRED_MANIFEST_FIELDS - set(manifest))
-    if missing:
+    if set(manifest) != REQUIRED_MANIFEST_FIELDS:
         raise DeployFailure(
-            "Public update manifest is missing required fields."
+            "Public update manifest fields are not exact."
         )
     if (
-        manifest.get("slug") != slug
+        any(
+            not isinstance(manifest.get(field), str)
+            or not manifest[field].strip()
+            for field in {
+                "author",
+                "homepage",
+                "last_updated",
+                "name",
+                "requires",
+                "requires_php",
+                "slug",
+                "tested",
+                "version",
+                "download_url",
+                "download_sha256",
+                "inventory_url",
+                "record_hash",
+            }
+        )
+        or not isinstance(manifest.get("download_size"), int)
+        or isinstance(manifest.get("download_size"), bool)
+        or manifest.get("slug") != slug
         or manifest.get("version") != version
         or manifest.get("download_url") != zip_url
         or manifest.get("download_sha256") != zip_sha256.lower()
@@ -402,7 +1311,7 @@ def verify_manifest(
         or manifest.get("inventory_url") != inventory_url
         or manifest.get("record_hash") != record_hash.lower()
         or manifest.get("homepage") != "https://robbottx.com/"
-        or not isinstance(manifest.get("sections"), dict)
+        or not _has_exact_keys(manifest.get("sections"), {"changelog"})
         or not isinstance(manifest["sections"].get("changelog"), str)
         or not manifest["sections"]["changelog"].strip()
     ):
@@ -427,7 +1336,29 @@ def verify_inventory(
 ) -> dict[str, int | str]:
     expected_artifact = f"{slug}-{version}.zip"
     if (
-        inventory.get("artifact") != expected_artifact
+        set(inventory) != {
+            "artifact",
+            "files",
+            "version",
+            "zip_bytes",
+            "zip_sha256",
+        }
+        or not isinstance(inventory.get("artifact"), str)
+        or not isinstance(inventory.get("version"), str)
+        or not isinstance(inventory.get("zip_sha256"), str)
+        or not isinstance(inventory.get("zip_bytes"), int)
+        or isinstance(inventory.get("zip_bytes"), bool)
+        or not isinstance(inventory.get("files"), list)
+        or any(
+            not _has_exact_keys(file_record, {"bytes", "path", "sha256"})
+            or not isinstance(file_record["path"], str)
+            or not isinstance(file_record["bytes"], int)
+            or isinstance(file_record["bytes"], bool)
+            or file_record["bytes"] < 0
+            or not _is_sha256(file_record["sha256"])
+            for file_record in inventory.get("files", [])
+        )
+        or inventory.get("artifact") != expected_artifact
         or inventory.get("version") != version
         or inventory.get("zip_sha256") != zip_sha256.lower()
         or inventory.get("zip_bytes") != zip_size
@@ -440,6 +1371,44 @@ def verify_inventory(
         "inventory_files": len(packaged_files),
         "inventory_zip_sha256": zip_sha256.lower(),
     }
+
+
+def require_snippet_capacity(base_url: str, auth: str) -> int:
+    status, content_type, body = request(
+        (
+            f"{base_url}/wp-json/code-snippets/v1/snippets"
+            "?per_page=100&page=1"
+        ),
+        auth=auth,
+        timeout=60,
+    )
+    if status < 200 or status >= 300:
+        raise DeployFailure("Code Snippets capacity verification failed.")
+    try:
+        snippets = _strict_json_loads(body)
+    except (
+        json.JSONDecodeError,
+        RecursionError,
+        UnicodeError,
+        ValueError,
+    ) as error:
+        raise DeployFailure(
+            "Code Snippets capacity verification returned invalid JSON."
+        ) from error
+    if (
+        content_type.split(";", 1)[0].strip().lower()
+        != "application/json"
+        or not isinstance(snippets, list)
+    ):
+        raise DeployFailure(
+            "Code Snippets capacity verification returned an unexpected shape."
+        )
+    snippet_count = len(snippets)
+    if snippet_count > MAX_CODE_SNIPPETS_RECORDS:
+        raise DeployFailure(
+            "Code Snippets has insufficient safe temporary capacity."
+        )
+    return snippet_count
 
 
 def verify_rendered_body(
@@ -929,8 +1898,52 @@ def parse_created_snippet_id(created: dict) -> int:
     return snippet_id
 
 
+def require_current_boundary_for_mutation(
+    args: argparse.Namespace,
+    initial_identity: dict[str, str],
+    route_template_head: str,
+) -> None:
+    current_identity = validate_boundary_receipt(
+        args.boundary_receipt,
+        version=args.version,
+        slug=args.plugin_slug,
+        zip_sha256=args.zip_sha256,
+        record_hash=args.record_hash,
+    )
+    if (
+        current_identity != initial_identity
+        or current_identity.get("git_head") != route_template_head
+    ):
+        raise DeployFailure(
+            "Public boundary changed before the WordPress mutation."
+        )
+
+
 def main() -> int:
     args = parse_args()
+    boundary_identity = validate_boundary_receipt(
+        args.boundary_receipt,
+        version=args.version,
+        slug=args.plugin_slug,
+        zip_sha256=args.zip_sha256,
+        record_hash=args.record_hash,
+    )
+    route_template_payload, route_template_head = read_clean_index_file(
+        Path(__file__).resolve().parents[1],
+        "scripts/templates/deploy-route.php.txt",
+        max_bytes=MAX_DEPLOY_ROUTE_TEMPLATE_BYTES,
+    )
+    if route_template_head != boundary_identity["git_head"]:
+        raise DeployFailure(
+            "Deploy route template is not bound to the reviewed release commit."
+        )
+    try:
+        route_template = route_template_payload.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise DeployFailure(
+            "Deploy route template is not valid UTF-8."
+        ) from error
+
     base_url = required_env("WP_BASE_URL").rstrip("/")
     inventory_url, manifest_url = validate_release_inputs(args, base_url)
     user = required_env("WP_USER")
@@ -1020,6 +2033,7 @@ def main() -> int:
         packaged_files=packaged_files,
     )
 
+    snippet_count = require_snippet_capacity(base_url, auth)
     require_route_not_registered(base_url, legacy_route_path)
     require_route_not_registered(base_url, route_path)
     require_deploy_route_absent(
@@ -1056,6 +2070,8 @@ def main() -> int:
                     "manifest_verified": True,
                     "inventory_files": inventory_receipt["inventory_files"],
                     "inventory_verified": True,
+                    "snippet_count": snippet_count,
+                    "snippet_limit": MAX_CODE_SNIPPETS_RECORDS,
                     "route_absent": True,
                     "snippet_name_absent": True,
                     "execute": False,
@@ -1065,12 +2081,7 @@ def main() -> int:
         )
         return 0
 
-    template_path = (
-        Path(__file__).resolve().parent
-        / "templates"
-        / "deploy-route.php.txt"
-    )
-    route_code = template_path.read_text(encoding="utf-8")
+    route_code = route_template
     encoded_zip_url = base64.b64encode(
         args.zip_url.encode("utf-8")
     ).decode("ascii")
@@ -1085,6 +2096,12 @@ def main() -> int:
     )
     if re.search(r"\{\{[A-Z0-9_]+\}\}", route_code):
         raise DeployFailure("Deploy route template contains unresolved placeholders.")
+
+    require_current_boundary_for_mutation(
+        args,
+        boundary_identity,
+        route_template_head,
+    )
 
     snippet_id: int | None = None
     snippet_deleted = False
@@ -1109,27 +2126,20 @@ def main() -> int:
         created = json_body(status, content_type, body, "Temporary route creation")
         snippet_id = parse_created_snippet_id(created)
 
-        try:
-            status, content_type, body = request(
-                f"{base_url}{route_path}",
-                method="POST",
-                auth=auth,
-                payload={},
-                timeout=180,
-            )
-            deployed = json_body(
-                status,
-                content_type,
-                body,
-                "Plugin_Upgrader deployment",
-            )
-            callback_confirmed = (
-                deployed.get("result") is True
-                and deployed.get("active") is True
-                and deployed.get("version") == args.version
-            )
-        except Exception:
-            callback_confirmed = False
+        status, content_type, body = request(
+            f"{base_url}{route_path}",
+            method="POST",
+            auth=auth,
+            payload={},
+            timeout=180,
+        )
+        verify_deploy_callback(
+            status,
+            content_type,
+            body,
+            expected_version=args.version,
+        )
+        callback_confirmed = True
 
         status, content_type, body = request(
             add_cache_buster(f"{base_url}{args.health_path}"),

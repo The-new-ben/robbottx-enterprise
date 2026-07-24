@@ -10,6 +10,25 @@
 - Added local contract, forbidden-input, theme, PHP, snapshot, and preview
   verification.
 
+## 0.1.6
+
+- Changed the exact inherited public routes from visible noindex pages to
+  HTTP 410 responses that use the established theme error surface.
+- Preserved the inherited records for administrators and editors without
+  deleting or rewriting database content.
+- Kept public author discovery disabled as a site-wide privacy policy while
+  preserving editorial access.
+- Closed the empty shop, cart, checkout, account, product, product-taxonomy,
+  and Store API discovery surfaces while preserving their administration
+  records. They can return only in a later reviewed release with a real
+  catalog and offer evidence.
+- Kept retired responses uncached and noindex after the WordPress query
+  transition.
+- Expanded the public-discovery harness to prove the response, template,
+  cache, robots, administration, editorial, and inactive-commerce boundaries.
+- Advanced the theme package to 0.1.5 with an in-body release identity so the
+  active presentation transition can be verified independently.
+
 ## 0.1.5
 
 - Added complete JSON Schema 2020-12 execution before the canonical

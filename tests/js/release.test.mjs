@@ -38,21 +38,21 @@ test('plugin version header, constant, manifest, and block agree', async () => {
     path.join(
       repositoryRoot,
       'plugin-dist',
-      'robbottx-core-0.1.5.inventory.json'
+      'robbottx-core-0.1.6.inventory.json'
     )
   );
   const snapshot = await readJson(snapshotPath);
 
-  assert.match(plugin, /\* Version:\s+0\.1\.5/);
-  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.5'\)/);
-  assert.equal(block.version, '0.1.5');
-  assert.equal(manifest.version, '0.1.5');
-  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.5.zip'));
+  assert.match(plugin, /\* Version:\s+0\.1\.6/);
+  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.6'\)/);
+  assert.equal(block.version, '0.1.6');
+  assert.equal(manifest.version, '0.1.6');
+  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.6.zip'));
   assert.equal(manifest.download_sha256, inventory.zip_sha256);
   assert.equal(manifest.download_size, inventory.zip_bytes);
   assert.ok(
     manifest.inventory_url.endsWith(
-      'robbottx-core-0.1.5.inventory.json'
+      'robbottx-core-0.1.6.inventory.json'
     )
   );
   assert.equal(manifest.record_hash, snapshot.payload_sha256);
@@ -90,6 +90,10 @@ test('the deployed record is executable PHP, not a directly readable JSON asset'
   assert.match(packaged, /^<\?php/);
   assert.ok(packaged.includes("if (! defined('ABSPATH'))"));
   assert.ok(packaged.includes("<<<'ROBBOTTX_RECORD'"));
+  assert.ok(!packaged.includes('"projection_state"'));
+  assert.ok(!packaged.includes('"snapshot_id"'));
+  assert.ok(!packaged.includes('"source_dataset_id"'));
+  assert.ok(!packaged.includes('"source_dataset_sha256"'));
   await assert.rejects(fs.access(publicJsonPath));
 });
 
@@ -108,6 +112,24 @@ test('plugin emits a versioned rendered-body marker for deploy verification', as
 
   assert.ok(plugin.includes("add_action('wp_footer'"));
   assert.ok(plugin.includes('<!-- robbottx-core:'));
+});
+
+test('the hosting root carries the exact public robots policy', async () => {
+  const robots = await fs.readFile(
+    path.join(repositoryRoot, 'hosting', 'robots.txt'),
+    'utf8'
+  );
+
+  assert.equal(
+    robots.replaceAll('\r\n', '\n'),
+    [
+      'User-agent: *',
+      'Disallow:',
+      '',
+      'Sitemap: https://robbottx.com/wp-sitemap.xml',
+      ''
+    ].join('\n')
+  );
 });
 
 test('homepage SEO is deterministic and evidence-conservative', async () => {
@@ -244,7 +266,7 @@ test('homepage asset discipline preserves every commerce context', async () => {
   }
 });
 
-test('theme language release preserves the previous container during deployment', async () => {
+test('theme release preserves the catalog container and exposes deployment identity', async () => {
   const style = await fs.readFile(
     path.join(
       repositoryRoot,
@@ -255,10 +277,34 @@ test('theme language release preserves the previous container during deployment'
     ),
     'utf8'
   );
+  const functions = await fs.readFile(
+    path.join(
+      repositoryRoot,
+      'wp-content',
+      'themes',
+      'robbottx',
+      'functions.php'
+    ),
+    'utf8'
+  );
+  const frontPage = await fs.readFile(
+    path.join(
+      repositoryRoot,
+      'wp-content',
+      'themes',
+      'robbottx',
+      'templates',
+      'front-page.html'
+    ),
+    'utf8'
+  );
 
-  assert.ok(style.includes('Version: 0.1.4'));
+  assert.ok(style.includes('Version: 0.1.5'));
   assert.ok(style.includes('.rbtx-golden-slice'));
   assert.ok(style.includes('.rbtx-featured-configuration'));
+  assert.ok(functions.includes("'wp_body_open'"));
+  assert.ok(functions.includes('<!-- robbottx-theme:%s -->'));
+  assert.ok(frontPage.includes('rbtx-main rbtx-atlas-home'));
 });
 
 test('theme ships an original cache-versioned favicon with guarded output', async () => {
@@ -291,7 +337,7 @@ test('theme ships an original cache-versioned favicon with guarded output', asyn
       favicon
     )
   );
-  assert.equal(receipt.version, '0.1.4');
+  assert.equal(receipt.version, '0.1.5');
   assert.equal(receipt.assets[0].path, 'assets/favicon.svg');
 });
 

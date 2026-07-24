@@ -1,0 +1,360 @@
+add_action( 'rest_api_init', static function (): void {
+    $pages = array(
+        29 => array(
+            'slug'    => 'shop',
+            'title'   => 'Shop',
+            'woo_key' => 'shop',
+        ),
+        30 => array(
+            'slug'    => 'cart',
+            'title'   => 'Cart',
+            'woo_key' => 'cart',
+        ),
+        31 => array(
+            'slug'    => 'checkout',
+            'title'   => 'Checkout',
+            'woo_key' => 'checkout',
+        ),
+        32 => array(
+            'slug'    => 'my-account',
+            'title'   => 'My account',
+            'woo_key' => 'myaccount',
+        ),
+    );
+
+    $permission = static function () use ( $pages ): bool {
+        if (
+            ! current_user_can( 'update_plugins' )
+            || ! current_user_can( 'manage_options' )
+            || ! current_user_can( 'manage_woocommerce' )
+            || ! current_user_can( 'edit_published_pages' )
+        ) {
+            return false;
+        }
+
+        foreach ( array_keys( $pages ) as $page_id ) {
+            if ( ! current_user_can( 'edit_post', $page_id ) ) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    $state = static function () use ( $pages ): array {
+        $page_ids = array();
+        foreach ( $pages as $expected ) {
+            $page_ids[ $expected['slug'] ] = function_exists(
+                'wc_get_page_id'
+            )
+                ? (int) wc_get_page_id( $expected['woo_key'] )
+                : 0;
+        }
+
+        return array(
+            'coming_soon'      => (string) get_option(
+                'woocommerce_coming_soon',
+                ''
+            ),
+            'store_pages_only' => (string) get_option(
+                'woocommerce_store_pages_only',
+                ''
+            ),
+            'page_ids'         => $page_ids,
+        );
+    };
+
+    register_rest_route(
+        'agentconfigure/v1',
+        '/run-{{ROUTE_TOKEN}}',
+        array(
+            array(
+                'methods'             => 'GET',
+                'permission_callback' => $permission,
+                'callback'            => static function () use ( $state ) {
+                    return $state();
+                },
+            ),
+            array(
+                'methods'             => 'POST',
+                'permission_callback' => $permission,
+                'callback'            => static function () use (
+                    $pages,
+                    $state
+                ) {
+                    if (
+                        ! defined( 'WC_VERSION' )
+                        || ! function_exists( 'wc_get_page_id' )
+                    ) {
+                        return new WP_Error(
+                            'robbottx_woocommerce_absent',
+                            'WooCommerce is not active.',
+                            array( 'status' => 409 )
+                        );
+                    }
+
+                    foreach ( $pages as $page_id => $expected ) {
+                        $page = get_post( $page_id );
+                        $permalink = get_permalink( $page_id );
+                        $expected_permalink = home_url(
+                            '/' . $expected['slug'] . '/'
+                        );
+                        if (
+                            ! $page instanceof WP_Post
+                            || 'page' !== $page->post_type
+                            || 'publish' !== $page->post_status
+                            || $expected['slug'] !== $page->post_name
+                            || (int) wc_get_page_id(
+                                $expected['woo_key']
+                            ) !== $page_id
+                            || ! is_string( $permalink )
+                            || untrailingslashit( $permalink )
+                            !== untrailingslashit( $expected_permalink )
+                        ) {
+                            return new WP_Error(
+                                'robbottx_commerce_page_mismatch',
+                                'A commerce page identity did not match.',
+                                array( 'status' => 409 )
+                            );
+                        }
+                    }
+
+                    $original_titles = array();
+                    foreach ( $pages as $page_id => $expected ) {
+                        $page = get_post( $page_id );
+                        if ( ! $page instanceof WP_Post ) {
+                            return new WP_Error(
+                                'robbottx_commerce_snapshot_failed',
+                                'The original commerce state was not read.',
+                                array( 'status' => 500 )
+                            );
+                        }
+                        $original_titles[ $page_id ] = $page->post_title;
+                    }
+                    $original_coming_soon = (string) get_option(
+                        'woocommerce_coming_soon',
+                        ''
+                    );
+                    if (
+                        ! in_array(
+                            $original_coming_soon,
+                            array( 'yes', 'no' ),
+                            true
+                        )
+                    ) {
+                        return new WP_Error(
+                            'robbottx_commerce_snapshot_failed',
+                            'The original commerce state was not exact.',
+                            array( 'status' => 500 )
+                        );
+                    }
+
+                    global $wpdb;
+                    if ( ! is_object( $wpdb ) ) {
+                        return new WP_Error(
+                            'robbottx_commerce_transaction_unavailable',
+                            'The commerce transaction is unavailable.',
+                            array( 'status' => 500 )
+                        );
+                    }
+
+                    $clear_transaction_caches = static function () use (
+                        $pages
+                    ): void {
+                        foreach ( array_keys( $pages ) as $page_id ) {
+                            clean_post_cache( $page_id );
+                        }
+                        wp_cache_delete(
+                            'woocommerce_coming_soon',
+                            'options'
+                        );
+                        wp_cache_delete( 'alloptions', 'options' );
+                        wp_cache_delete( 'notoptions', 'options' );
+                    };
+                    $verify_original_state = static function () use (
+                        $original_coming_soon,
+                        $original_titles,
+                        $pages
+                    ): bool {
+                        foreach ( array_keys( $pages ) as $page_id ) {
+                            $page = get_post( $page_id );
+                            if (
+                                ! $page instanceof WP_Post
+                                || $original_titles[ $page_id ]
+                                !== $page->post_title
+                            ) {
+                                return false;
+                            }
+                        }
+
+                        return $original_coming_soon
+                            === (string) get_option(
+                                'woocommerce_coming_soon',
+                                ''
+                            );
+                    };
+
+                    if (
+                        false === $wpdb->query( 'START TRANSACTION' )
+                    ) {
+                        return new WP_Error(
+                            'robbottx_commerce_transaction_start_failed',
+                            'The commerce transaction did not start.',
+                            array( 'status' => 500 )
+                        );
+                    }
+                    $transaction_active = true;
+                    $rollback = static function () use (
+                        &$transaction_active,
+                        $clear_transaction_caches,
+                        $verify_original_state,
+                        $wpdb
+                    ): bool {
+                        if ( ! $transaction_active ) {
+                            return false;
+                        }
+                        $rolled_back = false
+                            !== $wpdb->query( 'ROLLBACK' );
+                        $transaction_active = false;
+                        $clear_transaction_caches();
+
+                        return $rolled_back
+                            && $verify_original_state();
+                    };
+                    $abort_transaction = static function () use (
+                        $rollback
+                    ): WP_Error {
+                        try {
+                            $restored = $rollback();
+                        } catch ( Throwable $error ) {
+                            $restored = false;
+                        }
+                        if ( ! $restored ) {
+                            return new WP_Error(
+                                'robbottx_commerce_rollback_failed',
+                                'The original commerce state was not restored.',
+                                array( 'status' => 500 )
+                            );
+                        }
+
+                        return new WP_Error(
+                            'robbottx_commerce_transaction_rolled_back',
+                            'Commerce configuration was not applied.',
+                            array( 'status' => 500 )
+                        );
+                    };
+
+                    try {
+                        $changed_titles = array();
+                        $failure = null;
+                        foreach ( $pages as $page_id => $expected ) {
+                            $page = get_post( $page_id );
+                            if (
+                                $page instanceof WP_Post
+                                && $expected['title'] === $page->post_title
+                            ) {
+                                $changed_titles[ $expected['slug'] ] = false;
+                                continue;
+                            }
+
+                            $updated = wp_update_post(
+                                wp_slash(
+                                    array(
+                                        'ID'         => $page_id,
+                                        'post_title' => $expected['title'],
+                                    )
+                                ),
+                                true
+                            );
+                            if ( is_wp_error( $updated ) ) {
+                                $failure = new WP_Error(
+                                    'robbottx_commerce_title_write_failed',
+                                    'A commerce title was not applied.',
+                                    array( 'status' => 500 )
+                                );
+                                break;
+                            }
+                            $changed_titles[ $expected['slug'] ] = true;
+                        }
+
+                        $verified_titles = array();
+                        if ( null === $failure ) {
+                            foreach ( $pages as $page_id => $expected ) {
+                                $page = get_post( $page_id );
+                                $permalink = get_permalink( $page_id );
+                                $expected_permalink = home_url(
+                                    '/' . $expected['slug'] . '/'
+                                );
+                                if (
+                                    ! $page instanceof WP_Post
+                                    || 'page' !== $page->post_type
+                                    || 'publish' !== $page->post_status
+                                    || $expected['slug'] !== $page->post_name
+                                    || $expected['title'] !== $page->post_title
+                                    || (int) wc_get_page_id(
+                                        $expected['woo_key']
+                                    ) !== $page_id
+                                    || ! is_string( $permalink )
+                                    || untrailingslashit( $permalink )
+                                    !== untrailingslashit(
+                                        $expected_permalink
+                                    )
+                                ) {
+                                    $failure = new WP_Error(
+                                        'robbottx_commerce_state_not_applied',
+                                        'A commerce page state was not applied.',
+                                        array( 'status' => 500 )
+                                    );
+                                    break;
+                                }
+                                $verified_titles[ $expected['slug'] ] = true;
+                            }
+                        }
+
+                        if ( null === $failure ) {
+                            update_option(
+                                'woocommerce_coming_soon',
+                                'no'
+                            );
+                            if (
+                                'no' !== get_option(
+                                    'woocommerce_coming_soon'
+                                )
+                            ) {
+                                $failure = new WP_Error(
+                                    'robbottx_store_visibility_not_applied',
+                                    'Store visibility was not applied.',
+                                    array( 'status' => 500 )
+                                );
+                            }
+                        }
+
+                        if ( null !== $failure ) {
+                            return $abort_transaction();
+                        }
+
+                        if ( false === $wpdb->query( 'COMMIT' ) ) {
+                            return $abort_transaction();
+                        }
+                        $transaction_active = false;
+                    } catch ( Throwable $error ) {
+                        return $abort_transaction();
+                    }
+                    $clear_transaction_caches();
+
+                    do_action( 'litespeed_purge_all' );
+                    wp_cache_flush();
+
+                    return array(
+                        'result'           => true,
+                        'store_live'       => true,
+                        'titles_verified'  => $verified_titles,
+                        'titles_changed'   => $changed_titles,
+                        'cache_flush_sent' => true,
+                        'state'            => $state(),
+                    );
+                },
+            ),
+        )
+    );
+} );

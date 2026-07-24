@@ -287,11 +287,7 @@ return json_decode(
     },
     "summary": "A documented TurtleBot3 configuration pairing the Waffle Pi mobile base with OpenMANIPULATOR-X. Manufacturer sources describe the relationship. Review the compatibility section for exact revision, power, software, safety, and integration conditions."
   },
-  "payload_sha256": "8e859aaedfac1e7204399d050ec0da19f71f00113842edd9622c969dad4deb52",
-  "projection_state": "candidate",
-  "snapshot_id": "RBTX:S:019f8ff9-bcc4-7872-ab79-4a4d594d0aa3",
-  "source_dataset_id": "RBTX:S:019f8f7d-996c-7c8f-9035-1e398f9aa36f",
-  "source_dataset_sha256": "6bcf98e577786db49a2fd11dfbea20daf240e2dec34dfa27713c419ea5e09707"
+  "payload_sha256": "8e859aaedfac1e7204399d050ec0da19f71f00113842edd9622c969dad4deb52"
 }
 ROBBOTTX_RECORD,
     true,

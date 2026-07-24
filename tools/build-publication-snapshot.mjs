@@ -12,6 +12,12 @@ import path from 'node:path';
 
 const dataset = await readJson(fixturePath);
 const snapshot = buildSnapshot(dataset);
+const packagedRecord = {
+  format_version: snapshot.format_version,
+  generated_at: snapshot.generated_at,
+  payload: snapshot.payload,
+  payload_sha256: snapshot.payload_sha256
+};
 await writeJson(snapshotPath, snapshot);
 await fs.mkdir(path.dirname(packagedSnapshotPath), { recursive: true });
 await fs.writeFile(
@@ -26,7 +32,7 @@ if (! defined('ABSPATH')) {
 
 return json_decode(
     <<<'ROBBOTTX_RECORD'
-${stableStringify(snapshot, 2)}
+${stableStringify(packagedRecord, 2)}
 ROBBOTTX_RECORD,
     true,
     512,

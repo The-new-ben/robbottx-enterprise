@@ -36,7 +36,7 @@ if (!String(themeJson.$schema).includes('/wp/6.9/')) {
 const style = await fs.readFile(path.join(themeRoot, 'style.css'), 'utf8');
 for (const header of [
   'Theme Name: RobbottX Precision Atlas',
-  'Version: 0.1.4',
+  'Version: 0.1.5',
   'Requires at least: 6.9',
   'Requires PHP: 8.3'
 ]) {
@@ -48,7 +48,7 @@ const readme = await fs.readFile(path.join(themeRoot, 'readme.txt'), 'utf8');
 const assetLicenses = JSON.parse(
   await fs.readFile(path.join(themeRoot, 'ASSET-LICENSES.json'), 'utf8')
 );
-if (!readme.includes('Version: 0.1.4') || assetLicenses.version !== '0.1.4') {
+if (!readme.includes('Version: 0.1.5') || assetLicenses.version !== '0.1.5') {
   throw new Error('Theme style, readme, and asset receipt versions must agree.');
 }
 if (/url\(\s*['"]?https?:/i.test(style) || /@import/i.test(style)) {
