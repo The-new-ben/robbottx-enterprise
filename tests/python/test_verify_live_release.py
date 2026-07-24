@@ -3057,18 +3057,20 @@ class VerifyLiveReleaseTests(unittest.TestCase):
             )
         )
         invalid_evidence = {
-            "missing_element": "",
-            "invalid_attributes": invalid_attributes,
-            "stale_timestamp": offer_evidence_html(
-                offer_clock - timedelta(hours=24, minutes=1)
+            "missing_element": lambda: "",
+            "invalid_attributes": lambda: invalid_attributes,
+            "stale_timestamp": lambda: offer_evidence_html(
+                datetime.now(timezone.utc).replace(microsecond=0)
+                - timedelta(hours=24, minutes=1)
             ),
-            "future_timestamp": offer_evidence_html(
-                offer_clock + timedelta(minutes=10)
+            "future_timestamp": lambda: offer_evidence_html(
+                datetime.now(timezone.utc).replace(microsecond=0)
+                + timedelta(minutes=10)
             ),
         }
-        for case, evidence_html in invalid_evidence.items():
+        for case, evidence_factory in invalid_evidence.items():
             with self.subTest(case=case):
-                result = prove(evidence_html)
+                result = prove(evidence_factory())
                 self.assertTrue(result["operational"])
                 self.assertFalse(result["passed"])
                 self.assertEqual(
