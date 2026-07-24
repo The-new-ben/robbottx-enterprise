@@ -436,7 +436,10 @@ def verify_lighthouse_pin(repository_root: Path) -> dict[str, str]:
 
 
 def normalize_windows_path(value: Path | str) -> str:
-    normalized = ntpath.normpath(str(value).replace("/", "\\"))
+    raw_value = str(value).replace("/", "\\")
+    if raw_value.startswith("\\\\?\\"):
+        raw_value = raw_value[4:]
+    normalized = ntpath.normpath(raw_value)
     return normalized.rstrip("\\").lower()
 
 
@@ -475,6 +478,34 @@ def known_windows_cleanup_error(
         for token in disallowed_diagnostics
     ):
         return False
+    lighthouse_13_pattern = re.compile(
+        r"^(?:runtime error encountered:|error:)\s*"
+        r"eperm,\s*permission denied:\s*"
+        r"(?P<path>\\\\\?\\[^'\"]+?)\s+['\"](?P=path)['\"]$",
+        re.IGNORECASE,
+    )
+    if len(lines) >= 3:
+        runtime_match = lighthouse_13_pattern.fullmatch(lines[0])
+        error_match = lighthouse_13_pattern.fullmatch(lines[1])
+        rm_sync_match = re.fullmatch(
+            r"at rmsync \(node:fs:[0-9]+:[0-9]+\)",
+            lines[2],
+            re.IGNORECASE,
+        )
+        if (
+            runtime_match is not None
+            and error_match is not None
+            and lines[0].lower().startswith("runtime error encountered:")
+            and lines[1].lower().startswith("error:")
+            and runtime_match.group("path").lower()
+            == error_match.group("path").lower()
+            and rm_sync_match is not None
+        ):
+            lines = [
+                "Error: EPERM, permission denied, rmdir "
+                f"'{runtime_match.group('path')}'",
+                *lines[3:],
+            ]
     primary_pattern = re.compile(
         r"^(?:error:\s*)?eperm(?:[:,]\s*)"
         r"(?:permission denied|operation not permitted),?\s*"
@@ -485,6 +516,7 @@ def known_windows_cleanup_error(
     structured_paths: list[str] = []
     structured_syscalls: list[str] = []
     launcher_seen = False
+    owned_prefix = root + "\\"
     for line in lines:
         normalized = line.replace("/", "\\").lower()
         primary_match = primary_pattern.fullmatch(line)
@@ -494,7 +526,6 @@ def known_windows_cleanup_error(
             if windows_path_has_traversal(raw_failed_path):
                 return False
             failed_path = normalize_windows_path(raw_failed_path)
-            owned_prefix = root + "\\"
             relative_path = (
                 failed_path[len(owned_prefix):]
                 if failed_path.startswith(owned_prefix)

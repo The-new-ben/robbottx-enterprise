@@ -488,6 +488,60 @@ class RunLighthouseTests(unittest.TestCase):
             )
         )
 
+    def test_known_windows_cleanup_warning_accepts_lighthouse_13_shape(self):
+        owned = Path(
+            r"C:\Users\example\AppData\Local\Temp"
+            r"\robbottx-lighthouse-owned"
+        )
+        extended_owned = rf"\\?\{owned}"
+        failed_path = f"{extended_owned}\\lighthouse.76418190"
+        reviewed = (
+            "Runtime error encountered: EPERM, Permission denied: "
+            f"{failed_path} '{failed_path}'\n"
+            "Error: EPERM, Permission denied: "
+            f"{failed_path} '{failed_path}'\n"
+            "    at rmSync (node:fs:1212:18)\n"
+            "    at Launcher.destroyTmp "
+            "(file:///C:/repo/node_modules/chrome-launcher/"
+            "dist/chrome-launcher.js:367:9)\n"
+            "    at runLighthouse "
+            "(file:///C:/repo/node_modules/lighthouse/cli/run.js:217:21)\n"
+        )
+        self.assertTrue(
+            lighthouse.known_windows_cleanup_error(
+                reviewed,
+                returncode=1,
+                owned_temp_root=owned,
+                platform_name="nt",
+            )
+        )
+        for invalid in (
+            reviewed.replace(
+                "Runtime error encountered:",
+                "Runtime navigation failed:",
+            ),
+            reviewed.replace("Error: EPERM", "Warning: EPERM"),
+            reviewed.replace("    at rmSync (node:fs:1212:18)\n", ""),
+            reviewed.replace("chrome-launcher", "unrelated-module"),
+            reviewed.replace(
+                "robbottx-lighthouse-owned",
+                "robbottx-lighthouse-owned-other",
+            ),
+            reviewed.replace(
+                f"'{failed_path}'",
+                rf"'\\?\C:\outside\lighthouse.76418190'",
+            ),
+        ):
+            with self.subTest(invalid=invalid[-100:]):
+                self.assertFalse(
+                    lighthouse.known_windows_cleanup_error(
+                        invalid,
+                        returncode=1,
+                        owned_temp_root=owned,
+                        platform_name="nt",
+                    )
+                )
+
     def test_aggregate_requires_all_six_reports_and_computes_medians(self):
         reports = []
         scores = {
