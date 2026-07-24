@@ -82,6 +82,7 @@ class DeployWordPressThemeTests(unittest.TestCase):
             new_body_marker='data-theme-release="0.1.3"',
             old_body_marker='data-theme-release="0.1.2"',
             expect_fallback_favicon=True,
+            previous_favicon_absent=False,
             output=(
                 Path(self.temporary_directory.name)
                 / "theme-deploy-evidence.json"
@@ -118,6 +119,10 @@ class DeployWordPressThemeTests(unittest.TestCase):
             {"package_marker": " short "},
             {"new_body_marker": "same-marker", "old_body_marker": "same-marker"},
             {"render_path": "https://example.test/"},
+            {
+                "expect_fallback_favicon": False,
+                "previous_favicon_absent": True,
+            },
         ]
         for change in invalid_cases:
             with self.subTest(change=change):
@@ -973,6 +978,78 @@ class DeployWordPressThemeTests(unittest.TestCase):
                             True,
                         )
 
+    def test_previous_release_can_prove_exact_favicon_absence(self):
+        document = (
+            "<html><head>"
+            '<link rel="stylesheet" href="/wp-content/themes/robbottx/'
+            'style.css?ver=0.1.3">'
+            "</head><body>"
+            '<main data-theme-release="0.1.3"></main>'
+            "</body></html>"
+        )
+        identity = {
+            "id": 0,
+            "mime_by_url": {},
+            "mode": "theme_fallback",
+            "urls": set(),
+        }
+        with patch.object(
+            deploy,
+            "request",
+            return_value=(
+                200,
+                "text/html; charset=UTF-8",
+                document,
+            ),
+        ):
+            assets = deploy.verify_rendered_transition(
+                "https://example.test",
+                "/",
+                'data-theme-release="0.1.3"',
+                'data-theme-release="0.1.2"',
+                "robbottx",
+                "0.1.3",
+                identity,
+                fetch_assets=False,
+                allow_missing_fallback_favicon=True,
+            )
+
+        self.assertEqual(
+            assets["favicon_mode"],
+            "theme_fallback_absent",
+        )
+        self.assertIsNone(assets["favicon_path"])
+        self.assertEqual(assets["icon_count"], 0)
+
+        for relation in ("icon", "apple-touch-icon", "mask-icon"):
+            unexpected_icon = document.replace(
+                "</head>",
+                f'<link rel="{relation}" href="/wp-content/themes/robbottx/'
+                'assets/favicon.svg?ver=0.1.3"></head>',
+            )
+            with self.subTest(relation=relation):
+                with patch.object(
+                    deploy,
+                    "request",
+                    return_value=(
+                        200,
+                        "text/html; charset=UTF-8",
+                        unexpected_icon,
+                    ),
+                ):
+                    with self.assertRaises(deploy.DeployFailure):
+                        deploy.verify_rendered_transition(
+                            "https://example.test",
+                            "/",
+                            'data-theme-release="0.1.3"',
+                            'data-theme-release="0.1.2"',
+                            "robbottx",
+                            "0.1.3",
+                            identity,
+                            fetch_assets=False,
+                            allow_missing_fallback_favicon=True,
+                        )
+
     def test_rendered_release_rejects_external_decoy_and_duplicate_assets(self):
         valid_style = (
             "/wp-content/themes/robbottx/style.css?ver=0.1.3"
@@ -1022,6 +1099,15 @@ class DeployWordPressThemeTests(unittest.TestCase):
                 + '"><link rel="icon" href="'
                 + valid_icon
                 + '">',
+            ),
+            document(
+                '<link rel="stylesheet" href="'
+                + valid_style
+                + '"><link rel="icon" href="'
+                + valid_icon
+                + '"><link rel="mask-icon" href="'
+                + valid_icon
+                + '">'
             ),
         )
 

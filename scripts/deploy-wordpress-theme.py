@@ -57,6 +57,13 @@ TEXT_ARCHIVE_SUFFIXES = {
     ".svg",
     ".txt",
 }
+ICON_RELATIONS = frozenset(
+    {
+        "apple-touch-icon",
+        "icon",
+        "mask-icon",
+    }
+)
 FORBIDDEN_ARCHIVE_NAMES = {
     ".env",
     "credentials",
@@ -108,6 +115,7 @@ DEPLOY_EVIDENCE_SCHEMA = {
         "configured_site_icon_id": None,
         "new_marker_absent": None,
         "old_marker_present": None,
+        "previous_favicon_absent": None,
         "rendered_assets": RENDER_EVIDENCE_SCHEMA,
     },
     "callback": {
@@ -232,6 +240,14 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Require the theme fallback favicon, or use the negative form "
             "when WordPress has a configured site icon."
+        ),
+    )
+    parser.add_argument(
+        "--previous-favicon-absent",
+        action="store_true",
+        help=(
+            "Require the previous theme release to render no favicon while "
+            "the target release introduces the reviewed fallback favicon."
         ),
     )
     parser.add_argument(
@@ -720,6 +736,13 @@ def validate_inputs(args: argparse.Namespace) -> None:
     if args.previous_version == args.version:
         raise DeployFailure(
             "--previous-version must differ from --version."
+        )
+    if (
+        getattr(args, "previous_favicon_absent", False)
+        and not args.expect_fallback_favicon
+    ):
+        raise DeployFailure(
+            "--previous-favicon-absent requires fallback favicon mode."
         )
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", args.theme_slug):
         raise DeployFailure("--theme-slug must be a lowercase WordPress slug.")
@@ -1935,6 +1958,7 @@ def verify_rendered_transition(
     site_icon_identity: dict,
     *,
     fetch_assets: bool = True,
+    allow_missing_fallback_favicon: bool = False,
 ) -> dict:
     document_url = add_cache_buster(f"{base_url}{render_path}")
     status, content_type, rendered = request(
@@ -1984,14 +2008,19 @@ def verify_rendered_transition(
     )
 
     style_urls: list[str] = []
-    icon_urls: list[str] = []
+    icon_records: list[tuple[frozenset[str], str]] = []
     for link in head_facts.links:
-        relations = {
+        relations = frozenset(
             value.lower()
             for value in link.get("rel", "").split()
-        }
+        )
         href = link.get("href", "")
-        if not href or not relations.intersection({"stylesheet", "icon"}):
+        if (
+            not href
+            or not relations.intersection(
+                ICON_RELATIONS.union({"stylesheet"})
+            )
+        ):
             continue
         resolved = _resolve_head_href(
             document_url,
@@ -2001,15 +2030,20 @@ def verify_rendered_transition(
         )
         path = urllib.parse.urlsplit(resolved).path
         if not _same_origin(document_url, resolved):
-            if "icon" in relations or path == expected_style_path:
+            if (
+                relations.intersection(ICON_RELATIONS)
+                or path == expected_style_path
+            ):
                 raise DeployFailure(
                     "Rendered head contains an external release asset URL."
                 )
             continue
         if "stylesheet" in relations and path == expected_style_path:
             style_urls.append(resolved)
-        if "icon" in relations:
-            icon_urls.append(resolved)
+        if relations.intersection(ICON_RELATIONS):
+            icon_records.append((relations, resolved))
+
+    icon_urls = [url for _, url in icon_records]
 
     if (
         len(style_urls) != 1
@@ -2028,25 +2062,43 @@ def verify_rendered_transition(
 
     favicon_mode = site_icon_identity.get("mode")
     if favicon_mode == "theme_fallback":
-        if (
-            site_icon_identity.get("id") != 0
-            or len(icon_urls) != 1
-            or urllib.parse.urlsplit(icon_urls[0]).path
-            != expected_favicon_path
-            or not _has_only_version_query(icon_urls[0], theme_version)
-        ):
+        if site_icon_identity.get("id") != 0:
             raise DeployFailure(
-                "Rendered head does not contain exactly one versioned "
-                "theme favicon."
+                "Fallback favicon mode conflicts with the site-icon identity."
             )
-        verified_favicon_path = expected_favicon_path
-        if fetch_assets:
-            _fetch_exact_asset(
-                icon_urls[0],
-                label="Theme favicon",
-                allowed_media_types={"image/svg+xml"},
-            )
+        if allow_missing_fallback_favicon:
+            if icon_urls:
+                raise DeployFailure(
+                    "The previous release unexpectedly renders a favicon."
+                )
+            verified_favicon_path = None
+            verified_favicon_mode = "theme_fallback_absent"
+        else:
+            if (
+                len(icon_records) != 1
+                or icon_records[0][0].intersection(ICON_RELATIONS)
+                != {"icon"}
+                or urllib.parse.urlsplit(icon_urls[0]).path
+                != expected_favicon_path
+                or not _has_only_version_query(icon_urls[0], theme_version)
+            ):
+                raise DeployFailure(
+                    "Rendered head does not contain exactly one versioned "
+                    "theme favicon."
+                )
+            verified_favicon_path = expected_favicon_path
+            verified_favicon_mode = favicon_mode
+            if fetch_assets:
+                _fetch_exact_asset(
+                    icon_urls[0],
+                    label="Theme favicon",
+                    allowed_media_types={"image/svg+xml"},
+                )
     elif favicon_mode == "configured_site_icon":
+        if allow_missing_fallback_favicon:
+            raise DeployFailure(
+                "Missing-favicon transition requires fallback favicon mode."
+            )
         allowed_urls = site_icon_identity.get("urls")
         mime_by_url = site_icon_identity.get("mime_by_url")
         if (
@@ -2064,6 +2116,7 @@ def verify_rendered_transition(
                 "WordPress site icon."
             )
         verified_favicon_path = urllib.parse.urlsplit(icon_urls[0]).path
+        verified_favicon_mode = favicon_mode
         if fetch_assets:
             for icon_url in sorted(set(icon_urls)):
                 _fetch_exact_asset(
@@ -2078,8 +2131,8 @@ def verify_rendered_transition(
         "assets_fetched": fetch_assets,
         "base_mode": base_mode,
         "favicon_path": verified_favicon_path,
-        "favicon_mode": favicon_mode,
-        "icon_count": len(icon_urls),
+        "favicon_mode": verified_favicon_mode,
+        "icon_count": len(icon_records),
         "stylesheet_path": expected_style_path,
         "version": theme_version,
     }
@@ -2442,6 +2495,11 @@ def _run_deployment(args: argparse.Namespace, evidence: dict) -> None:
         args.theme_slug,
         args.previous_version,
         before_site_icon,
+        allow_missing_fallback_favicon=getattr(
+            args,
+            "previous_favicon_absent",
+            False,
+        ),
     )
     evidence["before"] = {
         "active_block_theme": True,
@@ -2449,6 +2507,10 @@ def _run_deployment(args: argparse.Namespace, evidence: dict) -> None:
         "configured_site_icon_id": before_site_icon["id"],
         "new_marker_absent": True,
         "old_marker_present": True,
+        "previous_favicon_absent": (
+            before_render.get("favicon_mode")
+            == "theme_fallback_absent"
+        ),
         "rendered_assets": _safe_render_evidence(before_render),
     }
 
