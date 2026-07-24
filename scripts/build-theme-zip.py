@@ -128,9 +128,10 @@ def main() -> int:
         ],
     }
     inventory_path = args.output_dir / f"{args.slug}-{args.version}.inventory.json"
-    inventory_path.write_text(
-        json.dumps(inventory, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    inventory_path.write_bytes(
+        (
+            json.dumps(inventory, indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
     )
     print(f"{output}\t{output.stat().st_size}\t{digest}")
     return 0

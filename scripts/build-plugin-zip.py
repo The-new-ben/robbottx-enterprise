@@ -37,7 +37,7 @@ ALLOWED_APPLICATION_FILES = {
 VENDORED_PREFIX = "lib/plugin-update-checker/"
 VENDORED_FILE_COUNT = 117
 VENDORED_TREE_SHA256 = (
-    "209664c4a743fa59e27cfbb8707d54a200e9a89dc4ed55dad5aa3503ea5535ea"
+    "5eee344091bc55556d5872d82dcd0531f597d0c5cbe029c1b5cdcef45c5ded18"
 )
 
 
@@ -206,9 +206,10 @@ def main() -> int:
         ],
     }
     inventory_path = args.output_dir / f"{args.slug}-{args.version}.inventory.json"
-    inventory_path.write_text(
-        json.dumps(inventory, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    inventory_path.write_bytes(
+        (
+            json.dumps(inventory, indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
     )
 
     print(f"{output}\t{output.stat().st_size}\t{digest}")

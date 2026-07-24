@@ -1331,6 +1331,78 @@ class DeployWordPressTests(unittest.TestCase):
                 "https://robbottx.com",
             )
 
+    def test_public_json_accepts_github_raw_text_plain(self):
+        for content_type in (
+            "application/json; charset=utf-8",
+            "text/plain; charset=utf-8",
+        ):
+            with (
+                self.subTest(content_type=content_type),
+                patch.object(
+                    deploy,
+                    "request",
+                    return_value=(
+                        200,
+                        content_type,
+                        '{"slug":"robbottx-core"}',
+                    ),
+                ),
+            ):
+                parsed = deploy.load_public_json(
+                    f"{deploy.EXPECTED_RAW_ROOT}/robbottx-core.json",
+                    "Public update manifest",
+                )
+
+            self.assertEqual(parsed, {"slug": "robbottx-core"})
+
+    def test_public_json_keeps_strict_type_and_json_validation(self):
+        invalid_responses = (
+            (
+                200,
+                "text/html; charset=utf-8",
+                '{"slug":"robbottx-core"}',
+            ),
+            (
+                200,
+                "text/plain; charset=utf-8",
+                '{"slug":"first","slug":"second"}',
+            ),
+            (
+                200,
+                "text/plain; charset=utf-8",
+                '["robbottx-core"]',
+            ),
+            (
+                200,
+                "text/plain; charset=utf-8",
+                '{"measurement":NaN}',
+            ),
+            (
+                200,
+                "text/plain; charset=utf-8",
+                '{"measurement":1e9999}',
+            ),
+            (
+                500,
+                "text/plain; charset=utf-8",
+                '{"slug":"robbottx-core"}',
+            ),
+        )
+        for response in invalid_responses:
+            with (
+                self.subTest(response=response),
+                patch.object(
+                    deploy,
+                    "request",
+                    return_value=response,
+                ),
+                self.assertRaises(deploy.DeployFailure),
+            ):
+                deploy.load_public_json(
+                    f"{deploy.EXPECTED_RAW_ROOT}/robbottx-core.json",
+                    "Public update manifest",
+                )
+
     def test_public_zip_rejects_traversal_member(self):
         record_hash = "c" * 64
         archive_buffer = io.BytesIO()

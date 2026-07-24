@@ -1219,7 +1219,36 @@ def load_public_json(url: str, context: str) -> dict:
         add_cache_buster(url),
         timeout=60,
     )
-    return json_body(status, content_type, body, context)
+    if status < 200 or status >= 300:
+        kind = (
+            "managed-host HTML/WAF response"
+            if "html" in content_type.lower()
+            else "JSON/API response"
+        )
+        raise DeployFailure(
+            f"{context} failed with HTTP {status} ({kind})."
+        )
+    media_type = content_type.split(";", 1)[0].strip().lower()
+    if media_type not in {"application/json", "text/plain"}:
+        raise DeployFailure(
+            f"{context} returned an unexpected content type."
+        )
+    try:
+        parsed = _strict_json_loads(body)
+    except (
+        json.JSONDecodeError,
+        RecursionError,
+        UnicodeError,
+        ValueError,
+    ) as error:
+        raise DeployFailure(
+            f"{context} returned invalid JSON."
+        ) from error
+    if not isinstance(parsed, dict):
+        raise DeployFailure(
+            f"{context} returned an unexpected JSON shape."
+        )
+    return parsed
 
 
 def wordpress_json_error_code(
