@@ -3,7 +3,7 @@ Contributors: robbottx
 Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 0.1.8
+Stable tag: 0.1.9
 License: GPLv2 or later
 
 Source-backed robotics records and compatibility views for RobbottX.

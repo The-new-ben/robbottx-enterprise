@@ -36,7 +36,7 @@ final class FlagshipSystemRenderer
             throw new \LogicException('Flagship BOM counts are inconsistent.');
         }
 
-        $imageUrl = ROBBOTTX_CORE_URL . 'assets/flagship-concept-v1.png';
+        $imageUrl = ROBBOTTX_CORE_URL . 'assets/flagship-concept-v1-648.jpg';
 
         ob_start();
         require ROBBOTTX_CORE_DIR

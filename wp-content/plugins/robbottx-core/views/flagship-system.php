@@ -60,8 +60,8 @@ $systemsJson = wp_json_encode(
                 <div class="rbtx-flagship-halo" aria-hidden="true"></div>
                 <img
                     src="<?php echo esc_url($imageUrl); ?>"
-                    width="864"
-                    height="1821"
+                    width="648"
+                    height="1366"
                     alt="<?php esc_attr_e('Original RobbottX dual-arm mobile robot concept in a dark product studio', 'robbottx-core'); ?>"
                     decoding="async"
                     fetchpriority="high"
@@ -102,8 +102,8 @@ $systemsJson = wp_json_encode(
                     <img
                         class="rbtx-canvas-fallback"
                         src="<?php echo esc_url($imageUrl); ?>"
-                        width="864"
-                        height="1821"
+                        width="648"
+                        height="1366"
                         alt="<?php esc_attr_e('Static view of the RobbottX flagship concept', 'robbottx-core'); ?>"
                         loading="lazy"
                         decoding="async"

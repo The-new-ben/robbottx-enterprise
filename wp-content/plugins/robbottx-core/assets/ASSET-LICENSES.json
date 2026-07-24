@@ -1,5 +1,5 @@
 {
-  "version": "0.1.8",
+  "version": "0.1.9",
   "assets": [
     {
       "path": "assets/flagship-concept-v1.png",
@@ -8,6 +8,14 @@
       "public_revision": "flagship-concept-v1",
       "bytes": 1799790,
       "sha256": "4a5ab8d3d595c57d1949b7c2d59e5cbd9da1cc4cf9eea786a9682c007cf1e5f1"
+    },
+    {
+      "path": "assets/flagship-concept-v1-648.jpg",
+      "source": "Web-optimized derivative of the original RobbottX flagship concept artwork",
+      "license": "GPL-2.0-or-later",
+      "public_revision": "flagship-concept-v1-web",
+      "bytes": 89865,
+      "sha256": "eeef9ff3e922b811ae6754fb734f9db53c6f21ac6ba4214cf6dc09fddda5b5f1"
     }
   ],
   "note": "The interactive system geometry, interface code, and concept artwork are original RobbottX release assets. No third-party robot model, CAD file, external font, or runtime library is included."

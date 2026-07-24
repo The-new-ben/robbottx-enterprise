@@ -1,19 +1,19 @@
 {
   "name": "RobbottX Core",
   "slug": "robbottx-core",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "author": "RobbottX",
   "homepage": "https://robbottx.com/",
   "requires": "6.9",
   "tested": "7.0",
   "requires_php": "8.3",
-  "download_url": "https://raw.githubusercontent.com/The-new-ben/robbottx-enterprise/main/plugin-dist/robbottx-core-0.1.8.zip",
-  "download_sha256": "01d8f582cac20edb5b86710f481f872dc34293136b8cafbe48555cbd2153a09a",
-  "download_size": 1994334,
-  "inventory_url": "https://raw.githubusercontent.com/The-new-ben/robbottx-enterprise/main/plugin-dist/robbottx-core-0.1.8.inventory.json",
+  "download_url": "https://raw.githubusercontent.com/The-new-ben/robbottx-enterprise/main/plugin-dist/robbottx-core-0.1.9.zip",
+  "download_sha256": "a11bc922d2eab1c3bf41d362827ff76100f8e0ec574282aad586a26e6d97c877",
+  "download_size": 2083342,
+  "inventory_url": "https://raw.githubusercontent.com/The-new-ben/robbottx-enterprise/main/plugin-dist/robbottx-core-0.1.9.inventory.json",
   "record_hash": "8e859aaedfac1e7204399d050ec0da19f71f00113842edd9622c969dad4deb52",
-  "last_updated": "2026-07-24 19:53:34",
+  "last_updated": "2026-07-24 20:21:30",
   "sections": {
-    "changelog": "<h4>0.1.8</h4><ul><li>Refines flagship color contrast for complete accessibility across the primary action and section labels.</li></ul><h4>0.1.7</h4><ul><li>Introduces the interactive flagship concept, system viewer, five-level BOM pyramid, and mission-profile brief.</li></ul><h4>0.1.6</h4><ul><li>Improves public navigation and search quality by removing unavailable pages from the customer-facing catalog.</li></ul><h4>0.1.5</h4><ul><li>Refines public search, feeds, sitemaps, and robots controls while strengthening catalog record integrity checks.</li></ul><h4>0.1.4</h4><ul><li>Improves homepage accessibility, social metadata, favicon behavior, and asset loading while preserving commerce pages.</li></ul><h4>0.1.3</h4><ul><li>Improves narrow-screen layout for long model identifiers and updates public labels for clearer engineering decisions.</li></ul><h4>0.1.2</h4><ul><li>Adds deterministic homepage description and WebSite/WebPage structured data with Rank Math integration and a guarded fallback.</li></ul><h4>0.1.1</h4><ul><li>Adds an in-body runtime marker for independent deployment verification.</li></ul><h4>0.1.0</h4><ul><li>Introduces source-backed configuration records, compatibility conditions, a public healthcheck, and an update fallback.</li></ul>"
+    "changelog": "<h4>0.1.9</h4><ul><li>Accelerates the flagship experience with a visually matched, web-optimized concept asset.</li></ul><h4>0.1.8</h4><ul><li>Refines flagship color contrast for complete accessibility across the primary action and section labels.</li></ul><h4>0.1.7</h4><ul><li>Introduces the interactive flagship concept, system viewer, five-level BOM pyramid, and mission-profile brief.</li></ul><h4>0.1.6</h4><ul><li>Improves public navigation and search quality by removing unavailable pages from the customer-facing catalog.</li></ul><h4>0.1.5</h4><ul><li>Refines public search, feeds, sitemaps, and robots controls while strengthening catalog record integrity checks.</li></ul><h4>0.1.4</h4><ul><li>Improves homepage accessibility, social metadata, favicon behavior, and asset loading while preserving commerce pages.</li></ul><h4>0.1.3</h4><ul><li>Improves narrow-screen layout for long model identifiers and updates public labels for clearer engineering decisions.</li></ul><h4>0.1.2</h4><ul><li>Adds deterministic homepage description and WebSite/WebPage structured data with Rank Math integration and a guarded fallback.</li></ul><h4>0.1.1</h4><ul><li>Adds an in-body runtime marker for independent deployment verification.</li></ul><h4>0.1.0</h4><ul><li>Introduces source-backed configuration records, compatibility conditions, a public healthcheck, and an update fallback.</li></ul>"
   }
 }

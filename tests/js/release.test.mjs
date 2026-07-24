@@ -39,21 +39,21 @@ test('plugin version header, constant, manifest, and block agree', async () => {
     path.join(
       repositoryRoot,
       'plugin-dist',
-      'robbottx-core-0.1.8.inventory.json'
+      'robbottx-core-0.1.9.inventory.json'
     )
   );
   const snapshot = await readJson(snapshotPath);
 
-  assert.match(plugin, /\* Version:\s+0\.1\.8/);
-  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.8'\)/);
-  assert.equal(block.version, '0.1.8');
-  assert.equal(manifest.version, '0.1.8');
-  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.8.zip'));
+  assert.match(plugin, /\* Version:\s+0\.1\.9/);
+  assert.match(plugin, /define\('ROBBOTTX_CORE_VERSION', '0\.1\.9'\)/);
+  assert.equal(block.version, '0.1.9');
+  assert.equal(manifest.version, '0.1.9');
+  assert.ok(manifest.download_url.endsWith('robbottx-core-0.1.9.zip'));
   assert.equal(manifest.download_sha256, inventory.zip_sha256);
   assert.equal(manifest.download_size, inventory.zip_bytes);
   assert.ok(
     manifest.inventory_url.endsWith(
-      'robbottx-core-0.1.8.inventory.json'
+      'robbottx-core-0.1.9.inventory.json'
     )
   );
   assert.equal(manifest.record_hash, snapshot.payload_sha256);
@@ -513,12 +513,12 @@ test('flagship release is interactive, count-bound, original, and public-safe', 
     path.join(pluginRoot, 'assets', 'ASSET-LICENSES.json')
   );
   const image = await fs.readFile(
-    path.join(pluginRoot, 'assets', 'flagship-concept-v1.png')
+    path.join(pluginRoot, 'assets', 'flagship-concept-v1-648.jpg')
   );
   const publicSource = [renderer, view, script, style].join('\n');
 
   assert.equal(block.name, 'robbottx/flagship-system');
-  assert.equal(block.version, '0.1.8');
+  assert.equal(block.version, '0.1.9');
   assert.equal([...renderer.matchAll(/'id'\s*=>/g)].length, 8);
   for (const runtimeCount of [
     "$counts['systems'] !== 8",
@@ -552,10 +552,15 @@ test('flagship release is interactive, count-bound, original, and public-safe', 
   assert.ok(!/\u2014/u.test(publicSource));
   assert.ok(!/\bRBTX-(?:RS|RP)-\d{3}\b/i.test(publicSource));
   assert.ok(!/\b(?:Tesla|Atlas|Figure|Unitree|Apptronik)\b/.test(publicSource));
-  assert.equal(assetReceipt.version, '0.1.8');
-  assert.equal(assetReceipt.assets[0].bytes, image.byteLength);
+  assert.equal(assetReceipt.version, '0.1.9');
+  const optimizedAsset = assetReceipt.assets.find(
+    (asset) => asset.path === 'assets/flagship-concept-v1-648.jpg'
+  );
+  assert.ok(optimizedAsset);
+  assert.equal(optimizedAsset.bytes, image.byteLength);
+  assert.ok(optimizedAsset.bytes < 100_000);
   assert.equal(
-    assetReceipt.assets[0].sha256,
+    optimizedAsset.sha256,
     crypto.createHash('sha256').update(image).digest('hex')
   );
 });

@@ -14,6 +14,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ALLOWED_APPLICATION_FILES = {
     "assets/ASSET-LICENSES.json",
+    "assets/flagship-concept-v1-648.jpg",
     "assets/flagship-concept-v1.png",
     "assets/flagship-system.css",
     "assets/flagship-system.js",
