@@ -1195,7 +1195,7 @@ def verify_deploy_callback(
 
 def add_cache_buster(url: str) -> str:
     separator = "&" if "?" in url else "?"
-    return f"{url}{separator}rbtxcb={int(time.time())}"
+    return f"{url}{separator}rbtxcb={time.time_ns()}"
 
 
 def verify_public_download_location(
@@ -1610,7 +1610,7 @@ def prove_snippet_record_absent(
     auth: str,
 ) -> tuple[bool, str]:
     status, content_type, body = request(
-        (
+        add_cache_buster(
             f"{base_url}/wp-json/code-snippets/v1/snippets/"
             f"{snippet_id}"
         ),
@@ -1635,7 +1635,7 @@ def delete_temporary_snippet(
     for attempt in range(1, attempts + 1):
         try:
             status, content_type, body = request(
-                (
+                add_cache_buster(
                     f"{base_url}/wp-json/code-snippets/v1/snippets/"
                     f"{snippet_id}?_method=DELETE"
                 ),
@@ -1687,7 +1687,7 @@ def find_snippet_ids_by_name(
     for page in range(1, max_pages + 1):
         try:
             status, content_type, body = request(
-                (
+                add_cache_buster(
                     f"{base_url}/wp-json/code-snippets/v1/snippets"
                     f"?per_page=100&page={page}"
                 ),
@@ -1751,7 +1751,7 @@ def snippet_record_has_exact_name(
 ) -> tuple[bool, list[str]]:
     try:
         status, content_type, body = request(
-            (
+            add_cache_buster(
                 f"{base_url}/wp-json/code-snippets/v1/snippets/"
                 f"{snippet_id}"
             ),
@@ -1763,8 +1763,12 @@ def snippet_record_has_exact_name(
             "snippet ownership lookup raised "
             f"{type(error).__name__}"
         ]
-    if status < 200 or status >= 300:
+    if code_snippets_record_is_missing(status, content_type, body):
         return False, []
+    if status < 200 or status >= 300:
+        return False, [
+            f"snippet ownership lookup returned HTTP {status}"
+        ]
     try:
         record = json.loads(body)
     except json.JSONDecodeError:
@@ -1776,7 +1780,9 @@ def snippet_record_has_exact_name(
         and record.get("name") == snippet_name
     ):
         return True, []
-    return False, []
+    return False, [
+        "created snippet ID did not resolve to the exact one-use name"
+    ]
 
 
 def cleanup_temporary_snippets(
@@ -1796,6 +1802,7 @@ def cleanup_temporary_snippets(
     ids.update(discovered)
     failures.extend(lookup_failures)
 
+    identity_ok = True
     if snippet_id is not None and snippet_id not in ids:
         owned, ownership_failures = snippet_record_has_exact_name(
             base_url,
@@ -1804,6 +1811,7 @@ def cleanup_temporary_snippets(
             auth,
         )
         failures.extend(ownership_failures)
+        identity_ok = not ownership_failures
         if owned:
             ids.add(snippet_id)
 
@@ -1830,7 +1838,12 @@ def cleanup_temporary_snippets(
             "temporary snippet name still resolves after deletion"
         )
 
-    return deletion_ok and lookup_ok and not remaining, failures
+    return (
+        deletion_ok
+        and lookup_ok
+        and identity_ok
+        and not remaining
+    ), failures
 
 
 def prove_deploy_route_absent(
@@ -1893,29 +1906,49 @@ def require_deploy_route_absent(
     raise DeployFailure(message)
 
 
+def prove_route_not_registered(
+    base_url: str,
+    route_path: str,
+) -> tuple[bool, list[str]]:
+    try:
+        status, content_type, body = request(
+            add_cache_buster(f"{base_url}/wp-json/"),
+            timeout=30,
+        )
+        index = json_body(
+            status,
+            content_type,
+            body,
+            "WordPress REST route inventory",
+        )
+        routes = index.get("routes")
+        if not isinstance(routes, dict):
+            return False, [
+                "WordPress REST route inventory has an unexpected shape"
+            ]
+        if route_path.removeprefix("/wp-json") in routes:
+            return False, [
+                "the route remains registered in REST inventory"
+            ]
+        return True, []
+    except Exception as error:
+        return False, [
+            f"REST inventory verification raised {type(error).__name__}"
+        ]
+
+
 def require_route_not_registered(
     base_url: str,
     route_path: str,
 ) -> None:
-    status, content_type, body = request(
-        add_cache_buster(f"{base_url}/wp-json/"),
-        timeout=30,
-    )
-    index = json_body(
-        status,
-        content_type,
-        body,
-        "WordPress REST route inventory",
-    )
-    routes = index.get("routes")
-    if not isinstance(routes, dict):
-        raise DeployFailure(
-            "WordPress REST route inventory has an unexpected shape."
-        )
-    if route_path.removeprefix("/wp-json") in routes:
-        raise DeployFailure(
-            "A stale deploy route is registered before release creation."
-        )
+    absent, failures = prove_route_not_registered(base_url, route_path)
+    if absent:
+        return
+    summary = "; ".join(failures)
+    message = "A stale deploy route is registered before release creation."
+    if summary:
+        message = f"{message} {summary}."
+    raise DeployFailure(message)
 
 
 def parse_created_snippet_id(created: dict) -> int:
@@ -2227,6 +2260,18 @@ def main() -> int:
                 "route absence proof raised "
                 f"{type(error).__name__}"
             )
+        unique_route_unregistered = False
+        try:
+            (
+                unique_route_unregistered,
+                inventory_failures,
+            ) = prove_route_not_registered(base_url, route_path)
+            cleanup_failures.extend(inventory_failures)
+        except Exception as error:
+            cleanup_failures.append(
+                "unique route inventory check raised "
+                f"{type(error).__name__}"
+            )
         legacy_route_absent = True
         try:
             require_route_not_registered(base_url, legacy_route_path)
@@ -2238,6 +2283,7 @@ def main() -> int:
         route_removed = (
             snippet_deleted
             and route_absent
+            and unique_route_unregistered
             and legacy_route_absent
         )
 

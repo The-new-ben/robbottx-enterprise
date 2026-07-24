@@ -1016,7 +1016,7 @@ def confirm_exact_deployment_callback(
 
 def add_cache_buster(url: str) -> str:
     separator = "&" if "?" in url else "?"
-    return f"{url}{separator}rbtxcb={int(time.time())}"
+    return f"{url}{separator}rbtxcb={time.time_ns()}"
 
 
 def verify_theme_zip(
@@ -1335,7 +1335,7 @@ def find_snippet_ids_by_name(
     for page in range(1, max_pages + 1):
         try:
             status, content_type, body = request(
-                (
+                add_cache_buster(
                     f"{base_url}/wp-json/code-snippets/v1/snippets"
                     f"?per_page=100&page={page}"
                 ),
@@ -1420,7 +1420,7 @@ def prove_snippet_record_absent(
     for attempt in range(1, attempts + 1):
         try:
             status, content_type, body = request(
-                (
+                add_cache_buster(
                     f"{base_url}/wp-json/code-snippets/v1/snippets/"
                     f"{snippet_id}"
                 ),
@@ -1458,7 +1458,7 @@ def delete_and_prove_snippet(
     for attempt in range(1, attempts + 1):
         try:
             status, _, _ = request(
-                (
+                add_cache_buster(
                     f"{base_url}/wp-json/code-snippets/v1/snippets/"
                     f"{snippet_id}?_method=DELETE"
                 ),
@@ -1499,7 +1499,7 @@ def verify_snippet_id_matches_name(
 ) -> tuple[bool, bool, list[str]]:
     try:
         status, content_type, body = request(
-            (
+            add_cache_buster(
                 f"{base_url}/wp-json/code-snippets/v1/snippets/"
                 f"{snippet_id}"
             ),

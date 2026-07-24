@@ -702,6 +702,32 @@ class DeployWordPressThemeTests(unittest.TestCase):
             "Basic redacted",
         )
 
+    def test_snippet_lookup_uses_a_fresh_exact_name_inventory(self):
+        response = json.dumps(
+            [
+                {
+                    "id": 91,
+                    "name": "tmp-robbottx-theme-deploy-unique",
+                }
+            ]
+        )
+        with patch.object(
+            deploy,
+            "request",
+            return_value=(200, "application/json", response),
+        ) as request_mock:
+            matches, failures = deploy.find_snippet_ids_by_name(
+                "https://example.test",
+                "tmp-robbottx-theme-deploy-unique",
+                "Basic redacted",
+            )
+
+        self.assertEqual(matches, [91])
+        self.assertEqual(failures, [])
+        lookup_url = request_mock.call_args.args[0]
+        self.assertIn("per_page=100&page=1", lookup_url)
+        self.assertIn("&rbtxcb=", lookup_url)
+
     def test_snippet_record_absence_rejects_route_level_or_html_404(self):
         invalid_responses = [
             (
@@ -814,6 +840,20 @@ class DeployWordPressThemeTests(unittest.TestCase):
 
         self.assertTrue(absent)
         self.assertEqual(request_mock.call_count, 4)
+        for delete_index in (0, 2):
+            delete_call = request_mock.call_args_list[delete_index]
+            self.assertEqual(
+                delete_call.kwargs["method"],
+                "POST",
+            )
+            self.assertIn("_method=DELETE", delete_call.args[0])
+            self.assertIn("rbtxcb=", delete_call.args[0])
+            self.assertEqual(delete_call.kwargs["payload"], {})
+        for proof_index in (1, 3):
+            self.assertIn(
+                "rbtxcb=",
+                request_mock.call_args_list[proof_index].args[0],
+            )
 
     def test_rendered_marker_must_be_inside_closed_body(self):
         response = (

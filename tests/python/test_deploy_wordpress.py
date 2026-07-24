@@ -694,6 +694,11 @@ class DeployWordPressTests(unittest.TestCase):
                 return_value=7,
             ),
             patch.object(deploy, "require_route_not_registered"),
+            patch.object(
+                deploy,
+                "prove_route_not_registered",
+                return_value=(True, []),
+            ),
             patch.object(deploy, "require_deploy_route_absent"),
             patch.object(
                 deploy,
@@ -988,7 +993,13 @@ class DeployWordPressTests(unittest.TestCase):
             patch.object(
                 deploy,
                 "snippet_record_has_exact_name",
-                return_value=(False, []),
+                return_value=(
+                    False,
+                    [
+                        "created snippet ID did not resolve to the "
+                        "exact one-use name"
+                    ],
+                ),
             ),
             patch.object(
                 deploy,
@@ -1003,8 +1014,11 @@ class DeployWordPressTests(unittest.TestCase):
                 7,
             )
 
-        self.assertTrue(cleaned)
-        self.assertEqual(failures, [])
+        self.assertFalse(cleaned)
+        self.assertIn(
+            "created snippet ID did not resolve to the exact one-use name",
+            failures,
+        )
         delete_mock.assert_called_once_with(
             "https://example.test",
             91,
@@ -1022,7 +1036,7 @@ class DeployWordPressTests(unittest.TestCase):
             deploy,
             "request",
             return_value=(200, "application/json", response),
-        ):
+        ) as request_mock:
             matches, failures = deploy.find_snippet_ids_by_name(
                 "https://example.test",
                 "tmp-robbottx-deploy-unique",
@@ -1031,6 +1045,9 @@ class DeployWordPressTests(unittest.TestCase):
 
         self.assertEqual(matches, [8])
         self.assertEqual(failures, [])
+        lookup_url = request_mock.call_args.args[0]
+        self.assertIn("per_page=100&page=1", lookup_url)
+        self.assertIn("&rbtxcb=", lookup_url)
 
     def test_public_zip_requires_exact_hash_size_root_version_and_marker(self):
         record_hash = "c" * 64
@@ -1131,7 +1148,7 @@ class DeployWordPressTests(unittest.TestCase):
                 (200, "application/json", deleted),
                 (500, "application/json", absent),
             ],
-        ):
+        ) as request_mock:
             success, failures = deploy.delete_temporary_snippet(
                 "https://example.test",
                 91,
@@ -1140,6 +1157,41 @@ class DeployWordPressTests(unittest.TestCase):
             )
         self.assertTrue(success)
         self.assertEqual(failures, [])
+        delete_call = request_mock.call_args_list[0]
+        self.assertEqual(delete_call.kwargs["method"], "POST")
+        self.assertIn("_method=DELETE", delete_call.args[0])
+        self.assertIn("rbtxcb=", delete_call.args[0])
+        self.assertEqual(delete_call.kwargs["payload"], {})
+        self.assertIn(
+            "rbtxcb=",
+            request_mock.call_args_list[1].args[0],
+        )
+
+    def test_unique_route_inventory_must_confirm_cleanup(self):
+        route_path = "/wp-json/agentdeploy/v1/run-unique"
+        index = json.dumps(
+            {
+                "routes": {
+                    route_path.removeprefix("/wp-json"): {},
+                }
+            }
+        )
+        with patch.object(
+            deploy,
+            "request",
+            return_value=(200, "application/json", index),
+        ) as request_mock:
+            absent, failures = deploy.prove_route_not_registered(
+                "https://example.test",
+                route_path,
+            )
+
+        self.assertFalse(absent)
+        self.assertEqual(
+            failures,
+            ["the route remains registered in REST inventory"],
+        )
+        self.assertIn("rbtxcb=", request_mock.call_args.args[0])
 
     def test_snippet_absence_accepts_code_snippets_verified_missing_shape(self):
         missing = json.dumps(
