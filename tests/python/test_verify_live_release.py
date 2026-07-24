@@ -22,7 +22,6 @@ sys.modules[SPEC.name] = verify
 SPEC.loader.exec_module(verify)
 
 VALID_OFFER_HASH = "a" * 64
-VALID_OFFER_CLOCK = datetime.now(timezone.utc).replace(microsecond=0)
 
 
 def offer_evidence_html(checked_at: datetime) -> str:
@@ -40,9 +39,10 @@ def offer_evidence_html(checked_at: datetime) -> str:
     )
 
 
-VALID_OFFER_EVIDENCE_HTML = offer_evidence_html(
-    VALID_OFFER_CLOCK
-)
+def current_offer_evidence_html() -> str:
+    return offer_evidence_html(
+        datetime.now(timezone.utc).replace(microsecond=0)
+    )
 
 
 class VerifyLiveReleaseTests(unittest.TestCase):
@@ -1999,7 +1999,7 @@ class VerifyLiveReleaseTests(unittest.TestCase):
                             "<h1 class=\"product_title\">"
                             "Reviewed system</h1>"
                             "<p class=\"stock in-stock\">In stock</p>"
-                            + VALID_OFFER_EVIDENCE_HTML
+                            + current_offer_evidence_html()
                             + "<form class=\"cart\" method=\"post\" "
                             "action=\"/product/reviewed-system/\">"
                             "<button type=\"submit\" "
@@ -2127,7 +2127,7 @@ class VerifyLiveReleaseTests(unittest.TestCase):
             stock_markup=(
                 '<p class="stock in-stock">In stock</p>'
             ),
-            offer_markup=VALID_OFFER_EVIDENCE_HTML,
+            offer_markup=current_offer_evidence_html(),
             related_markup="",
             outside_markup="",
         ):
@@ -2945,7 +2945,7 @@ class VerifyLiveReleaseTests(unittest.TestCase):
                 '<div class="product"><div class="summary">'
                 f'<h1 class="product_title">{title}</h1>'
                 '<p class="stock in-stock">In stock</p>'
-                + VALID_OFFER_EVIDENCE_HTML
+                + current_offer_evidence_html()
                 + '<form class="cart" method="post" '
                 'action="/product/reviewed-system/">'
                 '<button type="submit" name="add-to-cart" '
@@ -3029,16 +3029,18 @@ class VerifyLiveReleaseTests(unittest.TestCase):
                 chrome_path=chrome,
             )
 
-        valid = prove(VALID_OFFER_EVIDENCE_HTML)
+        offer_clock = datetime.now(timezone.utc).replace(microsecond=0)
+        valid_offer_evidence = offer_evidence_html(offer_clock)
+        valid = prove(valid_offer_evidence)
         self.assertTrue(valid["passed"])
         self.assertEqual(valid["dom"]["offerEvidenceCount"], 1)
         self.assertEqual(valid["dom"]["validOfferEvidenceCount"], 1)
 
-        valid_checked_at = VALID_OFFER_CLOCK.strftime(
+        valid_checked_at = offer_clock.strftime(
             "%Y-%m-%dT%H:%M:%SZ"
         )
         invalid_attributes = (
-            VALID_OFFER_EVIDENCE_HTML
+            valid_offer_evidence
             .replace('data-supplier="ROBOTIS"', 'data-supplier=""')
             .replace('data-region="IL"', 'data-region="ISR"')
             .replace(
@@ -3058,10 +3060,10 @@ class VerifyLiveReleaseTests(unittest.TestCase):
             "missing_element": "",
             "invalid_attributes": invalid_attributes,
             "stale_timestamp": offer_evidence_html(
-                VALID_OFFER_CLOCK - timedelta(hours=24, minutes=1)
+                offer_clock - timedelta(hours=24, minutes=1)
             ),
             "future_timestamp": offer_evidence_html(
-                VALID_OFFER_CLOCK + timedelta(minutes=10)
+                offer_clock + timedelta(minutes=10)
             ),
         }
         for case, evidence_html in invalid_evidence.items():
@@ -3096,7 +3098,7 @@ class VerifyLiveReleaseTests(unittest.TestCase):
                 '<div class="product"><div class="summary">'
                 '<h1 class="product_title">Reviewed system</h1>'
                 '<p class="stock in-stock">In stock</p>'
-                + VALID_OFFER_EVIDENCE_HTML
+                + current_offer_evidence_html()
                 + action_markup
                 + "</div></div></main></body></html>"
             )
