@@ -772,6 +772,18 @@
     color: #05201c;
 }
 
+.rbtx-flagship-stage .rbtx-flagship-button--primary {
+    color: #05201c;
+}
+
+.rbtx-bom-section .rbtx-eyebrow {
+    color: #05685d;
+}
+
+.rbtx-mission-panel .rbtx-eyebrow {
+    color: var(--rbtx-accent);
+}
+
 .rbtx-flagship-button--secondary {
     border-color: rgba(239, 251, 248, 0.24);
     color: var(--rbtx-text);
